@@ -60,9 +60,35 @@ angular.module('copay', ['ionic', 'copay.controllers'])
 
     .state('wallet.home', {
       url: "/wallet/home",
-      templateUrl: "templates/menu.html",
       views: {
-        'menuContent' :{
+        'home-tab' :{
+          templateUrl: "templates/home.html"
+        }
+      }
+    })
+
+    .state('wallet.receive', {
+      url: "/wallet/receive",
+      views: {
+        'receive-tab' :{
+          templateUrl: "templates/home.html"
+        }
+      }
+    })
+
+    .state('wallet.send', {
+      url: "/wallet/send",
+      views: {
+        'send-tab' :{
+          templateUrl: "templates/home.html"
+        }
+      }
+    })
+
+    .state('wallet.history', {
+      url: "/wallet/history",
+      views: {
+        'history-tab' :{
           templateUrl: "templates/home.html"
         }
       }
