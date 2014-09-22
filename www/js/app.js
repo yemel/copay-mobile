@@ -80,7 +80,8 @@ angular.module('copay', ['ionic', 'copay.controllers'])
       url: "/wallet/send",
       views: {
         'send-tab' :{
-          templateUrl: "templates/home.html"
+          templateUrl: "templates/send.html",
+          controller: 'SendCtrl'
         }
       }
     })

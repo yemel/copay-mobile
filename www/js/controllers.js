@@ -49,3 +49,9 @@ angular.module('copay.controllers', [])
     name: 'Personal Wallet',
   };
 })
+
+.controller('SendCtrl', function($scope, $state) {
+  $scope.wallet = {
+    name: 'Personal Wallet',
+  };
+})
