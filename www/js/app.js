@@ -51,6 +51,12 @@ angular.module('copay', ['ionic', 'copay.controllers'])
       controller: 'ConfirmPinCtrl'
     })
 
+    .state('profile', {
+      url: "/profile",
+      templateUrl: "templates/profile.html",
+      controller: 'ProfileCtrl'
+    })
+
     .state('wallet', {
       abstract: true,
       templateUrl: "templates/menu.html",

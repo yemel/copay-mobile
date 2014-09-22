@@ -38,6 +38,20 @@ angular.module('copay.controllers', [])
   };
 })
 
+.controller('ProfileCtrl', function($scope, $state) {
+  $scope.profile = {
+    name: 'Yemel Jardi',
+    email: 'angel.jardi@gmail.com',
+    displayUnit: 'BTC',
+    alternativeCurrency: 'USD',
+  }
+  $scope.wallets = [
+    {id: 1, name: 'Personal', copayers: 1, threshold: 1},
+    {id: 2, name: 'BitPay BsAs', copayers: 3, threshold: 2},
+    {id: 3, name: 'Roomates', copayers: 4, threshold: 2},
+  ]
+})
+
 .controller('WalletCtrl', function($scope, $state) {
   $scope.wallet = {
     name: 'Personal Wallet',
