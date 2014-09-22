@@ -70,7 +70,8 @@ angular.module('copay', ['ionic', 'copay.controllers'])
       url: "/wallet/receive",
       views: {
         'receive-tab' :{
-          templateUrl: "templates/home.html"
+          templateUrl: "templates/receive.html",
+          controller: 'ReceiveCtrl'
         }
       }
     })
