@@ -54,6 +54,7 @@ angular.module('copay', ['ionic', 'copay.controllers'])
     .state('wallet', {
       abstract: true,
       templateUrl: "templates/menu.html",
+      controller: 'WalletCtrl'
     })
 
     .state('wallet.home', {
@@ -90,7 +91,8 @@ angular.module('copay', ['ionic', 'copay.controllers'])
       url: "/wallet/history",
       views: {
         'history-tab' :{
-          templateUrl: "templates/home.html"
+          templateUrl: "templates/history.html",
+          controller: 'HistoryCtrl'
         }
       }
     })

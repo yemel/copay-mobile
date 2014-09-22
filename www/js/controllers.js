@@ -38,20 +38,23 @@ angular.module('copay.controllers', [])
   };
 })
 
-.controller('HomeCtrl', function($scope, $state) {
+.controller('WalletCtrl', function($scope, $state) {
   $scope.wallet = {
     name: 'Personal Wallet',
   };
+})
+
+.controller('HomeCtrl', function($scope, $state) {
+})
+
+.controller('HomeCtrl', function($scope, $state) {
 })
 
 .controller('ReceiveCtrl', function($scope, $state) {
-  $scope.wallet = {
-    name: 'Personal Wallet',
-  };
 })
 
 .controller('SendCtrl', function($scope, $state) {
-  $scope.wallet = {
-    name: 'Personal Wallet',
-  };
+})
+
+.controller('HistoryCtrl', function($scope, $state) {
 })
