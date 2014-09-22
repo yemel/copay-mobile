@@ -1,6 +1,6 @@
 // Copay App
 
-angular.module('copay', ['ionic', 'copay.controllers'])
+angular.module('copay', ['ionic', 'copay.controllers', 'copay.services'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {

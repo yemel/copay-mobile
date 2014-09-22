@@ -4,7 +4,7 @@
   </ion-header-bar>
 
   <ion-content>
-    <form ng-submit="submit()">
+    <form ng-submit="submit(loginData)">
       <div class="list">
         <label class="item item-input">
           <span class="input-label">Username</span>
@@ -14,6 +14,7 @@
           <span class="input-label">Password</span>
           <input type="password" ng-model="loginData.password">
         </label>
+          <div style="text-align: center"><span ng-show="UsernameValidate">Invalid Login</span></div>
         <label class="item">
           <button class="button button-block button-positive" type="submit">Log in</button>
         </label>
@@ -21,4 +22,3 @@
     </form>
   </ion-content>
 </ion-view>
-
