@@ -1,8 +1,30 @@
-<ion-view title="Home">
+<ion-view title="{{wallet.name}}">
   <ion-nav-buttons side="left">
     <button menu-toggle="left"class="button button-icon icon ion-navicon"></button>
   </ion-nav-buttons>
+
   <ion-content class="has-header">
-    <h1>Home</h1>
+
+    <div class="card">
+      <div class="item item-divider">
+        <i class="icon ion-social-bitcoin"></i> Balance
+      </div>
+      <div class="item item-text-wrap">
+        12323 bits ~= $234 USD
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="item item-divider">
+        <i class="icon ion-person"></i> Copayers
+      </div>
+      <div class="item item-text-wrap">
+        Yemel Jardi (me)
+      </div>
+      <div class="item item-text-wrap">
+        Manuel Araoz
+      </div>
+    </div>
+
   </ion-content>
 </ion-view>

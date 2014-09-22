@@ -37,3 +37,9 @@ angular.module('copay.controllers', [])
     }
   };
 })
+
+.controller('HomeCtrl', function($scope, $state) {
+  $scope.wallet = {
+    name: 'Personal Wallet',
+  };
+})

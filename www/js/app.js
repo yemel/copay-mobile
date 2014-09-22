@@ -22,13 +22,11 @@ angular.module('copay', ['ionic', 'copay.controllers'])
     .state('welcome', {
       url: "/",
       templateUrl: "templates/welcome.html",
-      // controller: 'WelcomeCtrl'
     })
 
     .state('settings', {
       url: "/settings",
       templateUrl: "templates/settings.html",
-      // controller: 'AppCtrl'
     })
 
     .state('register', {
@@ -62,7 +60,8 @@ angular.module('copay', ['ionic', 'copay.controllers'])
       url: "/wallet/home",
       views: {
         'home-tab' :{
-          templateUrl: "templates/home.html"
+          templateUrl: "templates/home.html",
+          controller: 'HomeCtrl'
         }
       }
     })
@@ -94,50 +93,6 @@ angular.module('copay', ['ionic', 'copay.controllers'])
       }
     })
 
-    // .state('profile.profile', {
-    //   url: "/app",
-    //   abstract: true,
-    //   templateUrl: "templates/menu.html",
-    //   controller: 'AppCtrl'
-    // })
-
-    // .state('profile.search', {
-    //   url: "/search",
-    //   views: {
-    //     'menuContent' :{
-    //       templateUrl: "templates/search.html"
-    //     }
-    //   }
-    // })
-
-    // .state('app.profile.browse', {
-    //   url: "/browse",
-    //   views: {
-    //     'menuContent' :{
-    //       templateUrl: "templates/browse.html"
-    //     }
-    //   }
-    // })
-    // .state('app.profile.playlists', {
-    //   url: "/playlists",
-    //   views: {
-    //     'menuContent' :{
-    //       templateUrl: "templates/playlists.html",
-    //       controller: 'PlaylistsCtrl'
-    //     }
-    //   }
-    // })
-
-    // .state('app.profile.single', {
-    //   url: "/playlists/:playlistId",
-    //   views: {
-    //     'menuContent' :{
-    //       templateUrl: "templates/playlist.html",
-    //       controller: 'PlaylistCtrl'
-    //     }
-    //   }
-    // });
-  // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/');
 });
 
