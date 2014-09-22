@@ -1,0 +1,38 @@
+<ion-view>
+  <ion-header-bar>
+    <h1 class="title">PIN</h1>
+  </ion-header-bar>
+
+  <ion-content>
+    <h3>{{message}}</h3>
+    <div class="row pin">
+      <div class="col"></div>
+      <div class="col">{{digits[0] || '_'}}</div>
+      <div class="col">{{digits[1] || '_'}}</div>
+      <div class="col">{{digits[2] || '_'}}</div>
+      <div class="col">{{digits[3] || '_'}}</div>
+      <div class="col"></div>
+    </div>
+    <div class="button-bar">
+      <button class="button" ng-click="press(1)">1</button>
+      <button class="button" ng-click="press(2)">2</button>
+      <button class="button" ng-click="press(3)">3</button>
+    </div>
+    <div class="button-bar">
+      <button class="button" ng-click="press(4)">4</button>
+      <button class="button" ng-click="press(5)">5</button>
+      <button class="button" ng-click="press(6)">6</button>
+    </div>
+    <div class="button-bar">
+      <button class="button" ng-click="press(7)">7</button>
+      <button class="button" ng-click="press(8)">8</button>
+      <button class="button" ng-click="press(9)">9</button>
+    </div>
+    <div class="button-bar">
+      <button class="button" ng-click="">FORGOT PIN</button>
+      <button class="button" ng-click="press(0)">0</button>
+      <button class="button" ng-click="">CLEAR</button>
+    </div>
+  </ion-content>
+</ion-view>
+
