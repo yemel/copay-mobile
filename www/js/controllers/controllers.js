@@ -19,8 +19,8 @@ angular.module('copay.controllers', [])
                         }
                     }
                 });
-
             }
+            $ionicLoading.hide();
         };
     })
 
