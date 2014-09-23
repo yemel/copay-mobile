@@ -20,6 +20,7 @@ angular.module('copay.controllers', [])
                     }
                 });
             }
+            $scope.usernameValidate = true;
             $ionicLoading.hide();
         };
     })
