@@ -9,6 +9,4 @@
     background:#F00;
 }
 
-.ng-dirty.ng-invalid {
-    background: rgb(255,0,0,0.3);
-}
+.ng-dirty.ng-invalid { background:rgb(255,0,0,0.3); }

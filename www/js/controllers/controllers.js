@@ -1,12 +1,12 @@
 angular.module('copay.controllers', [])
 
-    .controller('RegisterCtrl', function ($scope, $state, DataSrv) {
+    .controller('RegisterCtrl', function ($scope, $state, $ionicLoading, $ionicModal, DataSrv) {
         $scope.usernameValidate = false;
         $scope.submit = function (loginData) {
-            $ionicLoading.show({
-                template: '<i class="icon ion-loading-c"></i> Loading...'
-            });
             if (loginData) {
+                $ionicLoading.show({
+                    template: '<i class="icon ion-loading-c"></i> Doing Something...'
+                });
                 DataSrv.loginToApp(loginData.username, loginData.password, function (err, result) {
                     $ionicLoading.hide();
                     if (err) {
@@ -19,9 +19,9 @@ angular.module('copay.controllers', [])
                         }
                     }
                 });
+            } else {
+                $scope.usernameValidate = true;
             }
-            $scope.usernameValidate = true;
-            $ionicLoading.hide();
         };
     })
 
@@ -31,7 +31,7 @@ angular.module('copay.controllers', [])
 
         $scope.press = function (digit) {
             $scope.digits.push(digit);
-            if ($scope.digits.length == 4) {
+            if ($scope.digits.length === 4) {
                 $state.go('confirmPin');
             }
         };
@@ -43,7 +43,7 @@ angular.module('copay.controllers', [])
 
         $scope.press = function (digit) {
             $scope.digits.push(digit);
-            if ($scope.digits.length == 4) {
+            if ($scope.digits.length === 4) {
                 $state.go('wallet.home');
             }
         };
@@ -67,9 +67,6 @@ angular.module('copay.controllers', [])
         $scope.wallet = {
             name: 'Personal Wallet',
         };
-    })
-
-    .controller('HomeCtrl', function ($scope, $state) {
     })
 
     .controller('HomeCtrl', function ($scope, $state) {
