@@ -3,10 +3,14 @@ angular.module('copay.controllers', [])
     .controller('RegisterCtrl', function ($scope, $state, DataSrv) {
         $scope.usernameValidate = false;
         $scope.submit = function (loginData) {
+            $ionicLoading.show({
+                template: '<i class="icon ion-loading-c"></i> Loading...'
+            });
             if (loginData) {
                 DataSrv.loginToApp(loginData.username, loginData.password, function (err, result) {
+                    $ionicLoading.hide();
                     if (err) {
-                        throw err.message;
+                        console.warn(err.message);
                     } else {
                         if (result) {
                             $state.go('setPin');

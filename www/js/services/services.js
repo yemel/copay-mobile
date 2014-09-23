@@ -6,19 +6,14 @@ angular.module('copay.services', [])
                 var data,
                     err  = null;
 
-                $ionicLoading.show({
-                    template: '<i class="icon ion-loading-c"></i> Doing something...'
-                });
-
                 if (username === 'a' && pwd === 'a') {
-                    data = true;
+                    data = {name: "John", lastname: "Doe", birthdate: '04/04/04'};
                 } else {
-                    data = false;
-                    err = { message: "Invalid Login"};
+                    data = null;
+                    err = { message: "Service Failed" };
                 }
 
                 $timeout(function () {
-                    $ionicLoading.hide();
                     callback(err, data);
                 }, 2000);
             }
