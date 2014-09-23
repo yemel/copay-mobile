@@ -1,17 +1,26 @@
 angular.module('copay.services', [])
 
-    .factory('DataSrv', function () {
+    .factory('DataSrv', function ($ionicLoading, $timeout) {
         return {
-            loginToApp: function (username, pwd) {
-                var data;
+            loginToApp: function (username, pwd, callback) {
+                var data,
+                    err  = null;
+
+                $ionicLoading.show({
+                    template: '<i class="icon ion-loading-c"></i> Doing something...'
+                });
+
                 if (username === 'a' && pwd === 'a') {
                     data = true;
                 } else {
                     data = false;
+                    err = { message: "Invalid Login"};
                 }
-                return {response: function (callback) {
-                    callback(data);
-                } };
+
+                $timeout(function () {
+                    $ionicLoading.hide();
+                    callback(err, data);
+                }, 2000);
             }
         };
     });
