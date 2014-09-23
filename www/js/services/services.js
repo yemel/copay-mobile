@@ -10,7 +10,7 @@ angular.module('copay.services', [])
                     data = {name: "John", lastname: "Doe", birthdate: '04/04/04'};
                 }
 
-                //err = { message: "Service Failed" };
+                err = { message: "Service Failed" };
 
                 $timeout(function () {
                     callback(err, data);
