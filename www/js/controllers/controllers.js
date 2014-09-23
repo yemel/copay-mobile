@@ -1,21 +1,22 @@
 angular.module('copay.controllers', [])
 
     .controller('RegisterCtrl', function ($scope, $state, $ionicLoading, $ionicModal, $timeout, DataSrv) {
-        $scope.UsernameValidate = false;
+        $scope.usernameValidate = false;
         $scope.submit = function (loginData) {
             if (loginData) {
-                if (DataSrv.loginToApp(loginData.username, loginData.password)) {
-                    $ionicLoading.show({
-                        template: '<i class="icon ion-loading-c"></i> Doing something...'
-                    });
-
-                    $timeout(function () {
-                        $ionicLoading.hide();
-                        $state.go('setPin');
-                    }, 2000);
-                } else {
-                    $scope.UsernameValidate = true;
-                }
+                DataSrv.loginToApp(loginData.username, loginData.password).response(function (data) {
+                    if (data) {
+                        $ionicLoading.show({
+                            template: '<i class="icon ion-loading-c"></i> Doing something...'
+                        });
+                        $timeout(function () {
+                            $ionicLoading.hide();
+                            $state.go('setPin');
+                        }, 2000);
+                    } else {
+                        $scope.usernameValidate = true;
+                    }
+                });
             }
         };
     })
