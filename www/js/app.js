@@ -19,23 +19,28 @@ angular.module('copay', ['ionic', 'copay.controllers'])
 .config(function($stateProvider, $urlRouterProvider) {
   $stateProvider
 
-    .state('welcome', {
+    .state('start', {
+      abstract: true,
+      templateUrl: "templates/start.html"
+    })
+
+    .state('start.welcome', {
       url: "/",
-      templateUrl: "templates/welcome.html",
+      templateUrl: "templates/welcome.html"
     })
 
-    .state('settings', {
+    .state('start.settings', {
       url: "/settings",
-      templateUrl: "templates/settings.html",
+      templateUrl: "templates/settings.html"
     })
 
-    .state('register', {
+    .state('start.register', {
       url: "/register",
       templateUrl: "templates/register.html",
       controller: 'RegisterCtrl'
     })
 
-    .state('login', {
+    .state('start.login', {
       url: "/login",
       templateUrl: "templates/login.html",
       controller: 'RegisterCtrl'
@@ -51,11 +56,10 @@ angular.module('copay', ['ionic', 'copay.controllers'])
       controller: 'ConfirmPinCtrl'
     })
 
-
     .state('wallet', {
       url: "/wallet",
       abstract: true,
-      templateUrl: "templates/menu2.html",
+      templateUrl: "templates/menu2.html"
     })
 
     .state('wallet.home', {
