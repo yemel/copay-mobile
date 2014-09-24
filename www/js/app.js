@@ -58,50 +58,59 @@ angular.module('copay', ['ionic', 'copay.controllers'])
     })
 
     .state('wallet', {
+      url: "/wallet",
       abstract: true,
-      templateUrl: "templates/menu.html",
-      controller: 'WalletCtrl'
+      templateUrl: "templates/menu2.html",
     })
 
     .state('wallet.home', {
-      url: "/wallet/home",
+      url: "/home",
       views: {
-        'home-tab' :{
-          templateUrl: "templates/home.html",
-          controller: 'HomeCtrl'
+        'menuContent' :{
+          templateUrl: "templates/empty.html"
         }
       }
-    })
+    });
 
-    .state('wallet.receive', {
-      url: "/wallet/receive",
-      views: {
-        'receive-tab' :{
-          templateUrl: "templates/receive.html",
-          controller: 'ReceiveCtrl'
-        }
-      }
-    })
+    // .state('wallet.home', {
+    //   url: "/wallet/home",
+    //   views: {
+    //     'home-tab' :{
+    //       templateUrl: "templates/home.html",
+    //       controller: 'HomeCtrl'
+    //     }
+    //   }
+    // })
 
-    .state('wallet.send', {
-      url: "/wallet/send",
-      views: {
-        'send-tab' :{
-          templateUrl: "templates/send.html",
-          controller: 'SendCtrl'
-        }
-      }
-    })
+    // .state('wallet.receive', {
+    //   url: "/wallet/receive",
+    //   views: {
+    //     'receive-tab' :{
+    //       templateUrl: "templates/receive.html",
+    //       controller: 'ReceiveCtrl'
+    //     }
+    //   }
+    // })
 
-    .state('wallet.history', {
-      url: "/wallet/history",
-      views: {
-        'history-tab' :{
-          templateUrl: "templates/history.html",
-          controller: 'HistoryCtrl'
-        }
-      }
-    })
+    // .state('wallet.send', {
+    //   url: "/wallet/send",
+    //   views: {
+    //     'send-tab' :{
+    //       templateUrl: "templates/send.html",
+    //       controller: 'SendCtrl'
+    //     }
+    //   }
+    // })
+
+    // .state('wallet.history', {
+    //   url: "/wallet/history",
+    //   views: {
+    //     'history-tab' :{
+    //       templateUrl: "templates/history.html",
+    //       controller: 'HistoryCtrl'
+    //     }
+    //   }
+    // })
 
   $urlRouterProvider.otherwise('/');
 });

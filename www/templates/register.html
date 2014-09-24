@@ -1,9 +1,10 @@
-<ion-view>
-  <ion-header-bar>
-    <h1 class="title">Create Profile</h1>
-  </ion-header-bar>
+<ion-view title="New Profile">
 
-  <ion-content class="has-header">
+  <ion-nav-buttons side="right">
+    <a class="button button-clear" ui-sref="settings">Settings</a>
+  </ion-nav-buttons>
+
+  <ion-content>
     <form ng-submit="submit()">
       <div class="list">
         <label class="item item-input">
