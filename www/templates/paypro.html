@@ -1,0 +1,37 @@
+<ion-view title="Payment">
+
+  <ion-content class="has-header">
+
+    <div class="card">
+      <div class="item item-divider">
+        Send
+      </div>
+
+      <form ng-submit="newProposal()">
+          <label class="item item-input item-select">
+            <span class="input-label" disabled>Wallet</span>
+            <select>
+              <option selected>Personal Wallet</option>
+              <option>BitPay BsAs</option>
+            </select>
+          </label>
+          <label class="item item-input">
+            <input type="text" placeholder="Merchant's Name" disabled>
+          </label>
+          <label class="item item-input">
+            <input type="text" placeholder="0.23 BTC">
+            <input type="text" placeholder="123 USD">
+          </label>
+          <label class="item item-input">
+            <input type="text" placeholder="Invoice #123">
+          </label>
+          <label class="item">
+            <button class="button button-block button-positive" type="submit">
+              Pay
+            </button>
+        </div>
+      </form>
+    </div>
+
+  </ion-content>
+</ion-view>
