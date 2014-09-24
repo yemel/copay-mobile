@@ -59,10 +59,19 @@ angular.module('copay', ['ionic', 'copay.controllers'])
     .state('wallet', {
       url: "/wallet",
       abstract: true,
-      templateUrl: "templates/menu2.html"
+      templateUrl: "templates/menu.html"
     })
 
-    .state('wallet.home', {
+    .state('wallet.tabs', {
+      url: "/browse",
+      views: {
+        'content' :{
+          templateUrl: "templates/tabs.html"
+        }
+      }
+    })
+
+    .state('wallet.tabs.home', {
       url: "/home",
       views: {
         'tab1' :{
@@ -71,7 +80,7 @@ angular.module('copay', ['ionic', 'copay.controllers'])
       }
     })
 
-    .state('wallet.receive', {
+    .state('wallet.tabs.receive', {
       url: "/receive",
       views: {
         'tab2' :{
@@ -80,7 +89,16 @@ angular.module('copay', ['ionic', 'copay.controllers'])
       }
     })
 
-    .state('wallet.send', {
+    .state('wallet.tabs.invoice', {
+      url: "/invoice",
+      views: {
+        'tab2' :{
+          templateUrl: "templates/invoice.html"
+        }
+      }
+    })
+
+    .state('wallet.tabs.send', {
       url: "/send",
       views: {
         'tab3' :{
@@ -89,7 +107,16 @@ angular.module('copay', ['ionic', 'copay.controllers'])
       }
     })
 
-    .state('wallet.history', {
+  .state('wallet.tabs.proposal', {
+      url: "/proposal",
+      views: {
+        'tab3' :{
+          templateUrl: "templates/proposal.html"
+        }
+      }
+    })
+
+    .state('wallet.tabs.history', {
       url: "/history",
       views: {
         'tab4' :{
@@ -98,11 +125,23 @@ angular.module('copay', ['ionic', 'copay.controllers'])
       }
     })
 
-    .state('profile', {
-      url: "/profile",
-      templateUrl: "templates/profile.html",
-      controller: 'ProfileCtrl'
-    });
+    .state('wallet.profile', {
+      url: "/edit",
+      views: {
+        'content' :{
+          templateUrl: "templates/profile.html"
+        }
+      }
+    })
+
+    .state('wallet.add', {
+      url: "/add",
+      views: {
+        'content' :{
+          templateUrl: "templates/add.html"
+        }
+      }
+    })
 
     // .state('wallet.home', {
     //   url: "/wallet/home",

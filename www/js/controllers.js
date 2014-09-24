@@ -33,7 +33,7 @@ angular.module('copay.controllers', [])
   $scope.press = function(digit) {
     $scope.digits.push(digit);
     if($scope.digits.length == 4) {
-      $state.go('wallet.home', {walletID: 12});
+      $state.go('wallet.tabs.home', {walletID: 12});
     }
   };
 })

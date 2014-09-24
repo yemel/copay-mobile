@@ -1,7 +1,12 @@
-<ion-view title="{{wallet.name}}">
+<ion-view title="Receive">
   <ion-nav-buttons side="left">
     <button menu-toggle="left"class="button button-icon icon ion-navicon"></button>
   </ion-nav-buttons>
+
+  <ion-nav-buttons side="right">
+    <a class="button button-clear" ui-sref="wallet.profile">Profile</a>
+  </ion-nav-buttons>
+
 
   <ion-content class="has-header">
 
@@ -31,15 +36,15 @@
       <div class="item item-divider">
         Invoices
       </div>
-      <div class="item item-text-wrap">
+      <div class="item item-text-wrap" ui-sref="wallet.tabs.invoice">
         Esteban Ordano - 0.232 BTC
         <span class="badge badge-energized">Pending</span>
       </div>
-      <div class="item item-text-wrap">
+      <div class="item item-text-wrap" ui-sref="wallet.tabs.invoice">
         Matias Alejo García - 0.232 BTC
         <span class="badge badge-balanced">Paid</span>
       </div>
-      <div class="item item-text-wrap">
+      <div class="item item-text-wrap" ui-sref="wallet.tabs.invoice">
         Juan Sosa - 0.232 BTC
         <span class="badge badge-balanced">Paid</span>
       </div>
