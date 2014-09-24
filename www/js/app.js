@@ -56,14 +56,14 @@ angular.module('copay', ['ionic', 'copay.controllers'])
       controller: 'ConfirmPinCtrl'
     })
 
-    .state('wallet', {
-      url: "/wallet",
+    .state('profile', {
+      url: "/profile",
       abstract: true,
       templateUrl: "templates/menu.html"
     })
 
-    .state('wallet.tabs', {
-      url: "/browse",
+    .state('profile.wallet', {
+      url: "/wallet",
       views: {
         'content' :{
           templateUrl: "templates/tabs.html"
@@ -71,7 +71,7 @@ angular.module('copay', ['ionic', 'copay.controllers'])
       }
     })
 
-    .state('wallet.tabs.home', {
+    .state('profile.wallet.home', {
       url: "/home",
       views: {
         'tab1' :{
@@ -80,7 +80,7 @@ angular.module('copay', ['ionic', 'copay.controllers'])
       }
     })
 
-    .state('wallet.tabs.receive', {
+    .state('profile.wallet.receive', {
       url: "/receive",
       views: {
         'tab2' :{
@@ -89,7 +89,7 @@ angular.module('copay', ['ionic', 'copay.controllers'])
       }
     })
 
-    .state('wallet.tabs.invoice', {
+    .state('profile.wallet.invoice', {
       url: "/invoice",
       views: {
         'tab2' :{
@@ -98,7 +98,7 @@ angular.module('copay', ['ionic', 'copay.controllers'])
       }
     })
 
-    .state('wallet.tabs.send', {
+    .state('profile.wallet.send', {
       url: "/send",
       views: {
         'tab3' :{
@@ -107,7 +107,7 @@ angular.module('copay', ['ionic', 'copay.controllers'])
       }
     })
 
-  .state('wallet.tabs.proposal', {
+  .state('profile.wallet.proposal', {
       url: "/proposal",
       views: {
         'tab3' :{
@@ -116,7 +116,7 @@ angular.module('copay', ['ionic', 'copay.controllers'])
       }
     })
 
-    .state('wallet.tabs.history', {
+    .state('profile.wallet.history', {
       url: "/history",
       views: {
         'tab4' :{
@@ -125,7 +125,7 @@ angular.module('copay', ['ionic', 'copay.controllers'])
       }
     })
 
-    .state('wallet.profile', {
+    .state('profile.edit', {
       url: "/edit",
       views: {
         'content' :{
@@ -134,7 +134,7 @@ angular.module('copay', ['ionic', 'copay.controllers'])
       }
     })
 
-    .state('wallet.add', {
+    .state('profile.add', {
       url: "/add",
       views: {
         'content' :{
@@ -143,7 +143,7 @@ angular.module('copay', ['ionic', 'copay.controllers'])
       }
     })
 
-    .state('wallet.payment', {
+    .state('profile.payment', {
       url: "/payment",
       views: {
         'content' :{
