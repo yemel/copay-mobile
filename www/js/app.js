@@ -65,20 +65,43 @@ angular.module('copay', ['ionic', 'copay.controllers'])
     .state('wallet.home', {
       url: "/home",
       views: {
-        'menuContent' :{
+        'tab1' :{
           templateUrl: "templates/home.html"
         }
       }
     })
 
-    .state('wallet.profile', {
-      url: "/profile",
+    .state('wallet.receive', {
+      url: "/receive",
       views: {
-        'menuContent' :{
-          templateUrl: "templates/profile.html",
-          controller: 'ProfileCtrl'
+        'tab2' :{
+          templateUrl: "templates/receive.html"
         }
       }
+    })
+
+    .state('wallet.send', {
+      url: "/send",
+      views: {
+        'tab3' :{
+          templateUrl: "templates/send.html"
+        }
+      }
+    })
+
+    .state('wallet.history', {
+      url: "/history",
+      views: {
+        'tab4' :{
+          templateUrl: "templates/history.html"
+        }
+      }
+    })
+
+    .state('profile', {
+      url: "/profile",
+      templateUrl: "templates/profile.html",
+      controller: 'ProfileCtrl'
     });
 
     // .state('wallet.home', {

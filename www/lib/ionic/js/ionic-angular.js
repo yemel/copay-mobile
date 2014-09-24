@@ -2,7 +2,7 @@
  * Copyright 2014 Drifty Co.
  * http://drifty.com/
  *
- * Ionic, v1.0.0-beta.12
+ * Ionic, v1.0.0-beta.12-nightly-485
  * A powerful HTML5 mobile app framework.
  * http://ionicframework.com/
  *
@@ -188,7 +188,11 @@ function($rootScope, $compile, $animate, $timeout, $ionicTemplateLoader, $ionicP
 
       scope.removed = true;
       sheetEl.removeClass('action-sheet-up');
-      $ionicBody.removeClass('action-sheet-open');
+      $timeout(function(){
+        // wait to remove this due to a 300ms delay native
+        // click which would trigging whatever was underneath this
+        $ionicBody.removeClass('action-sheet-open');
+      }, 400);
       scope.$deregisterBackButton();
       stateChangeListenDone();
 
@@ -1071,7 +1075,7 @@ function($rootScope, $timeout) {
     renderItem: function(dataIndex, primaryPos, secondaryPos) {
       // Attach an item, and set its transform position to the required value
       var item = this.dataSource.attachItemAtIndex(dataIndex);
-      void 0;
+      //console.log(dataIndex, item);
       if (item && item.element) {
         if (item.primaryPos !== primaryPos || item.secondaryPos !== secondaryPos) {
           item.element.css(ionic.CSS.TRANSFORM, this.transformString(
@@ -1360,7 +1364,7 @@ var LOADING_SET_DEPRECATED = '$ionicLoading instance.setContent() has been depre
  */
 IonicModule
 .constant('$ionicLoadingConfig', {
-  template: '<i class="ion-loading-d"></i>'
+  template: '<i class="icon ion-loading-d"></i>'
 })
 .factory('$ionicLoading', [
   '$ionicLoadingConfig',
@@ -1535,10 +1539,14 @@ function($ionicLoadingConfig, $ionicBody, $ionicTemplateLoader, $ionicBackdrop, 
  *
  * Put the content of the modal inside of an `<ion-modal-view>` element.
  *
- * Note: a modal will broadcast 'modal.shown', 'modal.hidden', and 'modal.removed' events from its originating
+ * **Notes:**
+ * - A modal will broadcast 'modal.shown', 'modal.hidden', and 'modal.removed' events from its originating
  * scope, passing in itself as an event argument. Both the modal.removed and modal.hidden events are
  * called when the modal is removed.
  *
+ * - This example assumes your modal is in your main index file or another template file. If it is in its own
+ * template file, remove the script tags and call it by file name.
+ * 
  * @usage
  * ```html
  * <script id="my-modal.html" type="text/ng-template">
@@ -2105,6 +2113,28 @@ IonicModule
 
         /**
          * @ngdoc method
+         * @name $ionicPlatform#on
+         * @description
+         * Add Cordova event listeners, such as `pause`, `resume`, `volumedownbutton`, `batterylow`,
+         * `offline`, etc. More information about available event types can be found in
+         * [Cordova's event documentation](https://cordova.apache.org/docs/en/edge/cordova_events_events.md.html#Events).
+         * @param {string} type Cordova [event type](https://cordova.apache.org/docs/en/edge/cordova_events_events.md.html#Events).
+         * @param {function} callback Called when the Cordova event is fired.
+         * @returns {function} Returns a deregistration function to remove the event listener.
+         */
+        on: function(type, cb) {
+          ionic.Platform.ready(function(){
+            document.addEventListener(type, cb, false);
+          });
+          return function() {
+            ionic.Platform.ready(function(){
+              document.removeEventListener(type, cb);
+            });
+          };
+        },
+
+        /**
+         * @ngdoc method
          * @name $ionicPlatform#ready
          * @description
          * Trigger a callback once the device is ready,
@@ -2233,10 +2263,10 @@ function($ionicModal, $ionicPosition, $document, $window) {
     // make it pop up
     if (buttonOffset.top + buttonOffset.height + popoverHeight > bodyHeight) {
       popoverCSS.top = buttonOffset.top - popoverHeight;
-      popoverEle.removeClass('popover-top').addClass('popover-bottom');
+      popoverEle.addClass('popover-bottom');
     } else {
       popoverCSS.top = buttonOffset.top + buttonOffset.height;
-      popoverEle.removeClass('popover-bottom').addClass('popover-top');
+      popoverEle.removeClass('popover-bottom');
     }
 
     arrowEle.css({
@@ -2740,7 +2770,11 @@ function($ionicTemplateLoader, $ionicBackdrop, $q, $timeout, $rootScope, $ionicB
           previousPopup.show();
         } else {
           //Remove popup-open & backdrop if this is last popup
-          $ionicBody.removeClass('popup-open');
+          $timeout(function(){
+            // wait to remove this due to a 300ms delay native
+            // click which would trigging whatever was underneath this
+            $ionicBody.removeClass('popup-open');
+          }, 400);
           $ionicBackdrop.release();
           ($ionicPopup._backButtonActionDone || angular.noop)();
         }
@@ -3520,7 +3554,7 @@ function($stateProvider, $ionicConfigProvider) {
   var stateProviderState = $stateProvider.state;
   $stateProvider.state = function(stateName, definition) {
     // don't even bother if it's disabled. note, another config may run after this, so it's not a catch-all
-    if($ionicConfigProvider.prefetchTemplates() !== false){
+    if(typeof definition === 'object' && $ionicConfigProvider.prefetchTemplates() !== false){
       var enabled = definition.prefetchTemplate !== false;
       if(enabled && isString(definition.templateUrl))templatesToCache.push(definition.templateUrl);
       if(angular.isObject(definition.views)){
@@ -3641,6 +3675,11 @@ function($rootScope, $state, $location, $document, $animate, $ionicPlatform, $io
     $ionicViewService.disableRegisterByTagName('ion-tabs');
     $ionicViewService.disableRegisterByTagName('ion-side-menus');
   }
+
+  // always reset the keyboard state when change stage
+  $rootScope.$on('$stateChangeStart', function(){
+    ionic.keyboard.hide();
+  });
 
   $rootScope.$on('viewState.changeHistory', function(e, data) {
     if(!data) return;
@@ -3817,8 +3856,17 @@ function($rootScope, $state, $location, $window, $injector, $animate, $ionicNavV
                 hist.cursor > -1 && hist.stack.length > 0 && hist.cursor < hist.stack.length &&
                 hist.stack[hist.cursor].stateId === currentStateId) {
         // they just changed to a different history and the history already has views in it
-        rsp.viewId = hist.stack[hist.cursor].viewId;
+        var switchToView = hist.stack[hist.cursor];
+        rsp.viewId = switchToView.viewId;
         rsp.navAction = 'moveBack';
+
+        // if switching to a different history, and the history of the view we're switching
+        // to has an existing back view from a different history than itself, then
+        // it's back view would be better represented using the current view as its back view
+        var switchToViewBackView = this._getViewById(switchToView.backViewId);
+        if(switchToViewBackView && switchToView.historyId !== switchToViewBackView.historyId) {
+          hist.stack[hist.cursor].backViewId = currentView.viewId;
+        }
 
       } else {
 
@@ -3835,8 +3883,9 @@ function($rootScope, $state, $location, $window, $injector, $animate, $ionicNavV
           }
           rsp.navAction = 'newView';
 
-          // check if there is a new forward view
-          if(forwardView && currentView.stateId !== forwardView.stateId) {
+          // check if there is a new forward view within the same history
+          if(forwardView && currentView.stateId !== forwardView.stateId &&
+             currentView.historyId === forwardView.historyId) {
             // they navigated to a new view but the stack already has a forward view
             // since its a new view remove any forwards that existed
             var forwardsHistory = this._getHistoryById(forwardView.historyId);
@@ -4447,7 +4496,7 @@ function($scope, $element, $attrs, $ionicViewService, $animate, $compile, $ionic
     currentTitles = $element[0].querySelectorAll('.title');
     if (currentTitles.length) {
       oldTitleEl = $compile('<h1 class="title" ng-bind-html="oldTitle"></h1>')($scope);
-      jqLite(currentTitles[0]).replaceWith(oldTitleEl);
+      jqLite(currentTitles[currentTitles.length-1]).replaceWith(oldTitleEl);
     }
     //Compile new title
     newTitleEl = $compile('<h1 class="title invisible" ng-bind-html="title"></h1>')($scope);
@@ -4598,7 +4647,7 @@ function($scope, scrollViewOptions, $timeout, $window, $$scrollValueCache, $loca
   });
 
   $timeout(function() {
-    scrollView.run();
+    scrollView && scrollView.run && scrollView.run();
   });
 
   this._rememberScrollId = null;
@@ -4613,7 +4662,7 @@ function($scope, scrollViewOptions, $timeout, $window, $$scrollValueCache, $loca
 
   this.resize = function() {
     return $timeout(resize).then(function() {
-      $element.triggerHandler('scroll.resize');
+      $element && $element.triggerHandler('scroll.resize');
     });
   };
 
@@ -4688,7 +4737,7 @@ function($scope, scrollViewOptions, $timeout, $window, $$scrollValueCache, $loca
     var values = $$scrollValueCache[this._rememberScrollId];
     if (values) {
       this.resize().then(function() {
-        scrollView.scrollTo(+values.left, +values.top, shouldAnimate);
+        scrollView && scrollView.scrollTo && scrollView.scrollTo(+values.left, +values.top, shouldAnimate);
       });
     }
   };
@@ -4698,7 +4747,7 @@ function($scope, scrollViewOptions, $timeout, $window, $$scrollValueCache, $loca
    */
   this._setRefresher = function(refresherScope, refresherElement) {
     var refresher = this.refresher = refresherElement;
-    var refresherHeight = self.refresher.clientHeight || 0;
+    var refresherHeight = self.refresher.clientHeight || 60;
     scrollView.activatePullToRefresh(refresherHeight, function() {
       // activateCallback
       refresher.classList.add('active');
@@ -4708,6 +4757,7 @@ function($scope, scrollViewOptions, $timeout, $window, $$scrollValueCache, $loca
       $timeout(function(){
         refresher.classList.remove('active');
         refresher.classList.remove('refreshing');
+        refresher.classList.remove('refreshing-tail');
         refresher.classList.add('invisible');
       },300);
     }, function() {
@@ -4720,6 +4770,9 @@ function($scope, scrollViewOptions, $timeout, $window, $$scrollValueCache, $loca
     },function(){
       // hideCallback
       refresher.classList.add('invisible');
+    },function(){
+      // tailCallback
+      refresher.classList.add('refreshing-tail');
     });
   };
 }]);
@@ -4777,6 +4830,7 @@ function($scope, $attrs, $ionicSideMenuDelegate, $ionicPlatform, $ionicBody) {
    * Toggle the left menu to open 100%
    */
   self.toggleLeft = function(shouldOpen) {
+    if(isAsideExposed || !self.left.isEnabled) return;
     var openAmount = self.getOpenAmount();
     if (arguments.length === 0) {
       shouldOpen = openAmount <= 0;
@@ -4793,6 +4847,7 @@ function($scope, $attrs, $ionicSideMenuDelegate, $ionicPlatform, $ionicBody) {
    * Toggle the right menu to open 100%
    */
   self.toggleRight = function(shouldOpen) {
+    if(isAsideExposed || !self.right.isEnabled) return;
     var openAmount = self.getOpenAmount();
     if (arguments.length === 0) {
       shouldOpen = openAmount >= 0;
@@ -4984,6 +5039,9 @@ function($scope, $attrs, $ionicSideMenuDelegate, $ionicPlatform, $ionicBody) {
   };
 
   self.exposeAside = function(shouldExposeAside) {
+    if(!self.left || !self.left.isEnabled) return;
+
+    self.close();
     isAsideExposed = shouldExposeAside;
 
     // set the left marget width if it should be exposed
@@ -5068,7 +5126,7 @@ function($scope, $attrs, $ionicSideMenuDelegate, $ionicPlatform, $ionicBody) {
 
     var dragIsWithinBounds = !shouldOnlyAllowEdgeDrag ||
       startX <= self.edgeThreshold ||
-      startX >= self.content.offsetWidth - self.edgeThreshold;
+      startX >= self.content.element.offsetWidth - self.edgeThreshold;
 
     return ($scope.dragContent || self.isOpen()) &&
            dragIsWithinBounds &&
@@ -5874,7 +5932,7 @@ GESTURE_DIRECTIVES.forEach(function(name) {
  * @restrict A
  *
  * @description
- * Touch stays at the same location for 500ms.
+ * Touch stays at the same location for 500ms. Similar to long touch events available for AngularJS and jQuery.
  *
  * @usage
  * ```html
@@ -6335,7 +6393,7 @@ function headerFooterBarDirective(isHeader) {
  *     });
  *   };
  *
- *   $scope.$on('stateChangeSuccess', function() {
+ *   $scope.$on('$stateChangeSuccess', function() {
  *     $scope.loadMore();
  *   });
  * }
@@ -6410,7 +6468,8 @@ IonicModule
       });
 
       $scope.$on('$destroy', function() {
-        scrollCtrl.$element.off('scroll', checkBounds);
+        void 0;
+        if(scrollCtrl && scrollCtrl.$element)scrollCtrl.$element.off('scroll', checkBounds);
       });
 
       var checkBounds = ionic.animationFrameThrottle(checkInfiniteBounds);
@@ -6889,7 +6948,7 @@ function keyboardAttachGetClientHeight(element) {
 *
 * @param {string=} delegate-handle The handle used to identify this list with
 * {@link ionic.service:$ionicListDelegate}.
-* @param type {string=} The type of list to use (for example, list-inset for an inset list)
+* @param type {string=} The type of list to use (list-inset or card)
 * @param show-delete {boolean=} Whether the delete buttons for the items in the list are
 * currently shown or hidden.
 * @param show-reorder {boolean=} Whether the reorder buttons for the items in the list are
@@ -6992,7 +7051,7 @@ function($animate, $timeout) {
           function setButtonShown(el, shown) {
             shown() && el.addClass('visible') || el.removeClass('active');
             ionic.requestAnimationFrame(function() {
-              shown() && el.addClass('active') || el.removeClass('invisible');
+              shown() && el.addClass('active') || el.removeClass('visible');
             });
           }
         }
@@ -7925,6 +7984,8 @@ IonicModule
  * refresher.
  * @param {string=} refreshing-text The text to display after the user lets go of
  * the refresher.
+ * @param {boolean=} disable-pulling-rotation Disables the rotation animation of the pulling
+ * icon when it reaches its activated threshold. To be used with a custom `pulling-icon`.
  *
  */
 IonicModule
@@ -7937,7 +7998,7 @@ IonicModule
     '<div class="scroll-refresher" collection-repeat-ignore>' +
       '<div class="ionic-refresher-content" ' +
       'ng-class="{\'ionic-refresher-with-text\': pullingText || refreshingText}">' +
-        '<div class="icon-pulling">' +
+        '<div class="icon-pulling" ng-class="{\'pulling-rotation-disabled\':disablePullingRotation}">' +
           '<i class="icon {{pullingIcon}}"></i>' +
         '</div>' +
         '<div class="text-pulling" ng-bind-html="pullingText"></div>' +
@@ -7947,7 +8008,7 @@ IonicModule
     '</div>',
     compile: function($element, $attrs) {
       if (angular.isUndefined($attrs.pullingIcon)) {
-        $attrs.$set('pullingIcon', 'ion-arrow-down-c');
+        $attrs.$set('pullingIcon', 'ion-ios7-arrow-down');
       }
       if (angular.isUndefined($attrs.refreshingIcon)) {
         $attrs.$set('refreshingIcon', 'ion-loading-d');
@@ -7958,6 +8019,7 @@ IonicModule
           pullingText: '@',
           refreshingIcon: '@',
           refreshingText: '@',
+          disablePullingRotation: '@',
           $onRefresh: '&onRefresh',
           $onPulling: '&onPulling'
         });
@@ -8131,7 +8193,7 @@ IonicModule
         $scope.side = $attr.side || 'left';
 
         var sideMenu = sideMenuCtrl[$scope.side] = new ionic.views.SideMenu({
-          width: 275,
+          width: attr.width,
           el: $element[0],
           isEnabled: true
         });
@@ -8298,6 +8360,7 @@ function($timeout, $ionicGesture, $window) {
           }),
           setMarginLeft: ionic.animationFrameThrottle(function(amount) {
             if(amount) {
+              amount = parseInt(amount, 10);
               $element[0].style[ionic.CSS.TRANSFORM] = 'translate3d(' + amount + 'px,0,0)';
               $element[0].style.width = ($window.innerWidth - amount) + 'px';
               content.offsetX = amount;
@@ -8721,7 +8784,13 @@ function($rootScope, $animate, $ionicBind, $compile) {
 
         tabsCtrl.add($scope);
         $scope.$on('$destroy', function() {
-          tabsCtrl.remove($scope);
+          if(!$scope.$tabsDestroy) {
+            // if the containing ionTabs directive is being destroyed
+            // then don't bother going through the controllers remove
+            // method, since remove will reset the active tab as each tab
+            // is being destroyed, causing unnecessary view loads and transitions
+            tabsCtrl.remove($scope);
+          }
           tabNavElement.isolateScope().$destroy();
           tabNavElement.remove();
         });
@@ -8879,9 +8948,9 @@ IonicModule.constant('$ionicTabsConfig', {
 
 IonicModule
 .directive('ionTabs', [
-  '$ionicViewService', 
-  '$ionicTabsDelegate', 
-  '$ionicTabsConfig', 
+  '$ionicViewService',
+  '$ionicTabsDelegate',
+  '$ionicTabsConfig',
 function($ionicViewService, $ionicTabsDelegate, $ionicTabsConfig) {
   return {
     restrict: 'E',
@@ -8903,7 +8972,14 @@ function($ionicViewService, $ionicTabsDelegate, $ionicTabsConfig) {
           tabsCtrl, $attr.delegateHandle
         );
 
-        $scope.$on('$destroy', deregisterInstance);
+        $scope.$on('$destroy', function(){
+          // variable to inform child tabs that they're all being blown away
+          // used so that while destorying an individual tab, each one
+          // doesn't select the next tab as the active one, which causes unnecessary
+          // loading of tab views when each will eventually all go away anyway
+          $scope.$tabsDestroy = true;
+          deregisterInstance();
+        });
 
         tabsCtrl.$scope = $scope;
         tabsCtrl.$element = $element;
@@ -9145,7 +9221,6 @@ IonicModule
 }).call(this);
 
 /*
-//@ sourceMappingURL=performance-now.map
 */
 
 }).call(this,_dereq_("qhDIRT"))
@@ -9232,13 +9307,17 @@ var EventEmitter = _dereq_('./util/simple-emitter');
 
 function clamp(min, n, max) { return Math.max(min, Math.min(n, max)); }
 
-module.exports = Animator;
+var VELOCITY_MIN = 0.0075;
 
-function Animator(opts) {
+module.exports = Animation;
+
+function Animation(opts) {
   //if `new` keyword isn't provided, do it for user
-  if (!(this instanceof Animator)) {
-    return new Animator(opts);
+  if (!(this instanceof Animation)) {
+    return new Animation(opts);
   }
+  var self = this;
+
 
   opts = opts || {};
 
@@ -9247,7 +9326,9 @@ function Animator(opts) {
     id: uid(),
     percent: 0,
     duration: 500,
-    isReverse: false
+    reverse: false,
+    distance: 100,
+    deceleration: 0.998
   };
 
   var emitter = this._.emitter = new EventEmitter();
@@ -9261,24 +9342,65 @@ function Animator(opts) {
   this._.onStart = function() {
     emitter.emit('start');
   };
+
+  var precision = 10000;
   this._.onStep = function(v) {
-    emitter.emit('step', v);
+    emitter.emit('step', Math.round(v * precision) / precision);
   };
 
   opts.duration && this.duration(opts.duration);
   opts.percent && this.percent(opts.percent);
   opts.easing && this.easing(opts.easing);
   opts.reverse && this.reverse(opts.reverse);
+  opts.distance && this.distance(opts.distance);
+ 
+  //Put this here so we don't have to call _tick in the context of our object.
+  //Avoids having to use .bind() or .call() every frame.
+  self._tick = function(deltaT) {
+    var state = self._;
+    
+    state.onStep(animStepValue(self, state.percent));
+
+    if (Math.abs(state.velocity) < VELOCITY_MIN) {
+      state.velocity = 0;
+      return self.stop();
+    }
+    if (state.percent === animEndPercent(self)) {
+      return self.stop();
+    }
+
+    //First tick, don't up the percent
+    if (!deltaT) {
+      // Do nothing
+    } else if (state.velocity) {
+      var velocity = decayVelocity(state.velocity, deltaT, state.deceleration);
+      var currentDistance = state.percent * state.distance;
+      state.percent = (currentDistance - velocity) / state.distance;
+
+      if (state.percent > 1 || state.percent < 0) {
+        state.percent = clamp(0, state.percent, 1);
+        state.velocity = 0;
+      }
+      state.velocity = velocity;
+    } else {
+      if (state.reverse) {
+        state.percent = state.percent - (deltaT / state.duration);
+      } else {
+        state.percent = state.percent + (deltaT / state.duration);
+      }
+    }
+
+    state.percent = clamp(0, state.percent, 1);
+  };
 }
 
-Animator.prototype = {
-
+Animation.prototype = {
   reverse: function(reverse) {
     if (arguments.length) {
-      this._.isReverse = !!reverse;
+      this._.reverse = !!reverse;
       return this;
     }
-    return this._.isReverse;
+    return this._.reverse;
   },
 
   easing: function(easing) {
@@ -9292,17 +9414,45 @@ Animator.prototype = {
     return this._.easing;
   },
 
-  percent: function(percent) {
+  percent: function(percent, immediate) {
+    var self = this;
     if (arguments.length) {
       if (typeof percent === 'number') {
         this._.percent = clamp(0, percent, 1);
       }
       if (!this.isRunning()) {
-        this._.onStep(this._getValueForPercent(this._.percent));
+        if (immediate) {
+          this._tick();
+        } else {
+          timeline.tickAction(this._.id, function() {
+            self._tick();
+            timeline.untickAction(self._.id);
+          });
+        }
       }
       return this;
     }
     return this._.percent;
+  },
+
+  distance: function(distance) {
+    if (arguments.length) {
+      if (typeof distance === 'number' && distance > 0) {
+        this._.distance = distance;
+      }
+      return this;
+    }
+    return this._.distance;
+  },
+
+  deceleration: function(deceleration) {
+    if (arguments.length) {
+      if (typeof deceleration === 'number' && deceleration > 0 && deceleration < 1) {
+        this._.deceleration = deceleration;
+      }
+      return this;
+    }
+    return this._.deceleration;
   },
 
   duration: function(duration) {
@@ -9314,27 +9464,6 @@ Animator.prototype = {
     }
     return this._.duration;
   },
-
-  /**
-   * Interpolation is disabled for now.
-   */
-  // addInterpolation: function(el, startingStyles, endingStyles) {
-  //   var interpolators;
-  //   if (arguments.length) {
-  //     syncStyles(startingStyles, endingStyles, window.getComputedStyle(el));
-  //     interpolators = makePropertyInterpolators(startingStyles, endingStyles);
-
-  //     this.on('step', setStyles);
-  //     return function unbind() {
-  //       this.off('step', setStyles);
-  //     };
-  //   }
-  //   function setStyles(v) {
-  //     for (var property in interpolators) {
-  //       el.style[property] = interpolators[property](v);
-  //     }
-  //   }
-  // },
 
   isRunning: function() { 
     return !!this._.isRunning; 
@@ -9373,74 +9502,62 @@ Animator.prototype = {
     if (!this._.isRunning) return;
 
     this._.isRunning = false;
-    timeline.animationStopped(this);
+    timeline.untickAction(this._.id);
 
-    this._.onStop(this._isComplete());
+    this._.onStop(animIsComplete(this));
     return this;
   },
 
   restart: function(immediate) {
     if (this._.isRunning) return;
 
-    this._.percent = this._getStartPercent();
+    this._.percent = animStartPercent(this);
 
     return this.start(!!immediate);
   },
 
   start: function(immediate) {
-    if (this._.isRunning) return;
-
-    if (immediate) {
-      this._.onStep(this._getValueForPercent(this._.percent));
-    } else {
-      this._.isStarting = true;
-    }
-
-    this._.isRunning = true;
-    timeline.animationStarted(this);
-
-    this._.onStart();
-    return this;
+    return animBegin(this, immediate);
   },
 
-  _isComplete: function() {
-    return !this._.isRunning && 
-      this._.percent === this._getEndPercent();
+  velocity: function(velocity, immediate) {
+    this._.velocity = velocity;
+    return animBegin(this, immediate);
   },
-  _getEndPercent: function() {
-    return this._.isReverse ? 0 : 1;
-  },
-  _getStartPercent: function() {
-    return this._.isReverse ? 1 : 0;
-  },
-
-  _getValueForPercent: function(percent) {
-    if (this._.easing) {
-      return this._.easing(percent, this._.duration);
-    }
-    return percent;
-  },
-
-  _tick: function(deltaT) {
-    var state = this._;
-
-    //First tick, don't up the percent
-    if (state.isStarting) {
-      state.isStarting = false;
-    } else if (state.isReverse) {
-      state.percent = Math.max(0, state.percent - (deltaT / state.duration));
-    } else {
-      state.percent = Math.min(1, state.percent + (deltaT / state.duration));
-    }
-    
-    state.onStep(this._getValueForPercent(state.percent));
-
-    if (state.percent === this._getEndPercent()) {
-      this.stop();
-    }
-  },
-
 };
+
+function animBegin(animation, immediate) {
+  if (immediate) {
+    animation._tick();
+  }
+
+  animation._.isRunning = true;
+  timeline.tickAction(animation._.id, animation._tick);
+
+  animation._.onStart();
+  return animation;
+}
+function animIsComplete(animation) {
+  return !animation._.isRunning && 
+    animation._.percent === animEndPercent(animation);
+}
+function animEndPercent(animation) {
+  return animation._.reverse ? 0 : 1;
+}
+function animStartPercent(animation) {
+  return animation._.reverse ? 1 : 0;
+}
+function animStepValue(animation, value) {
+  if (animation._.easing) {
+    return animation._.easing(value, animation._.duration);
+  }
+  return value;
+}
+
+function decayVelocity(velocity, dt, deceleration) {
+  var kv = Math.pow(deceleration, dt);
+  return velocity * kv;
+}
 
 function figureOutEasing(easing) {
   if (typeof easing === 'object') {
@@ -9993,18 +10110,19 @@ var raf = _dereq_('raf');
 var time = _dereq_('performance-now');
 
 var self = module.exports = {
-  _running: {},
+  _actions: {},
+  isTicking: false,
 
-  animationStarted: function(instance) {
-    self._running[instance._.id] = instance;
+  tickAction: function(id, action) {
+    self._actions[id] = action;
 
     if (!self.isTicking) {
       self.tick();
     }
   },
 
-  animationStopped: function(instance) {
-    delete self._running[instance._.id];
+  untickAction: function(id) {
+    delete self._actions[id];
     self.maybeStopTicking();
   },
 
@@ -10021,8 +10139,8 @@ var self = module.exports = {
       var now = time();
       var deltaT = now - lastFrame;
 
-      for (var animationId in self._running) {
-        self._running[animationId]._tick(deltaT);
+      for (var id in self._actions) {
+        self._actions[id](deltaT);
       }
 
       lastFrame = now;
@@ -10030,7 +10148,7 @@ var self = module.exports = {
   },
 
   maybeStopTicking: function() {
-    if (self.isTicking && !Object.keys(self._running).length) {
+    if (self.isTicking && !Object.keys(self._actions).length) {
       raf.cancel(self._rafId);
       self.isTicking = false;
     }
@@ -10041,10 +10159,10 @@ var self = module.exports = {
 
 },{"performance-now":1,"raf":2}],9:[function(_dereq_,module,exports){
 module.exports = {
-  animator: _dereq_('./animator')
+  animation: _dereq_('./animation')
 };
 
-},{"./animator":4}],10:[function(_dereq_,module,exports){
+},{"./animation":4}],10:[function(_dereq_,module,exports){
 
 /*
  * There really is no tiny minimal extend() on npm to find,
@@ -10073,10 +10191,10 @@ module.exports = function extend(obj) {
 module.exports = SimpleEventEmitter;
 
 function SimpleEventEmitter() {
+  this.listeners = [];
 }
 
 SimpleEventEmitter.prototype = {
-  listeners: [],
   on: function(eventType, fn) {
     if (typeof fn !== 'function') return;
     this.listeners[eventType] || (this.listeners[eventType] = []);
@@ -10230,4 +10348,5 @@ process.chdir = function (dir) {
 },{}]},{},[9])
 (9)
 });
+
 })();
