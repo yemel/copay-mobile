@@ -51,11 +51,6 @@ angular.module('copay', ['ionic', 'copay.controllers'])
       controller: 'ConfirmPinCtrl'
     })
 
-    .state('profile', {
-      url: "/profile",
-      templateUrl: "templates/profile.html",
-      controller: 'ProfileCtrl'
-    })
 
     .state('wallet', {
       url: "/wallet",
@@ -67,7 +62,17 @@ angular.module('copay', ['ionic', 'copay.controllers'])
       url: "/home",
       views: {
         'menuContent' :{
-          templateUrl: "templates/empty.html"
+          templateUrl: "templates/home.html"
+        }
+      }
+    })
+
+    .state('wallet.profile', {
+      url: "/profile",
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/profile.html",
+          controller: 'ProfileCtrl'
         }
       }
     });
