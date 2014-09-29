@@ -1,6 +1,6 @@
 // Copay App
 
-angular.module('copay', ['ionic', 'copay.controllers'])
+angular.module('copay', ['ionic', 'copay.controllers', 'copay.services', 'copay.directives'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
@@ -43,7 +43,7 @@ angular.module('copay', ['ionic', 'copay.controllers'])
     .state('start.login', {
       url: "/login",
       templateUrl: "templates/login.html",
-      controller: 'RegisterCtrl'
+      controller: 'LoginCtrl'
     })
 
     .state('setPin', {

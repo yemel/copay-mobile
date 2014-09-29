@@ -1,16 +1,42 @@
 angular.module('copay.controllers', [])
 
-.controller('RegisterCtrl', function($scope, $state, $ionicLoading, $timeout) {
-  $scope.submit = function() {
+.controller('RegisterCtrl', function($scope, $state, $ionicLoading, Identity) {
+  $scope.profile = {};
+  $scope.errors = [];
+
+  $scope.submit = function(form) {
+    if (!form.$valid) return;
+
     $ionicLoading.show({
-      template: '<i class="icon ion-loading-c"></i> Doing something...'
+      template: '<i class="icon ion-loading-c"></i> Creating profile...'
     });
 
-    $timeout(function() {
+    Identity.createProfile($scope.profile, function(err, profile) {
       $ionicLoading.hide();
-      $state.go('setPin');
-    }, 2000);
+      if(err) return $scope.errors = err;
 
+      $state.go('setPin'); // continue to save a new pin
+    })
+  };
+})
+
+.controller('LoginCtrl', function($scope, $state, $ionicLoading, Identity) {
+  $scope.profile = {};
+  $scope.errors = [];
+
+  $scope.submit = function(form) {
+    if (!form.$valid) return;
+
+    $ionicLoading.show({
+      template: '<i class="icon ion-loading-c"></i> Fetching profile...'
+    });
+
+    Identity.fetchProfile($scope.profile, function(err, profile) {
+      $ionicLoading.hide();
+      if(err) return $scope.errors = err;
+
+      $state.go('setPin'); // continue to save a new pin
+    })
   };
 })
 

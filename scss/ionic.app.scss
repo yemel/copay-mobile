@@ -21,3 +21,38 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 // Include all of Ionic
 @import "www/lib/ionic/scss/ionic";
 
+
+// Custom
+
+form .errors {
+  background-color: #FFDEDE;
+}
+
+form i.icon.error {
+  color: $assertive;
+}
+
+form input + i.icon.error {
+  display: none;
+  margin-left: 8px;
+}
+
+form.error-icons input.ng-invalid + i.icon.error {
+  display: block;
+}
+
+form.error-icons input.ng-pristine + i.icon.error {
+  display: none;
+}
+
+form.error-icons input.ng-valid + i.icon.error {
+  display: none;
+}
+
+form .has-error {
+  border-left: 5px solid darken($assertive, 15%);
+}
+
+form .has-success {
+  border-left: 5px solid darken($energized, 15%);
+}
