@@ -1,6 +1,6 @@
 // Copay App
 
-angular.module('copay', ['ionic', 'copay.controllers', 'copay.services', 'copay.directives'])
+angular.module('copay', ['ionic', 'copay.controllers', 'copay.services', 'copay.directives', 'copay.filters'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
@@ -47,6 +47,7 @@ angular.module('copay', ['ionic', 'copay.controllers', 'copay.services', 'copay.
     })
 
     .state('setPin', {
+      url: "/pin",
       templateUrl: "templates/pin.html",
       controller: 'SetPinCtrl'
     })
@@ -59,7 +60,8 @@ angular.module('copay', ['ionic', 'copay.controllers', 'copay.services', 'copay.
     .state('profile', {
       url: "/profile",
       abstract: true,
-      templateUrl: "templates/menu.html"
+      templateUrl: "templates/menu.html",
+      controller: 'ProfileCtrl'
     })
 
     .state('profile.wallet', {

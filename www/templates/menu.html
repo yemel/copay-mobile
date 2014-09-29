@@ -14,17 +14,9 @@
     </header>
     <ion-content class="has-header">
       <ion-list>
-        <ion-item nav-clear menu-close ui-sref="profile.wallet.home">
-          Personal
-          <span class="item-note">1 of 1</span>
-        </ion-item>
-        <ion-item nav-clear menu-close ui-sref="profile.wallet.home">
-          BitPay BsAs
-          <span class="item-note">2 of 3</span>
-        </ion-item>
-        <ion-item nav-clear menu-close ui-sref="profile.wallet.home">
-          Roommates
-          <span class="item-note">2 of 4</span>
+        <ion-item ng-repeat="wallet in wallets" nav-clear menu-close ui-sref="profile.wallet.home">
+          {{wallet.name}}
+          <span class="item-note">{{wallet.threshold}} of {{wallet.copayers}}</span>
         </ion-item>
         <ion-item nav-clear menu-close ui-sref="profile.add">
           <i class="icon ion-plus"></i> New Wallet

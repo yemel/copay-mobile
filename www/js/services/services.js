@@ -48,25 +48,17 @@ angular.module('copay.services', [])
 
 
 .factory('Wallets', function() {
-  // Might use a resource here that returns a JSON array
-
-  // Some fake testing data
-  var products = [
-    { id: 0, name: 'Clasic Guitar', price: 99.95 },
-    { id: 1, name: 'Electric Guitar', price: 400 },
-    { id: 2, name: 'Violin', price: 700.5 },
-    { id: 3, name: 'Bass', price: 12.99 },
-    { id: 4, name: 'Drum set', price: 120 },
-    { id: 5, name: 'Guitar pick', price: 1.99 }
-  ];
+  var WALLETS = [];
+  var MOCK = [{name: 'Personal', copayers: 1, threshold: 1}];
 
   return {
-    all: function() {
-      return products;
+    create: function(data, cb) {
+      WALLETS.push(data);
+      cb(null, data);
     },
-    get: function(productId) {
-      // Simple index lookup
-      return products[productId];
+    all: function() {
+      if (WALLETS.length == 0) WALLETS = MOCK;
+      return WALLETS;
     }
   }
 });

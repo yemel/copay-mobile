@@ -1,6 +1,6 @@
 angular.module('copay.controllers', [])
 
-.controller('RegisterCtrl', function($scope, $state, $ionicLoading, Identity) {
+.controller('RegisterCtrl', function($scope, $state, $ionicLoading, Identity, Wallets) {
   $scope.profile = {};
   $scope.errors = [];
 
@@ -15,7 +15,13 @@ angular.module('copay.controllers', [])
       $ionicLoading.hide();
       if(err) return $scope.errors = err;
 
-      $state.go('setPin'); // continue to save a new pin
+      Wallets.create({ // create a default 1-of-1 wallet
+        name: 'Personal',
+        copayers: 1,
+        threshold: 1
+      }, function onResult() {
+        $state.go('setPin'); // continue to set a new pin
+      });
     })
   };
 })
@@ -33,7 +39,7 @@ angular.module('copay.controllers', [])
 
     Identity.fetchProfile($scope.profile, function(err, profile) {
       $ionicLoading.hide();
-      if(err) return $scope.errors = err;
+      if (err) return $scope.errors = err;
 
       $state.go('setPin'); // continue to save a new pin
     })
@@ -41,27 +47,38 @@ angular.module('copay.controllers', [])
 })
 
 .controller('SetPinCtrl', function($scope, $state) {
-  $scope.message = "Enter a 4-digit pin";
+  var PIN = null;
   $scope.digits = [];
+  $scope.confirm = false;
+
+  $scope.clear = function() {
+    $scope.digits = [];
+  };
 
   $scope.press = function(digit) {
     $scope.digits.push(digit);
-    if($scope.digits.length == 4) {
-      $state.go('confirmPin');
+    if ($scope.digits.length == 4) {
+      return $scope.confirm ? onConfirm() : onPIN();
     }
   };
-})
 
-.controller('ConfirmPinCtrl', function($scope, $state) {
-  $scope.message = "Confirm your 4-digit pin";
-  $scope.digits = [];
+  function onPIN() {
+    setPIN($scope.digits);
+  }
 
-  $scope.press = function(digit) {
-    $scope.digits.push(digit);
-    if($scope.digits.length == 4) {
-      $state.go('profile.wallet.home', {walletID: 12});
+  function onConfirm() {
+    if (angular.equals(PIN, $scope.digits)) {
+      return $state.go('profile.wallet.home', {walletID: 12});
     }
-  };
+
+    setPIN(null);
+  }
+
+  function setPIN(pin) {
+    PIN = pin;
+    $scope.clear();
+    $scope.confirm = !$scope.confirm;
+  }
 })
 
 .controller('ProfileCtrl', function($scope, $state) {
@@ -78,13 +95,11 @@ angular.module('copay.controllers', [])
   ]
 })
 
-.controller('WalletCtrl', function($scope, $state) {
-  $scope.wallet = {
-    name: 'Personal Wallet',
-  };
-})
+.controller('ProfileCtrl', function($scope, $state, Wallets) {
+  $scope.wallets = Wallets.all();
 
-.controller('HomeCtrl', function($scope, $state) {
+  console.log('Hola Punto');
+  console.log(Wallets.all());
 })
 
 .controller('HomeCtrl', function($scope, $state) {
