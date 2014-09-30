@@ -49,7 +49,7 @@ angular.module('copay.services', [])
 
 .factory('Wallets', function() {
   var WALLETS = [];
-  var MOCK = [{name: 'Personal', copayers: 1, threshold: 1}];
+  var MOCK = [{name: 'Personal', copayers: 1, threshold: 1, testnet: false}];
 
   return {
     create: function(data, cb) {

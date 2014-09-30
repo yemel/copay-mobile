@@ -11,32 +11,30 @@
         Create Wallet
       </div>
 
-      <form ng-submit="createWallet()">
+      <form name="newForm" ng-submit="create(newForm)" class="error-icons" novalidate>
           <label class="item item-input">
-            <input type="text" ng-model="form.name" placeholder="Wallet name">
+            <input type="text" ng-model="data.name" placeholder="Wallet name" required>
+            <i class="icon ion-alert-circled error"></i>
           </label>
           <label class="item item-input item-select">
             <span class="input-label">Copayers</span>
-            <select>
-              <option>1</option>
-              <option>2</option>
-              <option selected>3</option>
-              <option>4</option>
-              <option>5</option>
+            <select ng-model="data.copayers" ng-options="n as n for n in []|range:1:12" required>
             </select>
           </label>
           <label class="item item-input item-select">
             <span class="input-label">Required Signatures</span>
-            <select>
-              <option>1</option>
-              <option selected>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
+            <select ng-model="data.threshold" ng-options="n as n for n in []|range:1:threshold" required>
             </select>
           </label>
+          <li class="item item-toggle">
+            Testnet
+            <label class="toggle toggle-positive">
+              <input type="checkbox" ng-model="data.testnet">
+              <div class="track"><div class="handle"></div></div>
+            </label>
+          </li>
           <label class="item">
-            <button class="button button-block button-positive" type="submit">
+            <button class="button button-block button-positive" type="submit" ng-disabled="!newForm.$valid">
               Create Wallet
             </button>
         </div>
@@ -48,12 +46,13 @@
         Join Wallet
       </div>
 
-      <form ng-submit="joinWallet()">
+      <form name="joinForm" ng-submit="join(joinForm)" class="error-icons" novalidate>
           <label class="item item-input">
-            <input type="text" ng-model="form.address" placeholder="Wallet Secret">
+            <input type="text" ng-model="form.address" placeholder="Wallet Secret" required>
+            <i class="icon ion-alert-circled error"></i>
           </label>
           <label class="item">
-            <button class="button button-block button-positive" type="submit">
+            <button class="button button-block button-positive" type="submit" ng-disabled="!joinForm.$valid">
               Join Wallet
             </button>
         </div>

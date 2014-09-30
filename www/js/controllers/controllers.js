@@ -95,11 +95,32 @@ angular.module('copay.controllers', [])
   ]
 })
 
-.controller('ProfileCtrl', function($scope, $state, Wallets) {
+.controller('WalletCtrl', function($scope, $state, Wallets) {
   $scope.wallets = Wallets.all();
+})
 
-  console.log('Hola Punto');
-  console.log(Wallets.all());
+.controller('AddCtrl', function($scope, $state, Wallets) {
+  // Current limitations of multisig and transaction size
+  var COPAYERS_LIMIT = 12;
+  var THRESHOLD_LIMITS = [1, 2, 3, 4, 4, 3, 3, 2, 2, 2, 1, 1];
+
+  $scope.data = {copayers: 1, threshold: 1}; // form defaults
+  $scope.threshold = 1;
+
+  $scope.create = function(form) {
+    if (!form.$valid) return;
+
+    Wallets.create($scope.data, function onResult(err, wallet){
+      if (err) return err;
+      return $state.go('profile.wallet.home', {walletID: 12});
+    });
+  }
+
+  // Update threshold and selected value
+  $scope.$watch('data.copayers', function(copayers) {
+    $scope.threshold = THRESHOLD_LIMITS[copayers-1];
+    $scope.data.threshold = Math.min(parseInt($scope.data.copayers/2+1), $scope.threshold);
+  });
 })
 
 .controller('HomeCtrl', function($scope, $state) {

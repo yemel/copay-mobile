@@ -61,7 +61,7 @@ angular.module('copay', ['ionic', 'copay.controllers', 'copay.services', 'copay.
       url: "/profile",
       abstract: true,
       templateUrl: "templates/menu.html",
-      controller: 'ProfileCtrl'
+      controller: 'WalletCtrl'
     })
 
     .state('profile.wallet', {
@@ -140,7 +140,8 @@ angular.module('copay', ['ionic', 'copay.controllers', 'copay.services', 'copay.
       url: "/add",
       views: {
         'content' :{
-          templateUrl: "templates/add.html"
+          templateUrl: "templates/add.html",
+          controller: 'AddCtrl'
         }
       }
     })
