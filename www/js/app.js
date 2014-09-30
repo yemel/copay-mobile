@@ -61,14 +61,15 @@ angular.module('copay', ['ionic', 'copay.controllers', 'copay.services', 'copay.
       url: "/profile",
       abstract: true,
       templateUrl: "templates/menu.html",
-      controller: 'WalletCtrl'
+      controller: 'SidebarCtrl'
     })
 
     .state('profile.wallet', {
-      url: "/wallet",
+      url: "/wallet/:walletId",
       views: {
         'content' :{
-          templateUrl: "templates/tabs.html"
+          templateUrl: "templates/tabs.html",
+          controller: 'WalletCtrl'
         }
       }
     })

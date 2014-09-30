@@ -14,7 +14,7 @@
     </header>
     <ion-content class="has-header">
       <ion-list>
-        <ion-item ng-repeat="wallet in wallets" nav-clear menu-close ui-sref="profile.wallet.home">
+        <ion-item ng-repeat="wallet in wallets" nav-clear menu-close ui-sref="profile.wallet.home({walletId:wallet.id})">
           {{wallet.name}}
           <span class="item-note">{{wallet.threshold}} of {{wallet.copayers}}</span>
         </ion-item>

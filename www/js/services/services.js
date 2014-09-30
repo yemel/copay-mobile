@@ -47,18 +47,31 @@ angular.module('copay.services', [])
 })
 
 
-.factory('Wallets', function() {
+.factory('Wallets', function($timeout) {
   var WALLETS = [];
-  var MOCK = [{name: 'Personal', copayers: 1, threshold: 1, testnet: false}];
+  var MOCK = [{id: 123, name: 'Personal', copayers: 1, threshold: 1, testnet: false}];
 
   return {
     create: function(data, cb) {
+      data.id = data.id || parseInt(Math.random() * 1000);
+      data.testnet = data.testnet || false;
+
       WALLETS.push(data);
-      cb(null, data);
+      
+      $timeout(function() {
+        cb(null, data);
+      }, 1500);
     },
     all: function() {
       if (WALLETS.length == 0) WALLETS = MOCK;
       return WALLETS;
+    },
+    get: function(id) {
+      var ret = null;
+      WALLETS.forEach(function(w) {
+        if (w.id == id) ret = w;
+      });
+      return ret;
     }
   }
 });

@@ -68,7 +68,7 @@ angular.module('copay.controllers', [])
 
   function onConfirm() {
     if (angular.equals(PIN, $scope.digits)) {
-      return $state.go('profile.wallet.home', {walletID: 12});
+      return $state.go('profile.wallet.home', {walletId: 12});
     }
 
     setPIN(null);
@@ -95,11 +95,22 @@ angular.module('copay.controllers', [])
   ]
 })
 
-.controller('WalletCtrl', function($scope, $state, Wallets) {
+.controller('SidebarCtrl', function($scope, $state, Wallets) {
   $scope.wallets = Wallets.all();
 })
 
-.controller('AddCtrl', function($scope, $state, Wallets) {
+.controller('WalletCtrl', function($scope, $state, $stateParams, Wallets) {
+  $scope.wallet = Wallets.get($stateParams.walletId);
+
+  // Inexistent Wallet, redirect to default one
+  if (!$scope.wallet) {
+    var defualtWallet = Wallets.all()[0];
+    return $state.go('profile.wallet.home', {walletId: defualtWallet.id});
+  }
+
+})
+
+.controller('AddCtrl', function($scope, $state, $ionicLoading, Wallets) {
   // Current limitations of multisig and transaction size
   var COPAYERS_LIMIT = 12;
   var THRESHOLD_LIMITS = [1, 2, 3, 4, 4, 3, 3, 2, 2, 2, 1, 1];
@@ -110,9 +121,14 @@ angular.module('copay.controllers', [])
   $scope.create = function(form) {
     if (!form.$valid) return;
 
+    $ionicLoading.show({
+      template: '<i class="icon ion-loading-c"></i> Creating profile...'
+    });
+
     Wallets.create($scope.data, function onResult(err, wallet){
+      $ionicLoading.hide();
       if (err) return err;
-      return $state.go('profile.wallet.home', {walletID: 12});
+      return $state.go('profile.wallet.home', {walletId: wallet.id});
     });
   }
 
