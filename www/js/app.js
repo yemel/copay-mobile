@@ -133,7 +133,8 @@ angular.module('copay', [
       url: "/history",
       views: {
         'tab4' :{
-          templateUrl: "templates/history.html"
+          templateUrl: "templates/history.html",
+          controller: 'HistoryCtrl'
         }
       }
     })

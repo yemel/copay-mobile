@@ -9,13 +9,11 @@
       <div class="item item-divider">
         Transaction history
       </div>
-      <div class="item item-text-wrap">
-        Sep 22 - Manuel Araoz
-        <span class="badge badge-assertive">0.232 BTC</span>
-      </div>
-      <div class="item item-text-wrap">
-        Sep 20 - BitPay Inc.
-        <span class="badge badge-balanced">0.300 BTC</span>
+      <div class="item item-text-wrap" ng-repeat="trans in transactions">
+        <span>{{trans.time | timeAgo}} - Manuel Araoz</span>
+        <span class="badge" ng-class="{'badge-assertive': trans.value < 0, 'badge-balanced': trans.value > 0}">
+          {{trans.value}} BTC
+        </span>
       </div>
     </div> 
 
