@@ -34,7 +34,8 @@ angular.module('copay.controllers', [])
 
     Identity.openProfile($scope.profile, function(err, identity, wallet) {
       $ionicLoading.hide();
-      if (err) return $scope.errors = err;
+      console.log(err);
+      if (err) return $scope.error = err.message;
 
       Session.signin(identity);
       $state.go('profile.wallet.home', {walletId: wallet.id});
@@ -77,26 +78,18 @@ angular.module('copay.controllers', [])
   }
 })
 
-.controller('ProfileCtrl', function($scope, $state) {
-  $scope.profile = {
-    name: 'Yemel Jardi',
-    email: 'angel.jardi@gmail.com',
-    displayUnit: 'BTC',
-    alternativeCurrency: 'USD',
-  }
-  $scope.wallets = [
-    {id: 1, name: 'Personal', copayers: 1, threshold: 1},
-    {id: 2, name: 'BitPay BsAs', copayers: 3, threshold: 2},
-    {id: 3, name: 'Roomates', copayers: 4, threshold: 2},
-  ]
+.controller('ProfileCtrl', function($scope, $state, Session, Wallets) {
+  $scope.wallets = Wallets.all();
 })
 
-.controller('SidebarCtrl', function($scope, $state, Wallets) {
+.controller('SidebarCtrl', function($scope, $state, Session, Wallets) {
+  $scope.profile = Session.profile;
   $scope.wallets = Wallets.all();
 })
 
 .controller('WalletCtrl', function($scope, $state, $stateParams, Wallets) {
   $scope.wallet = Wallets.get($stateParams.walletId);
+  console.log('Wallet:', $scope.wallet);
 
   // Inexistent Wallet, redirect to default one
   if (!$scope.wallet) {
@@ -118,15 +111,30 @@ angular.module('copay.controllers', [])
     if (!form.$valid) return;
 
     $ionicLoading.show({
-      template: '<i class="icon ion-loading-c"></i> Creating profile...'
+      template: '<i class="icon ion-loading-c"></i> Creating wallet...'
     });
 
     Wallets.create($scope.data, function onResult(err, wallet){
       $ionicLoading.hide();
-      if (err) return err;
+      if (err) throw err;
       return $state.go('profile.wallet.home', {walletId: wallet.id});
     });
-  }
+  };
+
+  $scope.join = function(form) {
+    if (!form.$valid) return;
+
+    $ionicLoading.show({
+      template: '<i class="icon ion-loading-c"></i> Joining wallet...'
+    });
+
+    console.log('SECRET', $scope.data.secret);
+    Wallets.join($scope.data.secret, function onResult(err, wallet){
+      $ionicLoading.hide();
+      if (err) throw err;
+      return $state.go('profile.wallet.home', {walletId: wallet.id});
+    });
+  };
 
   // Update threshold and selected value
   $scope.$watch('data.copayers', function(copayers) {
@@ -136,6 +144,8 @@ angular.module('copay.controllers', [])
 })
 
 .controller('HomeCtrl', function($scope, $state) {
+  $scope.copayers = $scope.wallet.getRegisteredPeerIds(); // TODO: Rename method to getCopayers
+  $scope.remaining = $scope.wallet.publicKeyRing.remainingCopayers(); // TODO: Expose on Wallet
 })
 
 .controller('ReceiveCtrl', function($scope, $state) {

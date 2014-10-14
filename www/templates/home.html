@@ -6,30 +6,42 @@
 
   <ion-content class="has-header">
 
-    <div class="card">
+    <div class="card" ng-show="wallet.publicKeyRing.isComplete()">
       <div class="item item-divider">
-        <i class="icon ion-social-bitcoin"></i> Balance
+        Balance
       </div>
       <div class="item item-text-wrap">
-        12323 bits ~= $234 USD
+        <i class="icon ion-social-bitcoin"></i> 12323 bits ~= $234 USD
+      </div>
+    </div>
+
+    <div class="card" ng-hide="wallet.publicKeyRing.isComplete()">
+      <div class="item item-divider">
+        Share Wallet Secret
+        <a class="item-note icon ion-ios7-copy big"></a>
+      </div>
+      <div class="item item-text-wrap center">
+        <qrcode
+          version="7"
+          error-correction-level="M"
+          size="240"
+          data="{{wallet.getSecret()}}">
+        </qrcode>
+        <p>{{wallet.getSecret()}}</p>
       </div>
     </div>
 
     <div class="card">
       <div class="item item-divider">
-        <i class="icon ion-person"></i> Copayers
+        Copayers
+        <span class="item-note">{{wallet.requiredCopayers}} of {{wallet.totalCopayers}}</span>
       </div>
-      <div class="item item-avatar">
+      <div class="item item-avatar" ng-repeat="copayer in copayers">
         <img src="img/example/tully.jpg">
-        <h2>Yemel Jardi (me)</h2>
+        <h2>{{copayer.nick}} (me)</h2>
       </div>
-      <div class="item item-avatar">
-        <img src="img/example/winston.jpg">
-        <h2>Manuel Araoz</h2>
-      </div>
-      <div class="item item-avatar">
-        <img src="img/example/barrett.jpg">
-        <h2>Juan Sosa</h2>
+      <div class="item item-avatar" ng-show="remaining > 0">
+        <h2><i class="icon ion-loading-c"></i> Waiting for {{remaining}} copayers to join...</h2>
       </div>
     </div>
 

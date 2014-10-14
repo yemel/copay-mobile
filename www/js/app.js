@@ -1,6 +1,15 @@
 // Copay App
 
-angular.module('copay', ['ionic', 'copay.controllers', 'copay.services', 'copay.directives', 'copay.filters'])
+angular.module('copay', [
+  'ionic',
+  'monospaced.qrcode',
+  'yaru22.angular-timeago',
+
+  'copay.controllers',
+  'copay.services',
+  'copay.directives',
+  'copay.filters'
+])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
@@ -78,7 +87,8 @@ angular.module('copay', ['ionic', 'copay.controllers', 'copay.services', 'copay.
       url: "/home",
       views: {
         'tab1' :{
-          templateUrl: "templates/home.html"
+          templateUrl: "templates/home.html",
+          controller: 'HomeCtrl'
         }
       }
     })

@@ -9,9 +9,9 @@
   <ion-content>
     <form name="form" ng-submit="submit(form)" class="error-icons" novalidate>
       <div class="list">
-        <label class="item errors" ng-show="errors">
+        <label class="item errors" ng-show="error">
           <ul>
-            <li ng-repeat="err in errors">{{err}}</li>
+            <li>{{error}}</li>
           </ul>
         </label>
         <label class="item item-input">

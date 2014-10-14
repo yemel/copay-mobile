@@ -43,7 +43,10 @@ angular.module('copay.services', [])
     network: config.network,
     networkName: "livenet",
     walletDefaults: walletConfig,
-    passphrase: undefined,
+    passphraseConfig: {
+      iterations: 100,
+      storageSalt: "mjuBtGybi/4="
+    }
   }
 
   return config;
@@ -74,39 +77,57 @@ angular.module('copay.services', [])
   return Session;
 })
 
+// This factory it's extends copay.Identity for ease of use.
+// TODO: Copay initialization it's broken... stop using all that config.
 .factory('Identity', function(Config) {
   var Identity = angular.extend({}, copay.Identity);
 
   Identity.createProfile = function(p, callback) {
-    var call = this.create.bind(this, p.email, p.password, Config.identity, callback);
+    var opts = angular.copy(Config.identity);
+    var call = this.create.bind(this, p.email, p.password, opts, callback);
     setTimeout(call, 100);
   }
 
   Identity.openProfile = function(p, callback) {
-    var call = this.create.bind(this, p.email, p.password, Config.identity, callback);
+    var opts = angular.copy(Config.identity);
+    var call = Identity.open.bind(Identity, p.email, p.password, opts, callback);
     setTimeout(call, 100);
   }
 
   return Identity;
 })
 
-.factory('Wallets', function(Session) {
+// This factory should be replaced by Session.identity
+.factory('Wallets', function(Session, Identity) {
   var Wallets = function() {};
 
   Wallets.create = function(data, cb) {
+    var opts = {
+      name: data.name,
+      totalCopayers: data.copayers,
+      requiredCopayers: data.threshold,
+      networkName: data.testnet ? "testnet" : "livenet"
+    }
 
+    Session.identity.createWallet(opts, cb); // TODO: Use directlly
+  };
+
+  Wallets.join = function(secret, cb) {
+    var opts = {
+      secret: secret,
+      nickname: Session.profile.email // TODO: This shouldn't be necesary
+    }
+
+    Session.identity.joinWallet(opts, cb); // TODO: Use directlly
   };
 
   Wallets.all = function() {
     var wallets = Object.keys(Session.profile.walletInfos);
-    return wallets.map(function(id) {
-      return Session.profile.walletInfos[id];
-    });
+    return wallets.map(this.get.bind(this));
   }
 
   Wallets.get = function(id) {
     var wallet = Session.identity.getOpenWallet(id);
-    if (!wallet) throw new Error('Wallet not found');
     window.W = wallet;
     window.I = Session.identity;
     return wallet;

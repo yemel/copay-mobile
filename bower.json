@@ -3,5 +3,9 @@
   "private": "true",
   "devDependencies": {
     "ionic": "driftyco/ionic-bower#master"
+  },
+  "dependencies": {
+    "angular-qrcode": "~3.1.0",
+    "angular-timeago": "0.1.3"
   }
 }
