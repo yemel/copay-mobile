@@ -1,51 +1,69 @@
+'use strict'
+// TODO: Use a clousure to avoid cluttering the global namespace
+var copay = require('copay');
+
 angular.module('copay.services', [])
 
-/**
- * A simple example service that returns some data.
- */
-.factory('Identity', function($timeout) {
-  var PROFILE = null;
+// This is a hack for having cleaner configuration
+.factory('Config', function() {
+  var config = {};
 
-  return {
-    createProfile: function(profile, cb) {
-
-      function mockInsight() {
-        PROFILE = {
-          name: profile.name,
-          email: profile.email
-        }
-
-        // for testing errors
-        if (profile.email == 'used@gmail.com')
-          return cb(["The email is already in use"]);
-
-        cb(null, profile);
-      }
-
-      $timeout(mockInsight, 1500);
+  config.network = {
+    testnet: {
+      url: 'https://test-insight.bitpay.com:443',
+      transports: ['polling']
     },
-    setPin: function(pin, cb) {
-      PROFILE.pin = pin;
-      cb(null, profile);
-    },
-    fetchProfile: function(data, cb) {
+    livenet: {
+      url: 'https://insight.bitpay.com:443',
+      transports: ['polling']
+    }
+  };
 
-      function mockInsight() {
-        if (data.email != 'yemel@bitpay.com')
-          return cb(["Profile doesn't exists"]);
+  config.pluginManager = new copay.PluginManager({
+    plugins: { LocalStorage: true }
+  });
 
-        PROFILE = {
-          name: 'Yemel Jardi',
-          email: 'yemel@bitpay.com'
-        }
-        return cb(null, PROFILE);
-      }
-
-      $timeout(mockInsight, 1500);
+  var walletConfig = {
+    idleDurationMin: 4,
+    reconnectDelay: 5000,
+    totalCopayers: 3,
+    requiredCopayers: 2,
+    spendUnconfirmed: true,
+    settings: {
+      alternativeIsoCode: "USD",
+      alternativeName: "US Dollar",
+      unitDecimals: 2,
+      unitName: "bits",
+      unitToSatoshi: 100,
     }
   }
+
+  config.identity = {
+    pluginManager: config.pluginManager,
+    network: config.network,
+    networkName: "livenet",
+    walletDefaults: walletConfig,
+    passphrase: undefined,
+  }
+
+  return config;
 })
 
+.factory('Bitcore', function() {
+  var bitcore = require('bitcore');
+  return bitcore;
+})
+
+.factory('Identity', function(Config) {
+  var Identity = angular.extend({}, copay.Identity);
+
+  Identity.createProfile = function(p, callback) {
+    var call = this.create.bind(this, p.email, p.password, Config.identity, callback);
+    setTimeout(call, 100);
+  }
+
+  return Identity;
+})
 
 .factory('Wallets', function($timeout) {
   var WALLETS = [];

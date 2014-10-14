@@ -158,4 +158,3 @@ angular.module('copay', ['ionic', 'copay.controllers', 'copay.services', 'copay.
 
   $urlRouterProvider.otherwise('/');
 });
-

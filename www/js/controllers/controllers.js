@@ -1,6 +1,6 @@
 angular.module('copay.controllers', [])
 
-.controller('RegisterCtrl', function($scope, $state, $ionicLoading, Identity, Wallets) {
+.controller('RegisterCtrl', function($scope, $state, $ionicLoading, Config, Identity) {
   $scope.profile = {};
   $scope.errors = [];
 
@@ -11,18 +11,15 @@ angular.module('copay.controllers', [])
       template: '<i class="icon ion-loading-c"></i> Creating profile...'
     });
 
-    Identity.createProfile($scope.profile, function(err, profile) {
+    Identity.createProfile($scope.profile, function(err, identity, wallet) {
       $ionicLoading.hide();
       if(err) return $scope.errors = err;
 
-      Wallets.create({ // create a default 1-of-1 wallet
-        name: 'Personal',
-        copayers: 1,
-        threshold: 1
-      }, function onResult() {
-        $state.go('setPin'); // continue to set a new pin
-      });
-    })
+      window.I = identity;
+      window.W = wallet;
+      console.log(identity, wallet);
+      $state.go('setPin'); // continue to set a new pin
+    });
   };
 })
 
