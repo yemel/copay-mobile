@@ -54,6 +54,26 @@ angular.module('copay.services', [])
   return bitcore;
 })
 
+.factory('Session', function() {
+
+  var Session = function() {
+    this.identity = null;
+    this.profile = null;
+    this.pin = null;
+  };
+
+  Session.signin = function(identity) {
+    this.identity = identity;
+    this.profile = identity.profile;
+  }
+
+  Session.signout = function(identity) {
+    this.identity = null;
+  }
+
+  return Session;
+})
+
 .factory('Identity', function(Config) {
   var Identity = angular.extend({}, copay.Identity);
 
@@ -62,34 +82,35 @@ angular.module('copay.services', [])
     setTimeout(call, 100);
   }
 
+  Identity.openProfile = function(p, callback) {
+    var call = this.create.bind(this, p.email, p.password, Config.identity, callback);
+    setTimeout(call, 100);
+  }
+
   return Identity;
 })
 
-.factory('Wallets', function($timeout) {
-  var WALLETS = [];
-  var MOCK = [{id: 123, name: 'Personal', copayers: 1, threshold: 1, testnet: false}];
+.factory('Wallets', function(Session) {
+  var Wallets = function() {};
 
-  return {
-    create: function(data, cb) {
-      data.id = data.id || parseInt(Math.random() * 1000);
-      data.testnet = data.testnet || false;
+  Wallets.create = function(data, cb) {
 
-      WALLETS.push(data);
-      
-      $timeout(function() {
-        cb(null, data);
-      }, 1500);
-    },
-    all: function() {
-      if (WALLETS.length == 0) WALLETS = MOCK;
-      return WALLETS;
-    },
-    get: function(id) {
-      var ret = null;
-      WALLETS.forEach(function(w) {
-        if (w.id == id) ret = w;
-      });
-      return ret;
-    }
+  };
+
+  Wallets.all = function() {
+    var wallets = Object.keys(Session.profile.walletInfos);
+    return wallets.map(function(id) {
+      return Session.profile.walletInfos[id];
+    });
   }
+
+  Wallets.get = function(id) {
+    var wallet = Session.identity.getOpenWallet(id);
+    if (!wallet) throw new Error('Wallet not found');
+    window.W = wallet;
+    window.I = Session.identity;
+    return wallet;
+  }
+
+  return Wallets;
 });

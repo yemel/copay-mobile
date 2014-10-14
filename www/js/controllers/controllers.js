@@ -1,6 +1,6 @@
 angular.module('copay.controllers', [])
 
-.controller('RegisterCtrl', function($scope, $state, $ionicLoading, Config, Identity) {
+.controller('RegisterCtrl', function($scope, $state, $ionicLoading, Identity, Session) {
   $scope.profile = {};
   $scope.errors = [];
 
@@ -15,15 +15,13 @@ angular.module('copay.controllers', [])
       $ionicLoading.hide();
       if(err) return $scope.errors = err;
 
-      window.I = identity;
-      window.W = wallet;
-      console.log(identity, wallet);
-      $state.go('setPin'); // continue to set a new pin
+      Session.signin(identity);
+      $state.go('profile.wallet.home', {walletId: wallet.id});
     });
   };
 })
 
-.controller('LoginCtrl', function($scope, $state, $ionicLoading, Identity) {
+.controller('LoginCtrl', function($scope, $state, $ionicLoading, Identity, Session) {
   $scope.profile = {};
   $scope.errors = [];
 
@@ -31,14 +29,15 @@ angular.module('copay.controllers', [])
     if (!form.$valid) return;
 
     $ionicLoading.show({
-      template: '<i class="icon ion-loading-c"></i> Fetching profile...'
+      template: '<i class="icon ion-loading-c"></i> Opening profile...'
     });
 
-    Identity.fetchProfile($scope.profile, function(err, profile) {
+    Identity.openProfile($scope.profile, function(err, identity, wallet) {
       $ionicLoading.hide();
       if (err) return $scope.errors = err;
 
-      $state.go('setPin'); // continue to save a new pin
+      Session.signin(identity);
+      $state.go('profile.wallet.home', {walletId: wallet.id});
     })
   };
 })

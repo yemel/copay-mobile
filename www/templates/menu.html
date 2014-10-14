@@ -16,7 +16,7 @@
       <ion-list>
         <ion-item ng-repeat="wallet in wallets" nav-clear menu-close ui-sref="profile.wallet.home({walletId:wallet.id})">
           {{wallet.name}}
-          <span class="item-note">{{wallet.threshold}} of {{wallet.copayers}}</span>
+          <span class="item-note">{{wallet.requiredCopayers}} of {{wallet.totalCopayers}}</span>
         </ion-item>
         <ion-item nav-clear menu-close ui-sref="profile.add">
           <i class="icon ion-plus"></i> New Wallet
