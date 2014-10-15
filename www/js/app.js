@@ -56,21 +56,23 @@ angular.module('copay', [
     })
 
     .state('setPin', {
-      url: "/pin",
       templateUrl: "templates/pin.html",
-      controller: 'SetPinCtrl'
+      controller: 'SetPinCtrl',
+      params: ['email', 'password']
     })
 
-    .state('confirmPin', {
+    .state('pin', {
+      url: "/pin",
       templateUrl: "templates/pin.html",
-      controller: 'ConfirmPinCtrl'
+      controller: 'PinCtrl'
     })
 
     .state('profile', {
       url: "/profile",
       abstract: true,
       templateUrl: "templates/menu.html",
-      controller: 'SidebarCtrl'
+      controller: 'SidebarCtrl',
+      data: { auth: true }
     })
 
     .state('profile.wallet', {
@@ -168,4 +170,29 @@ angular.module('copay', [
     })
 
   $urlRouterProvider.otherwise('/');
-});
+})
+
+
+.run(['$rootScope', '$state', 'Session', function ($rootScope, $state, Session) {
+
+  $rootScope.$on("$stateChangeStart", function (event, toState, toParams, fromState, fromParams) {
+
+    // Redirect to PIN screen
+    if (!Session.isLogged() && Session.hasCredentials() && toState.name != 'pin') {
+      event.preventDefault();
+      return $state.go('pin');
+    }
+
+    // If not logged redirect to home
+    var isPrivate = !!(toState.data && toState.data.auth);
+    if (!Session.isLogged() && !Session.hasCredentials() && isPrivate) {
+      event.preventDefault();
+      return $state.go('start.welcome');
+    }
+
+    //toState.data && toState.data.auth
+    //event.preventDefault();
+    //$state.go('user.home');
+  });
+
+}]);

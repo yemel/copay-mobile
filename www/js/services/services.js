@@ -57,7 +57,7 @@ angular.module('copay.services', [])
   return bitcore;
 })
 
-.factory('Session', function() {
+.factory('Session', function($window) {
 
   var Session = function() {
     this.identity = null;
@@ -68,11 +68,38 @@ angular.module('copay.services', [])
   Session.signin = function(identity) {
     this.identity = identity;
     this.profile = identity.profile;
-  }
+  };
 
   Session.signout = function(identity) {
     this.identity = null;
-  }
+  };
+
+  Session.isLogged = function() {
+    return !!this.identity;
+  };
+
+  // ======= Temporal Hack ========
+  // TODO: Encript credentials with PIN
+  Session.hasCredentials = function() {
+    return !!$window.localStorage.getItem('session:data');
+  };
+
+  Session.setCredentials = function(pin, credentials) {
+    var data = JSON.stringify({
+      pin: pin,
+      credentials: credentials
+    });
+
+    $window.localStorage.setItem('session:data', data);
+  };
+
+  Session.getCredentials = function(pin) {
+    var data = $window.localStorage.getItem('session:data');
+    if (!data) return null;
+
+    data = JSON.parse(data);
+    return angular.equals(data.pin, pin) ? data.credentials : null;
+  };
 
   return Session;
 })

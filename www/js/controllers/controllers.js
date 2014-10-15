@@ -16,7 +16,7 @@ angular.module('copay.controllers', [])
       if(err) return $scope.errors = err;
 
       Session.signin(identity);
-      $state.go('profile.wallet.home', {walletId: wallet.id});
+      $state.go('setPin', $scope.profile);
     });
   };
 })
@@ -34,16 +34,49 @@ angular.module('copay.controllers', [])
 
     Identity.openProfile($scope.profile, function(err, identity, wallet) {
       $ionicLoading.hide();
-      console.log(err);
       if (err) return $scope.error = err.message;
 
       Session.signin(identity);
-      $state.go('profile.wallet.home', {walletId: wallet.id});
+      $state.go('setPin', $scope.profile);
     })
   };
 })
 
-.controller('SetPinCtrl', function($scope, $state) {
+// TODO: Abstract SetPinCtrl and PinCtrl
+.controller('PinCtrl', function($scope, $state, $ionicLoading, Identity, Session) {
+  $scope.digits = [];
+
+  $scope.clear = function() {
+    $scope.digits = [];
+  };
+
+  $scope.press = function(digit) {
+    $scope.digits.push(digit);
+    if ($scope.digits.length == 4) {
+      return onPIN();
+    }
+  };
+
+  function onPIN() {
+    var credentials = Session.getCredentials($scope.digits);
+    if (!credentials) return $scope.clear();
+
+    $ionicLoading.show({
+      template: '<i class="icon ion-loading-c"></i> Opening profile...'
+    });
+
+    Identity.openProfile(credentials, function(err, identity, wallet) {
+      $ionicLoading.hide();
+      if (err) throw err;
+
+      Session.signin(identity);
+      $state.go('profile.wallet.home');
+    });
+  }
+
+})
+
+.controller('SetPinCtrl', function($scope, $state, $stateParams, Identity, Session) {
   var PIN = null;
   $scope.digits = [];
   $scope.confirm = false;
@@ -65,7 +98,8 @@ angular.module('copay.controllers', [])
 
   function onConfirm() {
     if (angular.equals(PIN, $scope.digits)) {
-      return $state.go('profile.wallet.home', {walletId: 12});
+      Session.setCredentials(PIN, $stateParams);
+      return $state.go('profile.wallet.home');
     }
 
     setPIN(null);
