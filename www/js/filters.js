@@ -4,6 +4,13 @@ angular.module('copay.filters', [])
         return typeof(value) !== 'undefined' && value !== null;
       }
     })
+  .filter('capitalize', function() {
+    return function(input) {
+      return (!!input) ? input.replace(/([^\W_]+[^\s-]*) */g, function(txt){
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+      }) : '';
+    }
+  })
   .filter('range', function() {
     return function(input, from, to) {
       var min = parseInt(from, 10);

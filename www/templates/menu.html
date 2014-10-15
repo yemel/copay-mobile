@@ -6,7 +6,7 @@
     </ion-nav-bar>
 
     <ion-nav-buttons side="right">
-      <button class="button button-icon icon ion-qr-scanner"></button>
+      <button class="button button-icon icon ion-camera"></button>
     </ion-nav-buttons>
 
     <ion-nav-view name="content" animation="slide-left-right"></ion-nav-view>
@@ -20,7 +20,7 @@
     <ion-content class="has-header">
       <ion-list>
         <ion-item ng-repeat="wallet in wallets" nav-clear menu-close ui-sref="profile.wallet.home({walletId:wallet.id})">
-          {{wallet.name}}
+          {{wallet.name|capitalize}}
           <span class="item-note">{{wallet.requiredCopayers}} of {{wallet.totalCopayers}}</span>
         </ion-item>
         <ion-item nav-clear menu-close ui-sref="profile.add">

@@ -1,4 +1,4 @@
-<ion-view title="{{wallet.name}} Wallet" hide-back-button="true">
+<ion-view title="{{wallet.name|capitalize}} Wallet" hide-back-button="true">
   
   <ion-nav-buttons side="left">
     <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
@@ -17,17 +17,14 @@
 
     <div class="card" ng-hide="wallet.publicKeyRing.isComplete()">
       <div class="item item-divider">
-        Share Wallet Secret
-        <a class="item-note icon ion-ios7-copy big"></a>
+        Invite Copayers
       </div>
       <div class="item item-text-wrap center">
-        <qrcode
-          version="7"
-          error-correction-level="M"
-          size="240"
-          data="{{wallet.getSecret()}}">
-        </qrcode>
-        <p>{{wallet.getSecret()}}</p>
+        <div class="button-bar">
+          <button class="button button-positive icon ion-android-share"> Share</button>
+          <button class="button button-positive icon ion-ios7-copy"> Copy</button>
+          <button class="button button-positive icon ion-qr-scanner"> QR</button>
+        </div>
       </div>
     </div>
 
