@@ -177,7 +177,7 @@ angular.module('copay.controllers', [])
   });
 })
 
-.controller('HomeCtrl', function($scope, $state, $ionicModal) {
+.controller('HomeCtrl', function($scope, $state, $ionicModal, $window) {
   $scope.copayers = $scope.wallet.getRegisteredPeerIds(); // TODO: Rename method to getCopayers
   $scope.remaining = $scope.wallet.publicKeyRing.remainingCopayers(); // TODO: Expose on Wallet
 
@@ -194,6 +194,10 @@ angular.module('copay.controllers', [])
 
   $scope.closeModal = function() {
     $scope.modal.hide();
+  };
+
+  $scope.copySecret = function() {
+    $window.prompt("Copy to clipboard: Ctrl+C/⌘+C, Enter", $scope.wallet.getSecret());
   };
 })
 
