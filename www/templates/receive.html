@@ -40,21 +40,13 @@
       </form>
     </div>
 
-    <div class="card">
+    <div class="card" ng-show="invoices">
       <div class="item item-divider">
-        Invoices
+        Pending invoices
       </div>
-      <div class="item item-text-wrap" ui-sref="profile.wallet.invoice">
-        Esteban Ordano - 0.232 BTC
-        <span class="badge badge-energized">Pending</span>
-      </div>
-      <div class="item item-text-wrap" ui-sref="profile.wallet.invoice">
-        Matias Alejo García - 0.232 BTC
-        <span class="badge badge-balanced">Paid</span>
-      </div>
-      <div class="item item-text-wrap" ui-sref="profile.wallet.invoice">
-        Juan Sosa - 0.232 BTC
-        <span class="badge badge-balanced">Paid</span>
+      <div class="item item-text-wrap" ng-repeat="invoice in invoices" ui-sref="profile.wallet.invoice({address:invoice.address})">
+        {{invoice.sender}} - {{invoice.reference}}
+        <span class="badge">{{invoice.fiat}} {{invoice.fiatCode}}</span>
       </div>
     </div> 
     

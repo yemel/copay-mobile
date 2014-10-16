@@ -205,7 +205,9 @@ angular.module('copay.controllers', [])
   };
 })
 
-.controller('ReceiveCtrl', function($scope, $state, $ionicModal, $window) {
+.controller('ReceiveCtrl', function($scope, $state, $ionicModal, $window, Invoices, Session) {
+  $scope.invoices = Invoices.filter({ status: Invoices.STATUS.pending });
+  //$scope.invoices = Invoices.all();
 
   $scope.modal = {};
   $ionicModal.fromTemplateUrl('templates/qr.html', {
@@ -228,6 +230,34 @@ angular.module('copay.controllers', [])
 
   $scope.copyAddress = function() {
     $window.prompt("Copy to clipboard: Ctrl+C/⌘+C, Enter", "bitcoin://1HB5XMLmzFVj8ALj6mfBsbifRoD4miY36v");
+  };
+
+})
+
+.controller('InvoiceCtrl', function($scope, $ionicModal, $window, $stateParams, Invoices) {
+  $scope.invoice = Invoices.get($stateParams.address);
+
+  $scope.modal = {};
+  $ionicModal.fromTemplateUrl('templates/qr.html', {
+    scope: $scope,
+    animation: 'slide-in-up'
+  }).then(function(modal) {
+    $scope.modal = modal;
+  });
+
+  $scope.openModal = function() {
+    $scope.modal.title = "Share invoice";
+    $scope.modal.data = "bitcoin://" + $scope.invoice.address; // TODO: Use Bitcore BIP-21
+
+    $scope.modal.show();
+  };
+
+  $scope.closeModal = function() {
+    $scope.modal.hide();
+  };
+
+  $scope.copyAddress = function() {
+    $window.prompt("Copy to clipboard: Ctrl+C/⌘+C, Enter", "bitcoin://" + $scope.invoice.address);
   };
 
 })

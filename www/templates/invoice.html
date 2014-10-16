@@ -3,14 +3,27 @@
   <ion-content class="has-header">
 
     <div class="card">
-      <div class="item item-divider">
-        Invoice
+      <div class="item item-text-wrap">
+        Sender: {{invoice.sender}}
       </div>
       <div class="item item-text-wrap">
-        Esteban Ordano - 0.232 BTC
+        Amount: {{invoice.fiat}} {{invoice.fiatCode}} ({{invoice.amount}} BTC)
       </div>
       <div class="item item-text-wrap">
-        June rent payment
+        Reference: {{invoice.reference}}
+      </div>
+      <div class="item item-text-wrap">
+        Created: {{invoice.date|timeAgo}}
+      </div>
+      <div class="item item-text-wrap">
+        Paid: <span class="badge">Pending</span>
+      </div>
+      <div class="item item-text-wrap">
+        <div class="button-bar">
+          <button class="button button-positive icon ion-android-share"> Share</button>
+          <button class="button button-positive icon ion-ios7-copy" ng-click="copyAddress()"> Copy</button>
+          <button class="button button-positive icon ion-qr-scanner" ng-click="openModal()"> QR</button>
+        </div>
       </div>
     </div> 
 

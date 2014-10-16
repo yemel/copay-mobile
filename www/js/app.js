@@ -106,10 +106,11 @@ angular.module('copay', [
     })
 
     .state('profile.wallet.invoice', {
-      url: "/invoice",
+      url: "/invoice/:address",
       views: {
         'tab2' :{
-          templateUrl: "templates/invoice.html"
+          templateUrl: "templates/invoice.html",
+          controller: "InvoiceCtrl"
         }
       }
     })
