@@ -1,6 +1,6 @@
 <ion-modal-view>
   <ion-header-bar>
-    <h1 class="title">Invite Copayers</h1>
+    <h1 class="title">{{modal.title}}</h1>
     <div class="buttons">
       <button class="button button-clear" ng-click="closeModal()">Close</button>
     </div>
@@ -10,7 +10,7 @@
       version="7"
       error-correction-level="M"
       size="340"
-      data="{{wallet.getSecret()}}">
+      data="{{modal.data}}">
     </qrcode>
   </ion-content>
 </ion-modal-view>

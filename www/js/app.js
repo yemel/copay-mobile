@@ -99,7 +99,8 @@ angular.module('copay', [
       url: "/receive",
       views: {
         'tab2' :{
-          templateUrl: "templates/receive.html"
+          templateUrl: "templates/receive.html",
+          controller: "ReceiveCtrl"
         }
       }
     })

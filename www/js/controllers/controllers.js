@@ -181,6 +181,7 @@ angular.module('copay.controllers', [])
   $scope.copayers = $scope.wallet.getRegisteredPeerIds(); // TODO: Rename method to getCopayers
   $scope.remaining = $scope.wallet.publicKeyRing.remainingCopayers(); // TODO: Expose on Wallet
 
+  $scope.modal = {};
   $ionicModal.fromTemplateUrl('templates/qr.html', {
     scope: $scope,
     animation: 'slide-in-up'
@@ -189,6 +190,9 @@ angular.module('copay.controllers', [])
   });
 
   $scope.openModal = function() {
+    $scope.modal.title = "Invite copayers";
+    $scope.modal.data = $scope.wallet.getSecret();
+
     $scope.modal.show();
   };
 
@@ -201,7 +205,31 @@ angular.module('copay.controllers', [])
   };
 })
 
-.controller('ReceiveCtrl', function($scope, $state) {
+.controller('ReceiveCtrl', function($scope, $state, $ionicModal, $window) {
+
+  $scope.modal = {};
+  $ionicModal.fromTemplateUrl('templates/qr.html', {
+    scope: $scope,
+    animation: 'slide-in-up'
+  }).then(function(modal) {
+    $scope.modal = modal;
+  });
+
+  $scope.openModal = function() {
+    $scope.modal.title = "Quick receive";
+    $scope.modal.data = "bitcoin://1HB5XMLmzFVj8ALj6mfBsbifRoD4miY36v";
+
+    $scope.modal.show();
+  };
+
+  $scope.closeModal = function() {
+    $scope.modal.hide();
+  };
+
+  $scope.copyAddress = function() {
+    $window.prompt("Copy to clipboard: Ctrl+C/⌘+C, Enter", "bitcoin://1HB5XMLmzFVj8ALj6mfBsbifRoD4miY36v");
+  };
+
 })
 
 .controller('SendCtrl', function($scope, $state) {
