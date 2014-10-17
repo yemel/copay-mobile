@@ -65,26 +65,26 @@ angular.module('copay.services', [])
     this.pin = null;
   };
 
-  Session.signin = function(identity) {
+  Session.prototype.signin = function(identity) {
     this.identity = identity;
     this.profile = identity.profile;
   };
 
-  Session.signout = function(identity) {
+  Session.prototype.signout = function(identity) {
     this.identity = null;
   };
 
-  Session.isLogged = function() {
+  Session.prototype.isLogged = function() {
     return !!this.identity;
   };
 
   // ======= Temporal Hack ========
   // TODO: Encript credentials with PIN
-  Session.hasCredentials = function() {
+  Session.prototype.hasCredentials = function() {
     return !!$window.localStorage.getItem('session:data');
   };
 
-  Session.setCredentials = function(pin, credentials) {
+  Session.prototype.setCredentials = function(pin, credentials) {
     var data = JSON.stringify({
       pin: pin,
       credentials: credentials
@@ -93,7 +93,7 @@ angular.module('copay.services', [])
     $window.localStorage.setItem('session:data', data);
   };
 
-  Session.getCredentials = function(pin) {
+  Session.prototype.getCredentials = function(pin) {
     var data = $window.localStorage.getItem('session:data');
     if (!data) return null;
 
@@ -101,7 +101,7 @@ angular.module('copay.services', [])
     return angular.equals(data.pin, pin) ? data.credentials : null;
   };
 
-  return Session;
+  return new Session();
 })
 
 // This factory it's extends copay.Identity for ease of use.
