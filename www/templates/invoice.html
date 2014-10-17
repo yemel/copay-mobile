@@ -28,6 +28,9 @@
           <button class="button button-positive icon ion-qr-scanner" ng-click="openModal()"> QR</button>
         </div>
       </div>
+      <div class="item item-text-wrap" ng-show="invoice.status == 'pending'">
+        <button class="button button-block button-stable icon ion-archive"> Archive</button>
+      </div>
     </div> 
 
   </ion-content>
