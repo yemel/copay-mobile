@@ -119,16 +119,18 @@ angular.module('copay', [
       url: "/send",
       views: {
         'tab3' :{
-          templateUrl: "templates/send.html"
+          templateUrl: "templates/send.html",
+          controller: "SendCtrl"
         }
       }
     })
 
   .state('profile.wallet.proposal', {
-      url: "/proposal",
+      url: "/proposal/:proposalId",
       views: {
         'tab3' :{
-          templateUrl: "templates/proposal.html"
+          templateUrl: "templates/proposal.html",
+          controller: "ProposalCtrl"
         }
       }
     })

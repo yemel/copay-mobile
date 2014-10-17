@@ -207,7 +207,6 @@ angular.module('copay.controllers', [])
 
 .controller('ReceiveCtrl', function($scope, $state, $ionicModal, $window, Invoices, Session) {
   $scope.invoices = Invoices.filter({ status: Invoices.STATUS.pending });
-  //$scope.invoices = Invoices.all();
 
   $scope.modal = {};
   $ionicModal.fromTemplateUrl('templates/qr.html', {
@@ -262,7 +261,14 @@ angular.module('copay.controllers', [])
 
 })
 
-.controller('SendCtrl', function($scope, $state) {
+.controller('SendCtrl', function($scope, Proposals) {
+  $scope.proposals = Proposals.filter({ status: Proposals.STATUS.pending });
+
+})
+
+.controller('ProposalCtrl', function($scope, $stateParams, Proposals) {
+  $scope.proposal = Proposals.get($stateParams.proposalId);
+
 })
 
 .controller('HistoryCtrl', function($scope, $state) {

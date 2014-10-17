@@ -7,7 +7,7 @@
 
     <div class="card">
       <div class="item item-divider">
-        New proposal
+        {{wallet.isShared() ? 'New proposal' : 'Send'}}
       </div>
 
       <form ng-submit="newProposal()">
@@ -28,17 +28,20 @@
             <input type="text" ng-model="form.reference" placeholder="Reference">
           </label>
           <label class="item">
-            <button class="button button-block button-positive" type="submit">Create Proposal</button>
+            <button class="button button-block button-positive" type="submit">
+              {{wallet.isShared() ? 'Create proposal' : 'Send'}}
+            </button>
         </div>
       </form>
     </div>
 
-    <div class="card">
+    <div class="card" ng-show="wallet.isShared() && proposals">
       <div class="item item-divider">
         Spending proposals
       </div>
-      <div class="item item-text-wrap" ui-sref="profile.wallet.proposal">
-        To: Esteban Ordano - 0.232 BTC
+      <div class="item item-text-wrap" ng-repeat="proposal in proposals" ui-sref="profile.wallet.proposal({proposalId:proposal.id})">
+        {{proposal.receiver}} - {{proposal.reference}}
+        <span class="badge">{{proposal.fiat}} {{proposal.fiatCode}}</span>
       </div>
     </div> 
     

@@ -3,14 +3,41 @@
   <ion-content class="has-header">
 
     <div class="card">
+      <div class="item item-text-wrap">
+        Receiver: {{proposal.receiver}}
+      </div>
+      <div class="item item-text-wrap">
+        Amount: {{proposal.fiat}} {{proposal.fiatCode}} ({{proposal.amount}} BTC)
+      </div>
+      <div class="item item-text-wrap">
+        Reference: {{proposal.reference}}
+      </div>
+      <div class="item item-text-wrap">
+        Created: {{proposal.created|timeAgo}}
+      </div>
+      <div class="item item-text-wrap">
+        Status: <span class="badge">{{proposal.status|capitalize}}</span>
+      </div>
       <div class="item item-divider">
-        Proposal
+        Copayers
+        <span class="item-note">missing 1 signature</span>
+      </div>
+      <div class="item item-avatar">
+        <img src="img/example/barrett.jpg">
+        <h2>Manuel</h2><span class="badge badge-positive">Accepted</span>
+      </div>
+      <div class="item item-avatar">
+        <img src="img/example/tully.jpg">
+        <h2>Matias</h2><span class="badge badge-assertive">Rejected</span>
+      </div>
+      <div class="item item-divider">
+        Actions
       </div>
       <div class="item item-text-wrap">
-        Esteban Ordano - 0.232 BTC
-      </div>
-      <div class="item item-text-wrap">
-        June rent payment
+        <div class="button-bar">
+          <button class="button button-positive icon ion-checkmark"> Accept</button>
+          <button class="button button-assertive icon ion-close"> Reject</button>
+        </div>
       </div>
     </div> 
 
