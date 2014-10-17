@@ -121,9 +121,17 @@ angular.module('copay.controllers', [])
   $scope.wallets = Wallets.all();
 })
 
-.controller('WalletCtrl', function($scope, $state, $stateParams, Wallets) {
+.controller('WalletCtrl', function($scope, $state, $stateParams, Wallets, Invoices, Proposals) {
   $scope.wallet = Wallets.get($stateParams.walletId);
-  console.log('Wallet:', $scope.wallet);
+
+  $scope.pendingInvoices = function() {
+    return Invoices.filter({ status: Invoices.STATUS.pending }).length;
+  };
+
+  $scope.pendingProposals = function() {
+    if (!$scope.wallet || !$scope.wallet.isShared()) return 0;
+    return Proposals.filter({ status: Proposals.STATUS.pending }).length;
+  };
 
   // Inexistent Wallet, redirect to default one
   if (!$scope.wallet) {
