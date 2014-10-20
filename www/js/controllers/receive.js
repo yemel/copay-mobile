@@ -2,13 +2,9 @@
 
 angular.module('copay.controllers')
 
-.controller('ReceiveCtrl', function($scope, $state, $ionicModal, $window, Session) {
-  $scope.addresses = [
-    '1HB5XMLmzFVj8ALj6mfBsbifRoD4miY36v',
-    '1HB5XMLmzFVj8ALj6mfBsbifRoD4miY36k',
-    '1HB5XMLmzFVj8ALj6mfBsbifRoD4miY36c',
-    '1HB5XMLmzFVj8ALj6mfBsbifRoD4miY36d'
-  ];
+.controller('ReceiveCtrl', function($scope, $state, $ionicModal, $window, Session, Addresses) {
+  $scope.addresses = Addresses.filter($scope.wallet);
+  console.log($scope.addresses);
 
   $scope.modal = {};
   $ionicModal.fromTemplateUrl('templates/qr.html', {
@@ -17,6 +13,11 @@ angular.module('copay.controllers')
   }).then(function(modal) {
     $scope.modal = modal;
   });
+
+  $scope.createAddress = function() {
+    var addr = Addresses.createAddress($scope.wallet);
+    $scope.openModal('bitcoin://' + addr);
+  }
 
   $scope.openModal = function(data) {
     $scope.modal.title = "Address";

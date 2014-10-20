@@ -7,19 +7,19 @@
 
     <button
       class="button button-block button-positive icon ion-plus"
-      ng-click="openModal('bitcoin://1HB5XMLmzFVj8ALj6mfBsbifRoD4miY36v')">
+      ng-click="createAddress()">
       New Address
     </button>
 
-    <div class="card">
+    <div class="card" ng-show="addresses">
       <div class="item item-divider">
         Addresses
       </div>
       <div
         class="item item-text-wrap"
         ng-repeat="address in addresses"
-        ng-click="openModal('bitcoin://' + address)">
-        {{address| characters:10}}
+        ng-click="openModal('bitcoin://' + address.addressStr)">
+        {{address.addressStr| characters:10}}
         <span class="badge">$123.23 USD</span>
       </div>
     </div> 
