@@ -2,8 +2,7 @@
 
 angular.module('copay.controllers')
 
-.controller('ReceiveCtrl', function($scope, $state, $ionicModal, $window, Invoices, Session) {
-  $scope.invoices = Invoices.filter({ status: Invoices.STATUS.pending });
+.controller('ReceiveCtrl', function($scope, $state, $ionicModal, $window, Session) {
 
   $scope.modal = {};
   $ionicModal.fromTemplateUrl('templates/qr.html', {

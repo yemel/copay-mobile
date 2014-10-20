@@ -7,12 +7,8 @@ angular.module('copay.controllers')
   $scope.wallets = Wallets.all();
 })
 
-.controller('TabsCtrl', function($scope, $state, $stateParams, Wallets, Invoices, Proposals) {
+.controller('TabsCtrl', function($scope, $state, $stateParams, Wallets, Proposals) {
   $scope.wallet = Wallets.get($stateParams.walletId);
-
-  $scope.pendingInvoices = function() {
-    return Invoices.filter({ status: Invoices.STATUS.pending }).length;
-  };
 
   $scope.pendingProposals = function() {
     if (!$scope.wallet || !$scope.wallet.isShared()) return 0;

@@ -82,16 +82,6 @@ angular.module('copay')
       }
     })
 
-    .state('profile.wallet.invoice', {
-      url: "/invoice/:address",
-      views: {
-        'tab2' :{
-          templateUrl: "templates/invoice.html",
-          controller: "InvoiceCtrl"
-        }
-      }
-    })
-
     .state('profile.wallet.send', {
       url: "/send",
       views: {
