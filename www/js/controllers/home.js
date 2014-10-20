@@ -25,7 +25,7 @@ angular.module('copay.controllers')
     $scope.modal.hide();
   };
 
-  $scope.copySecret = function() {
+  $scope.copyData = function() {
     $window.prompt("Copy to clipboard: Ctrl+C/⌘+C, Enter", $scope.wallet.getSecret());
   };
 });

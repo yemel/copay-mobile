@@ -3,6 +3,12 @@
 angular.module('copay.controllers')
 
 .controller('ReceiveCtrl', function($scope, $state, $ionicModal, $window, Session) {
+  $scope.addresses = [
+    '1HB5XMLmzFVj8ALj6mfBsbifRoD4miY36v',
+    '1HB5XMLmzFVj8ALj6mfBsbifRoD4miY36k',
+    '1HB5XMLmzFVj8ALj6mfBsbifRoD4miY36c',
+    '1HB5XMLmzFVj8ALj6mfBsbifRoD4miY36d'
+  ];
 
   $scope.modal = {};
   $ionicModal.fromTemplateUrl('templates/qr.html', {
@@ -12,9 +18,9 @@ angular.module('copay.controllers')
     $scope.modal = modal;
   });
 
-  $scope.openModal = function() {
-    $scope.modal.title = "Quick receive";
-    $scope.modal.data = "bitcoin://1HB5XMLmzFVj8ALj6mfBsbifRoD4miY36v";
+  $scope.openModal = function(data) {
+    $scope.modal.title = "Address";
+    $scope.modal.data = data;
 
     $scope.modal.show();
   };
@@ -23,8 +29,8 @@ angular.module('copay.controllers')
     $scope.modal.hide();
   };
 
-  $scope.copyAddress = function() {
-    $window.prompt("Copy to clipboard: Ctrl+C/⌘+C, Enter", "bitcoin://1HB5XMLmzFVj8ALj6mfBsbifRoD4miY36v");
+  $scope.copyData = function() {
+    $window.prompt("Copy to clipboard: Ctrl+C/⌘+C, Enter", $scope.modal.data);
   };
 
 });

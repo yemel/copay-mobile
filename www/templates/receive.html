@@ -3,53 +3,24 @@
     <button menu-toggle="left"class="button button-icon icon ion-navicon"></button>
   </ion-nav-buttons>
 
-  <ion-content class="has-header">
+  <ion-content class="has-header padding">
+
+    <button
+      class="button button-block button-positive icon ion-plus"
+      ng-click="openModal('bitcoin://1HB5XMLmzFVj8ALj6mfBsbifRoD4miY36v')">
+      New Address
+    </button>
 
     <div class="card">
       <div class="item item-divider">
-        Quick receive
+        Addresses
       </div>
-      <div class="item item-text-wrap center">
-        <div class="button-bar">
-          <button class="button button-positive icon ion-android-share"> Share</button>
-          <button class="button button-positive icon ion-ios7-copy" ng-click="copyAddress()"> Copy</button>
-          <button class="button button-positive icon ion-qr-scanner" ng-click="openModal()"> QR</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="item item-divider">
-        New invoice
-      </div>
-
-      <form ng-submit="newInvoice()">
-          <label class="item item-input">
-            <input type="text" ng-model="form.from" placeholder="Sender's name">
-          </label>
-          <label class="item item-input">
-            <input type="number" ng-model="form.amount" placeholder="Amount">
-            <button class="button">USD</button>
-          </label>
-          <label class="item item-input">
-            <input type="number" placeholder="Amount in BTC" disabled="disabled">
-          </label>
-          <label class="item item-input">
-            <input type="text" ng-model="form.reference" placeholder="Reference">
-          </label>
-          <label class="item">
-            <button class="button button-block button-positive" type="submit">Create Invoice</button>
-        </div>
-      </form>
-    </div>
-
-    <div class="card" ng-show="invoices">
-      <div class="item item-divider">
-        Pending invoices
-      </div>
-      <div class="item item-text-wrap" ng-repeat="invoice in invoices" ui-sref="profile.wallet.invoice({address:invoice.address})">
-        {{invoice.sender}} - {{invoice.reference}}
-        <span class="badge">{{invoice.fiat}} {{invoice.fiatCode}}</span>
+      <div
+        class="item item-text-wrap"
+        ng-repeat="address in addresses"
+        ng-click="openModal('bitcoin://' + address)">
+        {{address| characters:10}}
+        <span class="badge">$123.23 USD</span>
       </div>
     </div> 
     

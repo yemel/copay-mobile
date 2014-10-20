@@ -4,6 +4,7 @@ angular.module('copay', [
   'ionic',
   'monospaced.qrcode',
   'yaru22.angular-timeago',
+  'truncate',
 
   'copay.controllers',
   'copay.services',

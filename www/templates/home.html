@@ -4,7 +4,7 @@
     <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
   </ion-nav-buttons>
 
-  <ion-content class="has-header">
+  <ion-content class="has-header padding">
 
     <div class="card" ng-show="wallet.publicKeyRing.isComplete()">
       <div class="item item-divider">
@@ -15,18 +15,12 @@
       </div>
     </div>
 
-    <div class="card" ng-hide="wallet.publicKeyRing.isComplete()">
-      <div class="item item-divider">
-        Invite copayers
-      </div>
-      <div class="item item-text-wrap center">
-        <div class="button-bar">
-          <button class="button button-positive icon ion-android-share"> Share</button>
-          <button class="button button-positive icon ion-ios7-copy" ng-click="copySecret()"> Copy</button>
-          <button class="button button-positive icon ion-qr-scanner" ng-click="openModal()"> QR</button>
-        </div>
-      </div>
-    </div>
+    <button
+      class="button button-block button-positive icon ion-plus"
+      ng-hide="wallet.publicKeyRing.isComplete()"
+      ng-click="openModal(wallet.getSecret())">
+      Invite Copayers
+    </button>
 
     <div class="card">
       <div class="item item-divider">
