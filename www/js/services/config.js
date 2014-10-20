@@ -8,6 +8,12 @@ angular.module('copay.services')
 
   var config = {};
 
+  // TODO: This should be a Profile preference
+  config.currency = {
+    btc: ["BTC", 1 / 1e8], // SAT to BTC
+    fiat: "USD" // Alternative Code
+  }
+
   config.network = {
     testnet: {
       url: 'https://test-insight.bitpay.com:443',
@@ -17,6 +23,11 @@ angular.module('copay.services')
       url: 'https://insight.bitpay.com:443',
       transports: ['polling']
     }
+  };
+
+  config.rates = {
+    url: 'https://bitpay.com/api/rates',
+    updateFrequencySeconds: 60 * 60
   };
 
   config.pluginManager = new copay.PluginManager({

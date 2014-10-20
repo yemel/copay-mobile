@@ -2,7 +2,7 @@
 
 angular.module('copay.controllers')
 
-.controller('HomeCtrl', function($scope, $state, $ionicModal, $window) {
+.controller('HomeCtrl', function($scope, $state, $ionicModal, $window, Rates) {
   $scope.copayers = $scope.wallet.getRegisteredPeerIds(); // TODO: Rename method to getCopayers
   $scope.remaining = $scope.wallet.publicKeyRing.remainingCopayers(); // TODO: Expose on Wallet
 
@@ -28,4 +28,5 @@ angular.module('copay.controllers')
   $scope.copyData = function() {
     $window.prompt("Copy to clipboard: Ctrl+C/⌘+C, Enter", $scope.wallet.getSecret());
   };
+
 });

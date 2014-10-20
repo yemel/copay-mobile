@@ -13,6 +13,19 @@ angular.module('copay.filters', [])
       }) : '';
     }
   })
+  .filter('displayBtc', ['Config', function(Config) {
+    return function(satoshis) {
+      var value = satoshis * Config.currency.btc[1];
+      return value + " " + Config.currency.btc[0];
+    }
+  }])
+  .filter('displayFiat', ['Config', 'Rates', function(Config, Rates) {
+    return function(satoshis) {
+      var unit = " " + Config.currency.fiat;
+      if (!Rates.isAvailable) return "$0" + unit;
+      return "$" + Rates.toFiat(satoshis, Config.currency.fiat) + unit;
+    }
+  }])
   .filter('range', function() {
     return function(input, from, to) {
       var min = parseInt(from, 10);
