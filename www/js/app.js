@@ -80,7 +80,7 @@ angular.module('copay', [
       views: {
         'content' :{
           templateUrl: "templates/tabs.html",
-          controller: 'WalletCtrl'
+          controller: 'TabsCtrl'
         }
       }
     })
@@ -159,7 +159,7 @@ angular.module('copay', [
       views: {
         'content' :{
           templateUrl: "templates/add.html",
-          controller: 'AddCtrl'
+          controller: 'WalletCtrl'
         }
       }
     })
@@ -200,3 +200,5 @@ angular.module('copay', [
   });
 
 }]);
+
+angular.module('copay.controllers', []);
