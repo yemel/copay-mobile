@@ -201,4 +201,5 @@ angular.module('copay', [
 
 }]);
 
+angular.module('copay.services', []);
 angular.module('copay.controllers', []);
