@@ -1,3 +1,5 @@
+'use strict'
+
 angular.module('copay.controllers')
 
 .controller('ReceiveCtrl', function($scope, $state, $ionicModal, $window, Invoices, Session) {

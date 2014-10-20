@@ -1,3 +1,5 @@
+'use strict'
+
 angular.module('copay.controllers')
 
 .controller('WalletCtrl', function($scope, $state, $ionicLoading, Wallets) {

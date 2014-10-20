@@ -1,3 +1,5 @@
+'use strict'
+
 angular.module('copay.controllers')
 
 .controller('SidebarCtrl', function($scope, $state, Session, Wallets) {

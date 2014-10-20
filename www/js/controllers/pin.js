@@ -1,3 +1,5 @@
+'use strict'
+
 angular.module('copay.controllers')
 
 // TODO: Abstract SetPinCtrl and PinCtrl

@@ -1,3 +1,5 @@
+'use strict'
+
 angular.module('copay.directives', [])
   .directive('match', function() {
     return {

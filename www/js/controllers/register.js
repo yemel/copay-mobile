@@ -1,3 +1,5 @@
+'use strict'
+
 angular.module('copay.controllers')
 
 .controller('RegisterCtrl', function($scope, $state, $ionicLoading, Identity, Session) {

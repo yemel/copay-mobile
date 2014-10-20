@@ -1,3 +1,5 @@
+'use strict'
+
 angular.module('copay.filters', [])
   .filter('defined', function() {
     return function(value) {

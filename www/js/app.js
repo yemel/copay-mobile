@@ -1,4 +1,4 @@
-// Copay App
+'use strict'
 
 angular.module('copay', [
   'ionic',
