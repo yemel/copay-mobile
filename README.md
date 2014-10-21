@@ -6,11 +6,10 @@ using the multisig power of Copay and making it context aware.
 
 ## Install
 
-    $ sudo npm install -g cordova ionic
-    $ git clone https://github.com/yemel/copay-mobile.git
-    $ cd copay-mobile
-    $ npm install
-    $ bower install
+    sudo npm install -g cordova ionic
+    git clone https://github.com/yemel/copay-mobile.git
+    cd copay-mobile
+    npm install
 
 ## Run
 
