@@ -23,14 +23,14 @@ angular.module('copay.controllers')
     $scope.convert();
   };
 
-  $scope.convert = function() {
-    if (!$scope.form.amount) return $scope.altAmount = null;
+  $scope.convert = function(value) {
+    if (!value) return $scope.altAmount = null;
 
     if ($scope.unitFiat) {
-      var sats = Rates.fromFiat($scope.form.amount, $scope.unitCode);
+      var sats = Rates.fromFiat(value, $scope.unitCode);
       $scope.altAmount = displayBtc(sats);
     } else {
-      var sats = Rates.toSatoshis($scope.form.amount, $scope.unitCode);
+      var sats = Rates.toSatoshis(value, $scope.unitCode);
       $scope.altAmount = displayFiat(sats);
     }
   }

@@ -8,6 +8,7 @@ angular.module('copay.services')
     this.identity = null;
     this.profile = null;
     this.pin = null;
+    this.currentWallet = null;
   };
 
   Session.prototype.signin = function(identity) {

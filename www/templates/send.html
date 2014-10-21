@@ -10,30 +10,35 @@
         {{wallet.isShared() ? 'New proposal' : 'Send'}}
       </div>
 
-      <form ng-submit="newProposal()" novalidate>
+      <form name="form" ng-submit="newProposal(form)" class="error-icons" novalidate>
           <label class="item item-input">
             <input
               type="text" ng-model="form.address"
-              placeholder="Bitcoin address" required>
+              placeholder="Bitcoin address" valid-address required>
+            <i class="icon ion-alert-circled error"></i>
           </label>
           <button class="button aside" ng-click="toggleUnit()">{{unitCode}}</button>
           <label class="item item-input">
             <input
               type="number" ng-model="form.amount"
-              placeholder="Amount in {{unitCode}}" ng-change="convert()"
+              placeholder="Amount in {{unitCode}}" ng-change="convert(form.amount)"
               min="0.00000001" max="10000000000" required>
+            <i class="icon ion-alert-circled error"></i>
           </label>
           <label class="item item-input">
             <input
               type="text" value="{{altAmount}}"
               placeholder="Amount in {{altCode}}"
-              disabled="disabled" convert-rate>
+              disabled="disabled">
           </label>
           <label class="item item-input">
             <input type="text" ng-model="form.reference" placeholder="Reference">
           </label>
           <label class="item">
-            <button class="button button-block button-positive" type="submit">
+            <button
+              type="submit"
+              class="button button-block button-positive"
+              ng-disabled="!form.$valid">
               {{wallet.isShared() ? 'Create proposal' : 'Send'}}
             </button>
         </div>
