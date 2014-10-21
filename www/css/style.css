@@ -12,3 +12,11 @@
 .center {
   text-align: center;
 }
+
+.button.aside {
+  float: right;
+  min-height: 46px;
+  border: 0px;
+  border-right: solid 1px #ddd;
+  min-width: 90px;
+}

@@ -5,6 +5,14 @@ var RateService = function($http, Config) {
   this.UNAVAILABLE_ERROR = 'Service is not available - check for service.isAvailable or use service.whenAvailable';
   this.SAT_TO_BTC = 1 / 1e8;
   this.BTC_TO_SAT = 1e8;
+
+  this.UNITS = {
+    "BTC": 1e8,
+    "bits": 1e6,
+    "mBTC": 1e3,
+    "Satoshis": 1
+  };
+
   var MINS_IN_HOUR = 60;
   var MILLIS_IN_SECOND = 1000;
   var rateServiceConfig = Config.rates;
@@ -63,6 +71,14 @@ RateService.prototype.fromFiat = function(amount, code) {
     throw new Error(this.UNAVAILABLE_ERROR);
   }
   return amount / this.rates[code] * this.BTC_TO_SAT;
+};
+
+RateService.prototype.toSatoshis = function(amount, code) {
+  return amount * this.UNITS[code];
+};
+
+RateService.prototype.fromSatoshis = function(satoshis, code) {
+  return satoshis / this.UNITS[code];
 };
 
 RateService.prototype.listAlternatives = function() {

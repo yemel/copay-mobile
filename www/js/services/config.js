@@ -10,8 +10,8 @@ angular.module('copay.services')
 
   // TODO: This should be a Profile preference
   config.currency = {
-    btc: ["BTC", 1 / 1e8], // SAT to BTC
-    fiat: "USD" // Alternative Code
+    btc: "BTC",
+    fiat: "USD"
   }
 
   config.network = {
