@@ -8,7 +8,7 @@ angular.module('copay.services')
     this.STATUS = {
       pending: 'pending',
       rejected: 'rejected',
-      accepted: 'approved'
+      approved: 'approved'
     };
   }
 
@@ -93,7 +93,7 @@ angular.module('copay.services')
       if (err) return cb(err);
       var proposal = wallet.txProposals.getTxProposal(proposalId);
       if (proposal.builder.isFullySigned()) {
-        wallet.send(proposalId, onSend);
+        wallet.sendTx(proposalId, onSend);
       }
     });
 

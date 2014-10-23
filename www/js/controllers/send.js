@@ -3,7 +3,7 @@
 angular.module('copay.controllers')
 
 .controller('SendCtrl', function($scope, $filter, $ionicLoading, Proposals, Config, Rates) {
-  $scope.proposals = Proposals.filter($scope.wallet);
+  $scope.proposals = Proposals.all($scope.wallet);
   $scope.needsApproval = $scope.wallet.requiresMultipleSignatures();
 
   window.P = $scope.proposals;
