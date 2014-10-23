@@ -86,6 +86,8 @@
   border: 0px;
   border-right: solid 1px #ddd;
   min-width: 90px;
+  border-radius: 0px;
+  margin: 0px;
 }
 
 .button.button-positive {
