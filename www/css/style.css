@@ -1,8 +1,59 @@
 /* Empty. Add your own CSS if you like */
+.pane, .view {
+	background-color: #F2F5F8;
+}
+
+.card {
+	-moz-box-shadow:    1px 1px 0px 0px rgba(32,48,64,0.20);
+	box-shadow:         1px 1px 0px 0px rgba(32,48,64,0.20);
+}
+
+.item {
+	color: #7A8C9E;
+	border-color: #D8DCE1;
+}
+
+.item.activated {
+	background: #F2F5F8;
+	border-color: transparent;
+}
+
+.item-divider {
+	background-color: #D8DCE1;
+	color: #2C3E50;
+	text-transform: uppercase;
+	font-size: 14px;
+	font-weight: 700;
+}
+
+.bar {
+	height: 50px;
+}
+
+.bar.bar-stable {
+	background-color: #2C3E50;
+	color: #fff;
+	border: none;
+}
+
+.bar.bar-stable .title, .bar-stable .button, .bar-stable .button.button-clear, .bar-stable .button:hover {
+	color: #fff;
+	top: 3px;
+}
+
+.has-header {
+	top: 50px;
+}
+
+.input-label {
+	color: #7A8C9E;
+	font-size: 14px;
+}
 
 .pin .col {
   text-align: center;
   font-size: 20px;
+  color: #1ABC9C;
 }
 
 .icon.big {
@@ -13,6 +64,22 @@
   text-align: center;
 }
 
+.button {
+	margin: 2px;
+}
+
+.button, .button:hover {
+	background-color: #2C3E50;
+	color: #fff;
+	border: 1px solid #213140;
+}
+
+.button.activated {
+	background: #213140;
+	-moz-box-shadow:    inset 0px 0px 8px 0px rgba(0,0,0,0.7);
+	box-shadow:         inset 0px 0px 8px 0px rgba(0,0,0,0.7);
+}
+
 .button.aside {
   float: right;
   min-height: 46px;
@@ -20,3 +87,52 @@
   border-right: solid 1px #ddd;
   min-width: 90px;
 }
+
+.button.button-positive {
+	border: none;
+	border-radius: 2px;
+	background: #1ABC9C;
+	-moz-box-shadow:    1px 1px 0px 0px #10856E;
+	box-shadow:         1px 1px 0px 0px #10856E;
+}
+
+.button.button-positive.activated {
+	background: #10856E;
+}
+
+.button-bar > .button {
+	padding: 16px;
+}
+
+.tabs-striped.tabs-light .tab-item.tab-item-active, .tabs-striped.tabs-light .tab-item.active, .tabs-striped.tabs-light .tab-item.activated {
+	background-color: #F2F5F8;
+	color: #2C3E50;
+	border-color: transparent;
+}
+
+.tabs-striped.tabs-background-positive .tabs{
+	background-color: #2C3E50;
+	height: 55px;
+}
+
+.box-pin {
+	margin: 20px 10px;
+	padding: 25px 0;
+	border-radius: 2px;
+	background: #FFFFFF;
+	-moz-box-shadow:    2px 1px 0px 0px rgba(32,48,64,0.10);
+	box-shadow:         2px 1px 0px 0px rgba(32,48,64,0.10);
+}
+
+.tabs .tab-item .badge.badge-balanced, .badge.badge-balanced {
+	background-color: #1ABC9C;
+}
+
+.tabs .tab-item .badge.badge-assertive, .badge.badge-assertive {
+	background-color: #C0392A;
+}
+
+.text-gray { color: #7A8C9E; }
+.text-black { color: #2C3E50;}
+
+
