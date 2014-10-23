@@ -26,6 +26,12 @@ angular.module('copay.filters', [])
       return "$" + Rates.toFiat(satoshis || 0, Config.currency.fiat) + unit;
     }
   }])
+  .filter('displayNick', [function() {
+    return function(copayer, wallet) {
+      var me = copayer.copayerId == wallet.getCopayerId() ? " (me)" : "";
+      return copayer.nick + me;
+    }
+  }])
   .filter('range', function() {
     return function(input, from, to) {
       var min = parseInt(from, 10);

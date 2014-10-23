@@ -4,39 +4,48 @@
 
     <div class="card">
       <div class="item item-text-wrap">
-        Receiver: {{proposal.receiver}}
+        Address: {{proposal.outputs[0].address| characters:15}}
       </div>
       <div class="item item-text-wrap">
-        Amount: {{proposal.fiat}} {{proposal.fiatCode}} ({{proposal.amount}} BTC)
+        Amount: {{proposal.total|displayBtc}} ({{proposal.total|displayFiat}})
       </div>
       <div class="item item-text-wrap">
-        Reference: {{proposal.reference}}
+        Fee: {{proposal.fee|displayBtc}}
       </div>
       <div class="item item-text-wrap">
-        Created: {{proposal.created|timeAgo}}
+        Reference: {{proposal.comment}}
+      </div>
+      <div class="item item-text-wrap">
+        Created: {{proposal.createdTs|timeAgo}}
       </div>
       <div class="item item-text-wrap">
         Status: <span class="badge">{{proposal.status|capitalize}}</span>
       </div>
       <div class="item item-divider">
         Copayers
-        <span class="item-note">missing 1 signature</span>
+        <span class="item-note">
+          <ng-pluralize count="proposal.missingSignatures"
+          when="{'0': '',
+              'one': '1 signature missing',
+              'other': '{} signatures missing'}">
+          </ng-pluralize>
+        </span>
       </div>
-      <div class="item item-avatar">
+      <div class="item item-avatar" ng-repeat="copayer in proposal.signers">
         <img src="img/example/barrett.jpg">
-        <h2>Manuel</h2><span class="badge badge-positive">Accepted</span>
+        <h2>{{copayer|displayNick:wallet}}</h2><span class="badge badge-positive">Approved</span>
       </div>
-      <div class="item item-avatar">
+      <div class="item item-avatar" ng-repeat="copayer in proposal.rejecters">
         <img src="img/example/tully.jpg">
-        <h2>Matias</h2><span class="badge badge-assertive">Rejected</span>
+        <h2>{{copayer|displayNick:wallet}}</h2><span class="badge badge-assertive">Rejected</span>
       </div>
-      <div class="item item-divider">
+      <div class="item item-divider" ng-show="proposal.awaitingAction">
         Actions
       </div>
-      <div class="item item-text-wrap">
+      <div class="item item-text-wrap" ng-show="proposal.awaitingAction">
         <div class="button-bar">
-          <button class="button button-positive icon ion-checkmark"> Accept</button>
-          <button class="button button-assertive icon ion-close"> Reject</button>
+          <button class="button button-positive icon ion-checkmark" ng-click="sign()"> Approve</button>
+          <button class="button button-assertive icon ion-close" ng-click="reject()"> Reject</button>
         </div>
       </div>
     </div> 

@@ -12,7 +12,7 @@ angular.module('copay.controllers')
 
   $scope.pendingProposals = function() {
     if (!$scope.wallet || !$scope.wallet.isShared()) return 0;
-    return Proposals.filter({ status: Proposals.STATUS.pending }).length;
+    return Proposals.filter($scope.wallet, { status: Proposals.STATUS.pending }).length;
   };
 
   // Inexistent Wallet, redirect to default one

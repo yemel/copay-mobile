@@ -74,11 +74,13 @@ RateService.prototype.fromFiat = function(amount, code) {
 };
 
 RateService.prototype.toSatoshis = function(amount, code) {
-  return amount * this.UNITS[code];
+  if (this.UNITS[code]) return amount * this.UNITS[code];
+  return this.fromFiat(amount, code);
 };
 
 RateService.prototype.fromSatoshis = function(satoshis, code) {
-  return satoshis / this.UNITS[code];
+  if (this.UNITS[code]) return satoshis / this.UNITS[code];
+  return this.toFiat(satoshis, code);
 };
 
 RateService.prototype.listAlternatives = function() {
