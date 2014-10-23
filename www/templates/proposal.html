@@ -23,7 +23,7 @@
       </div>
       <div class="item item-divider">
         Copayers
-        <span class="item-note">
+        <span class="item-note" ng-show="proposal.isPending">
           <ng-pluralize count="proposal.missingSignatures"
           when="{'0': '',
               'one': '1 signature missing',

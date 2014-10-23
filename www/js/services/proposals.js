@@ -8,7 +8,7 @@ angular.module('copay.services')
     this.STATUS = {
       pending: 'pending',
       rejected: 'rejected',
-      accepted: 'accepted'
+      accepted: 'approved'
     };
   }
 
@@ -60,7 +60,9 @@ angular.module('copay.services')
       tx.missingSignatures = t.countInputMissingSignatures(0);
       tx.awaitingAction = tx.isPending && copayerId != tx.creator && !tx.rejectedByUs && !tx.signedByUs;
       tx.id = tx.ntxid;
-      tx.status = tx.isPending ? self.STATUS.pending : 'other'; // TODO: Add Rejected and Approved
+      tx.status = tx.isPending
+        ? self.STATUS.pending
+        : tx.finallyRejected ? self.STATUS.rejected : self.STATUS.approved;
 
       tx.signers = wallet.getRegisteredPeerIds().filter(function(copayer) {
         return tx.signedBy[copayer.copayerId];

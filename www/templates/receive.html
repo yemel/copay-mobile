@@ -19,7 +19,7 @@
         class="item item-text-wrap"
         ng-repeat="address in addresses"
         ng-click="openModal('bitcoin://' + address.addressStr)">
-        {{address.addressStr| characters:10}}
+        {{address.addressStr| characters:15}}
         <span class="badge text-black">{{address.balance| displayBtc}}</span>
       </div>
     </div> 
