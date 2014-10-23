@@ -3,14 +3,12 @@
 var RateService = function($http, Config) {
   this.isAvailable = false;
   this.UNAVAILABLE_ERROR = 'Service is not available - check for service.isAvailable or use service.whenAvailable';
-  this.SAT_TO_BTC = 1 / 1e8;
-  this.BTC_TO_SAT = 1e8;
 
   this.UNITS = {
-    "BTC": 1e8,
-    "bits": 1e6,
-    "mBTC": 1e3,
-    "Satoshis": 1
+    "BTC": [1e8, 8],
+    "bits": [1e6, 6],
+    "mBTC": [1e3, 3],
+    "Satoshis": [1, 0]
   };
 
   var MINS_IN_HOUR = 60;
@@ -63,23 +61,27 @@ RateService.prototype.toFiat = function(satoshis, code) {
   if (!this.isAvailable) {
     throw new Error(this.UNAVAILABLE_ERROR);
   }
-  return satoshis * this.SAT_TO_BTC * this.rates[code];
+  var value = satoshis / this.UNITS["BTC"][0] * this.rates[code];
+  return parseFloat((value).toFixed(2)); // Remove extra decimal places
 };
 
 RateService.prototype.fromFiat = function(amount, code) {
   if (!this.isAvailable) {
     throw new Error(this.UNAVAILABLE_ERROR);
   }
-  return amount / this.rates[code] * this.BTC_TO_SAT;
+  return parseInt(amount / this.rates[code] * this.UNITS["BTC"][0]);
 };
 
 RateService.prototype.toSatoshis = function(amount, code) {
-  if (this.UNITS[code]) return amount * this.UNITS[code];
+  if (this.UNITS[code]) return parseInt(amount * this.UNITS[code][0]);
   return this.fromFiat(amount, code);
 };
 
 RateService.prototype.fromSatoshis = function(satoshis, code) {
-  if (this.UNITS[code]) return satoshis / this.UNITS[code];
+  if (this.UNITS[code]) {
+    var value = satoshis / this.UNITS[code][0];
+    return parseFloat(value.toFixed(this.UNITS[code][1])); // Remove extra decimal places
+  }
   return this.toFiat(satoshis, code);
 };
 
