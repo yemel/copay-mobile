@@ -4,7 +4,7 @@ angular.module('copay.services')
 
 // This factory extends copay.Identity for ease of use.
 // TODO: Copay initialization it's broken... stop using all that config.
-.factory('Identity', function(Config) {
+.factory('Identity', ['Config', function(Config) {
   var copay = require('copay');
 
   var Identity = angular.extend({}, copay.Identity);
@@ -22,4 +22,4 @@ angular.module('copay.services')
   }
 
   return Identity;
-});
+}]);

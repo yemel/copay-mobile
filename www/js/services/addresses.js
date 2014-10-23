@@ -3,7 +3,7 @@
 angular.module('copay.services')
 
 // TODO: Make this functionality part of Wallet
-.factory('Addresses', function(Wallets) {
+.factory('Addresses', ['Wallets', function(Wallets) {
 
   // Listar todas las addresses
   // Actualizar su balance
@@ -47,4 +47,4 @@ angular.module('copay.services')
   }
 
   return new Addresses();
-});
+}]);

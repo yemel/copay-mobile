@@ -2,7 +2,7 @@
 
 angular.module('copay.services')
 
-.factory('Session', function($window) {
+.factory('Session', ['$window', function($window) {
 
   var Session = function() {
     this.identity = null;
@@ -48,4 +48,4 @@ angular.module('copay.services')
   };
 
   return new Session();
-});
+}]);

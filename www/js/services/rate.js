@@ -1,6 +1,6 @@
 'use strict';
 
-var RateService = function($http, Config) {
+function Rates($http, Config) {
   this.isAvailable = false;
   this.UNAVAILABLE_ERROR = 'Service is not available - check for service.isAvailable or use service.whenAvailable';
 
@@ -49,7 +49,7 @@ var RateService = function($http, Config) {
   retrieve();
 };
 
-RateService.prototype.whenAvailable = function(callback) {
+Rates.prototype.whenAvailable = function(callback) {
   if (this.isAvailable) {
     setTimeout(callback, 1);
   } else {
@@ -57,7 +57,7 @@ RateService.prototype.whenAvailable = function(callback) {
   }
 };
 
-RateService.prototype.toFiat = function(satoshis, code) {
+Rates.prototype.toFiat = function(satoshis, code) {
   if (!this.isAvailable) {
     throw new Error(this.UNAVAILABLE_ERROR);
   }
@@ -65,19 +65,19 @@ RateService.prototype.toFiat = function(satoshis, code) {
   return parseFloat((value).toFixed(2)); // Remove extra decimal places
 };
 
-RateService.prototype.fromFiat = function(amount, code) {
+Rates.prototype.fromFiat = function(amount, code) {
   if (!this.isAvailable) {
     throw new Error(this.UNAVAILABLE_ERROR);
   }
   return parseInt(amount / this.rates[code] * this.UNITS["BTC"][0]);
 };
 
-RateService.prototype.toSatoshis = function(amount, code) {
+Rates.prototype.toSatoshis = function(amount, code) {
   if (this.UNITS[code]) return parseInt(amount * this.UNITS[code][0]);
   return this.fromFiat(amount, code);
 };
 
-RateService.prototype.fromSatoshis = function(satoshis, code) {
+Rates.prototype.fromSatoshis = function(satoshis, code) {
   if (this.UNITS[code]) {
     var value = satoshis / this.UNITS[code][0];
     return parseFloat(value.toFixed(this.UNITS[code][1])); // Remove extra decimal places
@@ -85,7 +85,7 @@ RateService.prototype.fromSatoshis = function(satoshis, code) {
   return this.toFiat(satoshis, code);
 };
 
-RateService.prototype.listAlternatives = function() {
+Rates.prototype.listAlternatives = function() {
   if (!this.isAvailable) {
     throw new Error(this.UNAVAILABLE_ERROR);
   }
@@ -100,4 +100,5 @@ RateService.prototype.listAlternatives = function() {
   return alts;
 };
 
-angular.module('copay.services').service('Rates', RateService);
+angular.module('copay.services').service('Rates', ['$http', 'Config', Rates]);
+

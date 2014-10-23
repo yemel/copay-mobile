@@ -3,7 +3,7 @@
 angular.module('copay.services')
 
 // This factory should be replaced by Session.identity
-.factory('Wallets', function(Session, Identity) {
+.factory('Wallets', ['Session', 'Identity', function(Session, Identity) {
   var Wallets = function() {};
 
   Wallets.create = function(data, cb) {
@@ -39,4 +39,4 @@ angular.module('copay.services')
   }
 
   return Wallets;
-});
+}]);

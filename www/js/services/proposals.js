@@ -2,7 +2,7 @@ angular.module('copay.services')
 
 // This class provides some missing functionalities from Copay
 // TODO: Implement this on copay lib
-.factory('Proposals', function(Session, Bitcore) {
+.factory('Proposals', ['Session', 'Bitcore', function(Session, Bitcore) {
 
   function Proposals() {
     this.STATUS = {
@@ -103,4 +103,4 @@ angular.module('copay.services')
   };
 
   return new Proposals();
-});
+}]);

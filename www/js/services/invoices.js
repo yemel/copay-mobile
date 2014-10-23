@@ -2,7 +2,7 @@
 
 angular.module('copay.services')
 
-.factory('Invoices', function(Session) {
+.factory('Invoices', ['Session', function(Session) {
 
   function Invoices() {
     this.invoices = [
@@ -49,4 +49,4 @@ angular.module('copay.services')
   };
 
   return new Invoices();
-});
+}]);
