@@ -2,7 +2,9 @@
 
 angular.module('copay.controllers')
 
-.controller('WalletCtrl', function($scope, $state, $ionicLoading, Wallets) {
+.controller('WalletCtrl', ['$scope', '$state', '$ionicLoading', 'Wallets',
+            function WalletCtrl($scope, $state, $ionicLoading, Wallets) {
+
   // Current limitations of multisig and transaction size
   var COPAYERS_LIMIT = 12;
   var THRESHOLD_LIMITS = [1, 2, 3, 4, 4, 3, 3, 2, 2, 2, 1, 1];
@@ -44,4 +46,4 @@ angular.module('copay.controllers')
     $scope.threshold = THRESHOLD_LIMITS[copayers-1];
     $scope.data.threshold = Math.min(parseInt($scope.data.copayers/2+1), $scope.threshold);
   });
-});
+}]);

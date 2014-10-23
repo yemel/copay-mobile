@@ -2,7 +2,9 @@
 
 angular.module('copay.controllers')
 
-.controller('SendCtrl', function($scope, $filter, $ionicLoading, Proposals, Config, Rates) {
+.controller('SendCtrl', ['$scope', '$filter', '$ionicLoading', 'Proposals', 'Config', 'Rates',
+            function SendCtrl($scope, $filter, $ionicLoading, Proposals, Config, Rates) {
+
   $scope.proposals = Proposals.all($scope.wallet);
   $scope.needsApproval = $scope.wallet.requiresMultipleSignatures();
 
@@ -75,9 +77,10 @@ angular.module('copay.controllers')
     }
   }
 
-})
+}])
 
-.controller('ProposalCtrl', function($scope, $state, $ionicLoading, $stateParams, Proposals) {
+.controller('ProposalCtrl', ['$scope', '$state', '$ionicLoading', '$stateParams', 'Proposals',
+            function ProposalCtrl($scope, $state, $ionicLoading, $stateParams, Proposals) {
   $scope.proposal = Proposals.get($scope.wallet, $stateParams.proposalId);
 
   $scope.sign = function() {
@@ -106,4 +109,4 @@ angular.module('copay.controllers')
     });
   };
 
-});
+}]);

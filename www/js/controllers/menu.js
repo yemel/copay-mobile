@@ -2,12 +2,12 @@
 
 angular.module('copay.controllers')
 
-.controller('SidebarCtrl', function($scope, $state, Session, Wallets) {
+.controller('SidebarCtrl', ['$scope', '$state', 'Session', 'Wallets', function SidebarCtrl($scope, $state, Session, Wallets) {
   $scope.profile = Session.profile;
   $scope.wallets = Wallets.all();
-})
+}])
 
-.controller('TabsCtrl', function($scope, $state, $stateParams, Session, Wallets, Proposals) {
+.controller('TabsCtrl', ['$scope', '$state', '$stateParams', 'Session', 'Wallets', 'Proposals', function($scope, $state, $stateParams, Session, Wallets, Proposals) {
   $scope.wallet = Session.currentWallet = Wallets.get($stateParams.walletId);
 
   $scope.pendingProposals = function() {
@@ -21,4 +21,4 @@ angular.module('copay.controllers')
     return $state.go('profile.wallet.home', {walletId: defualtWallet.id});
   }
 
-});
+}]);
