@@ -6,8 +6,6 @@ angular.module('copay.controllers')
   $scope.proposals = Proposals.all($scope.wallet);
   $scope.needsApproval = $scope.wallet.requiresMultipleSignatures();
 
-  window.P = $scope.proposals;
-
   $scope.unitCode = Config.currency.fiat;
   $scope.altCode = Config.currency.btc;
   $scope.unitFiat = true;
@@ -37,9 +35,9 @@ angular.module('copay.controllers')
     }
   };
 
-  $scope.clearF = function(form) {
+  $scope.clearForm = function(form) {
+    form.address = form.amount = $scope.altAmount = form.reference = "";
     form.$setPristine();
-    window.F = form;
   }
 
   $scope.submit = function(form) {
@@ -70,8 +68,7 @@ angular.module('copay.controllers')
       if (!txid) throw 'Problem Sending!'; // TODO: Handle this!
       $ionicLoading.hide();
       // TODO: Toast Notification
-      form.address = form.amount = form.reference = null;
-      form.address.$pristine = form.amount.$pristine = true;
+      $scope.clearForm(form);
     }
   }
 
