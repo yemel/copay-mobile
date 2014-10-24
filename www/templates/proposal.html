@@ -4,6 +4,13 @@
 
     <div class="card">
       <div class="item item-text-wrap">
+        Status: <span class="badge" ng-class="{
+          'badge-balanced': proposal.status == 'approved',
+          'badge-assertive': proposal.status == 'rejected',
+          'badge-energized': proposal.status == 'pending'
+        }">{{proposal.status|capitalize}}</span>
+      </div>
+      <div class="item item-text-wrap">
         Address: {{proposal.outputs[0].address| characters:15}}
       </div>
       <div class="item item-text-wrap">
@@ -17,9 +24,6 @@
       </div>
       <div class="item item-text-wrap">
         Created: {{proposal.createdTs|timeAgo}}
-      </div>
-      <div class="item item-text-wrap">
-        Status: <span class="badge">{{proposal.status|capitalize}}</span>
       </div>
       <div class="item item-divider">
         Copayers
