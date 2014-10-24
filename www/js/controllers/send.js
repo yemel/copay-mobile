@@ -2,8 +2,8 @@
 
 angular.module('copay.controllers')
 
-.controller('SendCtrl', function($scope, $filter, $ionicLoading, Proposals, Config, Rates) {
-  $scope.proposals = Proposals.all($scope.wallet);
+.controller('SendCtrl', function($scope, $filter, $state, $ionicLoading, Proposals, Config, Rates) {
+  $scope.proposals = Proposals.filter($scope.wallet, {status: Proposals.STATUS.pending});
   $scope.needsApproval = $scope.wallet.requiresMultipleSignatures();
 
   $scope.unitCode = Config.currency.fiat;
@@ -52,13 +52,13 @@ angular.module('copay.controllers')
     var satoshis = Rates.toSatoshis(form.amount, $scope.unitCode);
     wallet.createTx(form.address, satoshis, form.reference, onCreate);
 
-    function onCreate(err, ntxid) {
+    function onCreate(err, proposalId) {
       if (err) throw err; // TODO: Handle this!
 
       if ($scope.needsApproval) {
         $ionicLoading.hide();
         // TODO: Toast Notification
-        // reload page!
+        $state.go('profile.wallet.proposal', {proposalId: proposalId});
       } else {
         wallet.sendTx(ntxid, onSend);
       }
