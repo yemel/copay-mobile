@@ -2,7 +2,9 @@
 
 angular.module('copay.controllers')
 
-.controller('RegisterCtrl', function($scope, $state, $ionicLoading, Identity, Session) {
+.controller('RegisterCtrl', ['$scope', '$state', '$ionicLoading', 'Identity', 'Session',
+            function RegisterCtrl($scope, $state, $ionicLoading, Identity, Session) {
+
   $scope.profile = {};
   $scope.errors = [];
 
@@ -21,4 +23,4 @@ angular.module('copay.controllers')
       $state.go('setPin', $scope.profile);
     });
   };
-});
+}]);

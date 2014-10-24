@@ -2,7 +2,7 @@
 
 angular.module('copay.controllers')
 
-.controller('ReceiveCtrl', function($scope, $state, $ionicModal, $window, Session, Addresses) {
+.controller('ReceiveCtrl', ['$scope', '$state', '$ionicModal', '$window', 'Session', 'Addresses', function ReceiveCtrl($scope, $state, $ionicModal, $window, Session, Addresses) {
   $scope.addresses = Addresses.filter($scope.wallet);
   console.log($scope.addresses);
 
@@ -34,4 +34,4 @@ angular.module('copay.controllers')
     $window.prompt("Copy to clipboard: Ctrl+C/⌘+C, Enter", $scope.modal.data);
   };
 
-});
+}]);
