@@ -19,7 +19,11 @@ angular.module('copay.services')
       networkName: data.testnet ? "testnet" : "livenet"
     }
 
-    Session.identity.createWallet(opts, cb); // TODO: Use directlly
+    Session.identity.createWallet(opts, createWalletCallback); // TODO: Use directlly
+    // TODO: Add event handler to store this instead of doing it this way
+    function createWalletCallback(err, wallet) {
+      Session.identity.store({}, cb);
+    }
   };
 
   Wallets.join = function(secret, cb) {

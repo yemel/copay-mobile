@@ -6,8 +6,10 @@ angular.module('copay.controllers')
   $scope.proposals = Proposals.filter($scope.wallet, {status: Proposals.STATUS.pending});
   $scope.needsApproval = $scope.wallet.requiresMultipleSignatures();
 
-  $scope.unitCode = Config.currency.fiat;
-  $scope.altCode = Config.currency.btc;
+  window.P = $scope.proposals;
+
+  $scope.primaryCode = Config.currency.fiat;
+  $scope.secondaryCode = Config.currency.btc;
   $scope.unitFiat = true;
 
   var displayBtc = $filter('displayBtc');
@@ -17,21 +19,27 @@ angular.module('copay.controllers')
     var currency = Config.currency;
 
     $scope.unitFiat = !$scope.unitFiat;
-    $scope.unitCode = $scope.unitFiat ? currency.fiat : currency.btc;
-    $scope.altCode = !$scope.unitFiat ? currency.fiat : currency.btc;
+    $scope.primaryCode =   $scope.unitFiat ? currency.fiat : currency.btc;
+    $scope.secondaryCode = !$scope.unitFiat ? currency.fiat : currency.btc;
 
     $scope.convert(value);
   };
 
+  var getSatoshis = function(value) {
+    if ($scope.unitFiat) {
+      return Rates.fromFiat(value, Config.currency.fiat);
+    } else {
+      return Rates.toSatoshis(value, Config.currency.btc);
+    }
+  }
+
   $scope.convert = function(value) {
-    if (!value) return $scope.altAmount = null;
+    if (!value) return $scope.secondaryAmount = null;
 
     if ($scope.unitFiat) {
-      var sats = Rates.fromFiat(value, $scope.unitCode);
-      $scope.altAmount = displayBtc(sats);
+      $scope.secondaryAmount = displayBtc(getSatoshis(value));
     } else {
-      var sats = Rates.toSatoshis(value, $scope.unitCode);
-      $scope.altAmount = displayFiat(sats);
+      $scope.secondaryAmount = displayFiat(getSatoshis(value));
     }
   };
 
@@ -49,7 +57,7 @@ angular.module('copay.controllers')
       template: '<i class="icon ion-loading-c"></i> ' + message + '...'
     });
 
-    var satoshis = Rates.toSatoshis(form.amount, $scope.unitCode);
+    var satoshis = getSatoshis(form.amount);
     wallet.createTx(form.address, satoshis, form.reference, onCreate);
 
     function onCreate(err, proposalId) {
