@@ -2,7 +2,7 @@
 
 angular.module('copay.controllers')
 
-.controller('ReceiveCtrl', function($scope, $state, $ionicModal, $window, Session, Addresses) {
+.controller('ReceiveCtrl', function($scope, $state, $ionicModal, $window, $cordovaSocialSharing, Session, Addresses) {
   $scope.addresses = Addresses.filter($scope.wallet);
   console.log($scope.addresses);
 
@@ -28,6 +28,11 @@ angular.module('copay.controllers')
 
   $scope.closeModal = function() {
     $scope.modal.hide();
+  };
+
+  $scope.shareData = function() {
+    var message = "Here is my bitcoin address:<br/><br/>" + $scope.modal.data;
+    $cordovaSocialSharing.shareViaEmail(message, "My bitcoin address");
   };
 
   $scope.copyData = function() {
