@@ -6,14 +6,12 @@ angular.module('copay.services')
 
   var Session = function() {
     this.identity = null;
-    this.profile = null;
     this.pin = null;
     this.currentWallet = null;
   };
 
   Session.prototype.signin = function(identity) {
     this.identity = identity;
-    this.profile = identity.profile;
   };
 
   Session.prototype.signout = function(identity) {

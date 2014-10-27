@@ -31,7 +31,7 @@ angular.module('copay.services')
   };
 
   config.pluginManager = new copay.PluginManager({
-    plugins: { LocalStorage: true }
+    plugins: { EncryptedLocalStorage: true }
   });
 
   var walletConfig = {

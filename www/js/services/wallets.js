@@ -32,12 +32,12 @@ angular.module('copay.services')
   };
 
   Wallets.all = function() {
-    var wallets = Object.keys(Session.profile.walletInfos);
+    var wallets = Object.keys(Session.identity.wallets);
     return wallets.map(this.get.bind(this));
   }
 
   Wallets.get = function(id) {
-    var wallet = Session.identity.getOpenWallet(id);
+    var wallet = Session.identity.wallets[id];
     window.W = wallet;
     window.I = Session.identity;
     return wallet;

@@ -11,13 +11,17 @@ angular.module('copay.services')
 
   Identity.createProfile = function(p, callback) {
     var opts = angular.copy(Config.identity);
-    var call = this.create.bind(this, p.email, p.password, opts, callback);
+    opts.email = p.email;
+    opts.password = p.password;
+    var call = this.create.bind(this, opts, callback);
     setTimeout(call, 100);
   }
 
   Identity.openProfile = function(p, callback) {
     var opts = angular.copy(Config.identity);
-    var call = Identity.open.bind(Identity, p.email, p.password, opts, callback);
+    opts.email = p.email;
+    opts.password = p.password;
+    var call = Identity.open.bind(Identity, opts, callback);
     setTimeout(call, 100);
   }
 
