@@ -18,6 +18,21 @@ angular.module('copay.directives', [])
     };
   })
 
+  .directive('validSecret', function() {
+    var copay = require('copay');
+    return {
+      require: 'ngModel',
+      link: function(scope, elem, attrs, ctrl) {
+        ctrl.$parsers.unshift(function validSecret(value) {
+          if (!copay.Wallet.decodeSecret(value)) {
+            ctrl.$setValidity('validSecret', false);
+          }
+          return value;
+        });
+      }
+    }
+  })
+
   .directive('validAddress', ['Session', 'Bitcore',
     function(Session, Bitcore) {
       return {

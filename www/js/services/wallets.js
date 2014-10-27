@@ -6,6 +6,11 @@ angular.module('copay.services')
 .factory('Wallets', function(Session, Identity) {
   var Wallets = function() {};
 
+  // TODO: This should go into main Copay and be documented
+  Wallets.error = {
+    badSecret: 'badSecret'
+  };
+
   Wallets.create = function(data, cb) {
     var opts = {
       name: data.name,
