@@ -3,6 +3,7 @@
 	background-color: #F2F5F8;
 }
 
+
 .card {
 	-moz-box-shadow:    1px 1px 0px 0px rgba(32,48,64,0.20);
 	box-shadow:         1px 1px 0px 0px rgba(32,48,64,0.20);
@@ -11,6 +12,24 @@
 .item {
 	color: #7A8C9E;
 	border-color: #D8DCE1;
+}
+
+.menu {
+	background-color: #213140;
+	color: #fff;
+}
+
+.menu .item {
+	border-color: #2C3E50;
+	margin: -2px;
+}
+
+.menu h4 {
+	color: #fff;
+}
+
+.item-complex .item-content, .item-radio .item-content {
+	background-color: #213140
 }
 
 .item.activated {
@@ -27,7 +46,7 @@
 }
 
 .bar {
-	height: 50px;
+	height: 55px;
 }
 
 .bar.bar-stable {
@@ -36,13 +55,23 @@
 	border: none;
 }
 
+.bar .title {
+	margin: 5px 10px;
+}
+
 .bar.bar-stable .title, .bar-stable .button, .bar-stable .button.button-clear, .bar-stable .button:hover {
 	color: #fff;
-	top: 3px;
+}
+
+.numbers {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	height: 0%;
 }
 
 .has-header {
-	top: 50px;
+	top: 55px;
 }
 
 .input-label {
@@ -137,4 +166,9 @@
 .text-gray { color: #7A8C9E; }
 .text-black { color: #2C3E50;}
 
+.left { float: left; }
 
+.size-12 {font-size: 12px !important;}
+.size-14 {font-size: 14px !important;}
+.size-18 {font-size: 18px !important;}
+.size-20 {font-size: 20px !important;}

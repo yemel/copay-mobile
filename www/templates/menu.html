@@ -19,9 +19,10 @@
     </header>
     <ion-content class="has-header">
       <ion-list>
-        <ion-item ng-repeat="wallet in wallets" nav-clear menu-close ui-sref="profile.wallet.home({walletId:wallet.id})">
+        <ion-item ng-repeat="wallet in wallets" nav-clear menu-close ui-sref="profile.wallet.home({walletId:wallet.id})" class="item-icon-right">
           {{wallet.name|capitalize}}
           <span class="item-note">{{wallet.requiredCopayers}} of {{wallet.totalCopayers}}</span>
+          <i class="icon ion-chevron-right size-14"></i>
         </ion-item>
         <ion-item nav-clear menu-close ui-sref="profile.add">
           <i class="icon ion-plus"></i> New Wallet
@@ -30,9 +31,17 @@
 
     </ion-content>
       <div class="bar bar-footer bar-stable" nav-clear menu-close ui-sref="profile.edit">
-        <div class="title">
-          <i class="icon ion-person"></i> {{profile.email}}
+
+        <div class="item-icon-left item-icon-right size-20" href="#">
+          <i class="icon ion-person size-20"></i>
+          <h4 class="size-18">Call Ma</h4>
+          <i class="icon ion-chevron-right size-14"></i>
         </div>
+        <!-- <div class="row">
+          <div class="col"> <i class="icon ion-person"></i> </div>
+          <div class="col-75"> <h4> {{profile.email}} </h4></div>
+          <div class="col"><i class="icon ion-chevron-right"></i></div>
+        </div> -->
       </div>
   </ion-side-menu>
 </ion-side-menus>
