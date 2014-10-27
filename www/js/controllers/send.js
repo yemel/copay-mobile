@@ -60,7 +60,7 @@ angular.module('copay.controllers')
         // TODO: Toast Notification
         $state.go('profile.wallet.proposal', {proposalId: proposalId});
       } else {
-        wallet.sendTx(ntxid, onSend);
+        wallet.sendTx(proposalId, onSend);
       }
     }
 

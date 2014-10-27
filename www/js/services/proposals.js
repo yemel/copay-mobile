@@ -1,3 +1,5 @@
+'use strict'
+
 angular.module('copay.services')
 
 // This class provides some missing functionalities from Copay

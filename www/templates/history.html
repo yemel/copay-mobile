@@ -10,9 +10,14 @@
         Transaction history
       </div>
       <div class="item item-text-wrap" ng-repeat="trans in transactions">
-        <span>{{trans.time | timeAgo}} - Manuel Araoz</span>
-        <span class="badge" ng-class="{'badge-assertive': trans.value < 0, 'badge-balanced': trans.value > 0}">
-          {{trans.value}} BTC
+        <span ng-show="trans.time">{{trans.time | timeAgo}}</span>
+        <span ng-show="!trans.time">Unconfirmed</span>
+        <span ng-show="trans.comment">{{trans.comment}}</span>
+        <span class="badge badge-assertive" ng-show="trans.action == 'sent'">
+          -{{trans.amountSat|displayBtc}}
+        </span>
+        <span class="badge badge-balanced" ng-show="trans.action == 'received'">
+          {{trans.amountSat|displayBtc}}
         </span>
       </div>
     </div> 
