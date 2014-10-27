@@ -2,7 +2,7 @@
 
 angular.module('copay.controllers')
 
-.controller('ReceiveCtrl', function($scope, $state, $ionicModal, $window, $cordovaSocialSharing, Session, Addresses) {
+.controller('ReceiveCtrl', function($scope, $state, $ionicModal, $window, $cordovaSocialSharing, $cordovaClipboard, Session, Addresses, Notifications) {
   $scope.addresses = Addresses.filter($scope.wallet);
   console.log($scope.addresses);
 
@@ -36,7 +36,15 @@ angular.module('copay.controllers')
   };
 
   $scope.copyData = function() {
-    $window.prompt("Copy to clipboard: Ctrl+C/⌘+C, Enter", $scope.modal.data);
+    var data = $scope.modal.data;
+
+    if (!$window.cordova) {
+      return $window.prompt("Copy to clipboard: Ctrl+C/⌘+C, Enter", data);
+    }
+
+    $cordovaClipboard.copy(data).then(function() {
+      Notifications.toast('Address copied');
+    });
   };
 
 });

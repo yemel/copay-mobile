@@ -2,7 +2,7 @@
 
 angular.module('copay.controllers')
 
-.controller('HomeCtrl', function($scope, $state, $ionicModal, $window, $cordovaSocialSharing, Rates) {
+.controller('HomeCtrl', function($scope, $state, $ionicModal, $window, $cordovaSocialSharing, $cordovaClipboard, Rates, Notifications) {
   $scope.copayers = $scope.wallet.getRegisteredPeerIds(); // TODO: Rename method to getCopayers
   $scope.remaining = $scope.wallet.publicKeyRing.remainingCopayers(); // TODO: Expose on Wallet
 
@@ -31,7 +31,14 @@ angular.module('copay.controllers')
   }
 
   $scope.copyData = function() {
-    $window.prompt("Copy to clipboard: Ctrl+C/⌘+C, Enter", $scope.wallet.getSecret());
+    var data = $scope.wallet.getSecret();
+    if (!$window.cordova) {
+      return $window.prompt("Copy to clipboard: Ctrl+C/⌘+C, Enter", data);
+    }
+
+    $cordovaClipboard.copy(data).then(function() {
+      Notifications.toast('Secret copied');
+    });
   };
 
 });
