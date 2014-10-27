@@ -2,7 +2,7 @@
 
 angular.module('copay.controllers')
 
-.controller('SendCtrl', function($scope, $filter, $state, $ionicLoading, Proposals, Config, Rates, Notifications) {
+.controller('SendCtrl', function($scope, $filter, $state, $ionicLoading, $stateParams, Proposals, Config, Rates, Notifications) {
   $scope.proposals = Proposals.filter($scope.wallet, {status: Proposals.STATUS.pending});
   $scope.needsApproval = $scope.wallet.requiresMultipleSignatures();
 
@@ -12,6 +12,8 @@ angular.module('copay.controllers')
 
   var displayBtc = $filter('displayBtc');
   var displayFiat = $filter('displayFiat');
+
+  console.log('Data', $stateParams);
 
   $scope.toggleUnit = function(value) {
     var currency = Config.currency;

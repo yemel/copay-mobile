@@ -25,7 +25,7 @@ angular.module('copay.services')
   Wallets.join = function(secret, cb) {
     var opts = {
       secret: secret,
-      nickname: Session.profile.email // TODO: This shouldn't be necesary
+      nickname: Session.email // TODO: This shouldn't be necesary
     }
 
     Session.identity.joinWallet(opts, cb); // TODO: Use directlly

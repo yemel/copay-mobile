@@ -15,6 +15,7 @@ angular.module('copay.controllers')
 
     $cordovaBarcodeScanner.scan().then(onCamera, onError);
 
+    // TODO: Should this belong to a Camera Service ?
     function onCamera(result) {
       if (result.cancelled) {
         // Copyrighted Hack: http://marsbomber.com/2014/05/29/BarcodeScanner-With-Ionic/
@@ -30,9 +31,16 @@ angular.module('copay.controllers')
     }
 
     function onScann(data) {
-      console.log('ONSCAN', data);
-      // Check if its a Join Secret
+      var copay = require('copay');
+      if (copay.Wallet.decodeSecret(data)) {
+        return $state.go('profile.add', { secret: data });
+      }
+
       // Check if its an Bitcoin Address
+      $state.go('profile.wallet.send', {
+        walletId: Session.currentWallet.id,
+        data: data
+      });
     }
 
     function onError(error) {
@@ -52,7 +60,7 @@ angular.module('copay.controllers')
 
   // Inexistent Wallet, redirect to default one
   if (!$scope.wallet) {
-    var defualtWallet = Wallets.all()[0];
+    var defualtWallet = Wallets.all()[0]; // TODO: Use last opened wallet
     return $state.go('profile.wallet.home', {walletId: defualtWallet.id});
   }
 

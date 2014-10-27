@@ -83,7 +83,7 @@ angular.module('copay')
     })
 
     .state('profile.wallet.send', {
-      url: "/send",
+      url: "/send?data",
       views: {
         'tab3' :{
           templateUrl: "templates/send.html",
@@ -122,7 +122,7 @@ angular.module('copay')
     })
 
     .state('profile.add', {
-      url: "/add",
+      url: "/add?secret",
       views: {
         'content' :{
           templateUrl: "templates/add.html",
