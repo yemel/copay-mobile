@@ -14,6 +14,7 @@ using the multisig power of Copay and making it context aware.
 ## Cordova Plugins
 
     cordova plugin add https://github.com/EddyVerbruggen/Toast-PhoneGap-Plugin.git
+    cordova plugin add https://github.com/wildabeast/BarcodeScanner.git
 
 ## Run
 
