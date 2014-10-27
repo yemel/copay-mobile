@@ -20,6 +20,8 @@ angular.module('copay.controllers')
     Wallets.create($scope.data, function onResult(err, wallet){
       $ionicLoading.hide();
       if (err) throw err;
+
+      Notifications.toast('Wallet created');
       return $state.go('profile.wallet.home', {walletId: wallet.id});
     });
   };
@@ -48,6 +50,8 @@ angular.module('copay.controllers')
           throw err;
         }
       }
+
+      Notifications.toast('Wallet joined');
       return $state.go('profile.wallet.home', {walletId: wallet.id});
     });
   };

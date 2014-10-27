@@ -5,6 +5,7 @@ angular.module('copay', [
   'monospaced.qrcode',
   'yaru22.angular-timeago',
   'truncate',
+  'ngCordova',
 
   'copay.controllers',
   'copay.services',

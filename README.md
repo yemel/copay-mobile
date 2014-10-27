@@ -11,6 +11,10 @@ using the multisig power of Copay and making it context aware.
     cd copay-mobile
     npm install
 
+## Cordova Plugins
+
+    cordova plugin add https://github.com/EddyVerbruggen/Toast-PhoneGap-Plugin.git
+
 ## Run
 
 Run it on the IOS emulator:

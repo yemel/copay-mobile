@@ -93,17 +93,18 @@ angular.module('copay.services')
   Proposals.prototype.sign = function(wallet, proposalId, cb) {
     wallet.sign(proposalId, function onSigning(err) {
       if (!err) return cb('Could not sign the transaction'); // TODO: cb(err, data) standar is broken on wallet.sign
+
       var proposal = wallet.txProposals.getTxProposal(proposalId);
       if (proposal.builder.isFullySigned()) {
         return wallet.sendTx(proposalId, onSend);
       }
 
-      cb();
+      cb(null, false);
     });
 
     function onSend(txid) {
       if (!txid) return cb('Error sending');
-      cb();
+      cb(null, true);
     }
   };
 

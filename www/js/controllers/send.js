@@ -2,7 +2,7 @@
 
 angular.module('copay.controllers')
 
-.controller('SendCtrl', function($scope, $filter, $state, $ionicLoading, Proposals, Config, Rates) {
+.controller('SendCtrl', function($scope, $filter, $state, $ionicLoading, Proposals, Config, Rates, Notifications) {
   $scope.proposals = Proposals.filter($scope.wallet, {status: Proposals.STATUS.pending});
   $scope.needsApproval = $scope.wallet.requiresMultipleSignatures();
 
@@ -57,7 +57,7 @@ angular.module('copay.controllers')
 
       if ($scope.needsApproval) {
         $ionicLoading.hide();
-        // TODO: Toast Notification
+        Notifications.toast('Proposal created');
         $state.go('profile.wallet.proposal', {proposalId: proposalId});
       } else {
         wallet.sendTx(proposalId, onSend);
@@ -67,14 +67,14 @@ angular.module('copay.controllers')
     function onSend(txid) {
       if (!txid) throw 'Problem Sending!'; // TODO: Handle this!
       $ionicLoading.hide();
-      // TODO: Toast Notification
+      Notifications.toast('Transaction sent');
       $scope.clearForm(form);
     }
   }
 
 })
 
-.controller('ProposalCtrl', function($scope, $state, $ionicLoading, $stateParams, Proposals) {
+.controller('ProposalCtrl', function($scope, $state, $ionicLoading, $stateParams, Proposals, Notifications) {
   $scope.proposal = Proposals.get($scope.wallet, $stateParams.proposalId);
 
   $scope.sign = function() {
@@ -82,10 +82,12 @@ angular.module('copay.controllers')
       template: '<i class="icon ion-loading-c"></i> Signing...'
     });
 
-    Proposals.sign($scope.wallet, $stateParams.proposalId, function onResult(err) {
+    Proposals.sign($scope.wallet, $stateParams.proposalId, function onResult(err, broadcasted) {
       $ionicLoading.hide();
       if (err) throw err; // TODO: Handle this error!
-      // TODO: Notification it's done!
+
+      var message = broadcasted ? 'Transaction sent' : 'Proposal approved';
+      Notifications.toast(message);
       $state.reload();
     });
   };
@@ -98,7 +100,8 @@ angular.module('copay.controllers')
     Proposals.reject($scope.wallet, $stateParams.proposalId, function onResult(err) {
       $ionicLoading.hide();
       if (err) throw err; // TODO: Handle this error!
-      // TODO: Notification it's done!
+
+      Notifications.toast('Proposal rejected');
       $state.reload();
     });
   };
