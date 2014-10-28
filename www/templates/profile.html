@@ -5,36 +5,48 @@
   </ion-nav-buttons>
 
   <ion-content class="has-header">
-    <form ng-submit="submit()">
-      <div class="list">
-        <label class="item item-input">
-          <span class="input-label" disabled>Email</span>
-          <input type="email" ng-model="profile.email" disabled>
-        </label>
-        <label class="item item-input item-select">
-          <span class="input-label" disabled>Bitcoin unit</span>
-          <select>
-            <option selected>BTC</option>
-            <option>bits (1,000,000 bits = 1 BTC)</option>
-            <option>mBTC (1,000 bits = 1 BTC)</option>
-            <option>Satoshis (100,000,000 bits = 1 BTC)</option>
-          </select>
-        </label>
-        <label class="item item-input item-select">
-          <span class="input-label" disabled>Alternative currency</span>
-          <select>
-            <option selected>US Dollar</option>
-            <option>Eurozone Euro</option>
-            <option>Pound Sterling</option>
-            <option>Japanese Yen</option>
-            <option>Argentine Peso</option>
-          </select>
-        </label>
-        <label class="item">
-          <button class="button button-block button-positive" type="submit">Save</button>
-        </label>
+
+    <div class="card">
+      <div class="item item-divider">
+        Preferences
       </div>
-    </form>
+      <form ng-submit="submit()">
+        <div class="list">
+          <label class="item item-input">
+            <span class="input-label" disabled>Email</span>
+            <input type="email" ng-model="profile.email" disabled>
+          </label>
+          <label class="item item-input item-select">
+            <span class="input-label" disabled>Bitcoin unit</span>
+            <select>
+              <option selected>BTC</option>
+              <option>bits (1,000,000 bits = 1 BTC)</option>
+              <option>mBTC (1,000 bits = 1 BTC)</option>
+              <option>Satoshis (100,000,000 bits = 1 BTC)</option>
+            </select>
+          </label>
+          <label class="item item-input item-select">
+            <span class="input-label" disabled>Alternative currency</span>
+            <select>
+              <option selected>US Dollar</option>
+              <option>Eurozone Euro</option>
+              <option>Pound Sterling</option>
+              <option>Japanese Yen</option>
+              <option>Argentine Peso</option>
+            </select>
+          </label>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="item item-divider">
+        Backup profile
+      </div>
+      <div class="item item">
+        <button class="button button-block button-positive" ng-click="backup()">Email Backup</button>
+      </div>
+    </div>
 
   </ion-content>
 </ion-view>

@@ -116,7 +116,8 @@ angular.module('copay')
       url: "/edit",
       views: {
         'content' :{
-          templateUrl: "templates/profile.html"
+          templateUrl: "templates/profile.html",
+          controller: 'ProfileCtrl'
         }
       }
     })
