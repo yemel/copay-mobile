@@ -3,15 +3,15 @@
     <ion-nav-view name="tab1">Home</ion-nav-view>
   </ion-tab>
 
-  <ion-tab title="Receive" icon="icon ion-ios7-download" ui-sref="profile.wallet.receive">
+  <ion-tab title="Receive" ng-if="wallet.publicKeyRing.isComplete()" icon="icon ion-ios7-download" ui-sref="profile.wallet.receive">
     <ion-nav-view name="tab2">Receive</ion-nav-view>
   </ion-tab>
 
-  <ion-tab title="Send" icon="icon ion-ios7-upload" ui-sref="profile.wallet.send" badge="pendingProposals()" badge-style="badge-balanced">
+  <ion-tab title="Send" ng-if="wallet.publicKeyRing.isComplete()" icon="icon ion-ios7-upload" ui-sref="profile.wallet.send" badge="pendingProposals()" badge-style="badge-balanced">
     <ion-nav-view name="tab3">Send</ion-nav-view>
   </ion-tab>
 
-  <ion-tab title="History" icon="icon ion-ios7-paper" ui-sref="profile.wallet.history">
+  <ion-tab title="History" ng-if="wallet.publicKeyRing.isComplete()" icon="icon ion-ios7-paper" ui-sref="profile.wallet.history">
     <ion-nav-view name="tab4">History</ion-nav-view>
   </ion-tab>
 </ion-tabs>
