@@ -54,7 +54,8 @@ angular.module('copay.controllers')
   };
 })
 
-.controller('TabsCtrl', function($scope, $state, $stateParams, Session, Wallets, Proposals) {
+// Note that Addresses, History are only injected to initializate them ASAP
+.controller('TabsCtrl', function($scope, $state, $stateParams, Session, Wallets, Proposals, Addresses, History) {
   $scope.wallet = Session.currentWallet = Wallets.get($stateParams.walletId);
 
   $scope.pendingProposals = function() {

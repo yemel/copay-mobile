@@ -13,8 +13,6 @@ angular.module('copay.controllers')
   var displayBtc = $filter('displayBtc');
   var displayFiat = $filter('displayFiat');
 
-  console.log('Data', $stateParams);
-
   $scope.toggleUnit = function(value) {
     var currency = Config.currency;
 

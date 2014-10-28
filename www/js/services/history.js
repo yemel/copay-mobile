@@ -3,38 +3,35 @@
 angular.module('copay.services')
 
 // TODO: This should be part of the wallet
-.factory('History', function() {
+.factory('History', function($rootScope, Wallets) {
   var copay = require('copay');
 
   var History = function() {
-    this.cache = {};
-    this.loading = {};
+    this.transactions = {};
+
+    var self = this;
+    Wallets.all().forEach(function(wallet) {
+      self.update(wallet);
+    });
   };
 
   History.prototype.all = function(wallet) {
-    if (!this.cache[wallet.id]) this.update(wallet);
-    return this.cache[wallet.id] || [];
+    if (!this.transactions[wallet.id]) this.update(wallet);
+    return this.transactions[wallet.id] || [];
   }
 
   History.prototype.update = function(wallet) {
+    if (!wallet.publicKeyRing.isComplete()) return;
+  
     var self = this;
-
-    self.loading[wallet.id] = true;
     wallet.getTransactionHistory(function(err, res) {
       if (err) throw err;
 
-      self.cache[wallet.id] = res;
-      self.loading[wallet.id] = false;
-      console.log('TXS', res);
-      window.TXS = res;
-      // TODO: Emit Event when finished!
+      self.transactions[wallet.id] = res;
+      $rootScope.$emit('transactions', wallet);
     });
 
   }
-
-  History.prototype.isLoading = function(wallet) {
-    return this.loading[wallet.id];
-  };
 
   return new History();
 });

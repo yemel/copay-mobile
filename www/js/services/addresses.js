@@ -3,10 +3,7 @@
 angular.module('copay.services')
 
 // TODO: Make this functionality part of Wallet
-.factory('Addresses', function(Wallets) {
-
-  // Listar todas las addresses
-  // Actualizar su balance
+.factory('Addresses', function($rootScope, Wallets) {
 
   function Addresses() {
     this.addresses = {};
@@ -33,6 +30,8 @@ angular.module('copay.services')
       self.addresses[wallet.id].forEach(function(address) {
         address.balance = addressesBalance[address.addressStr] || 0;
       });
+
+      $rootScope.$apply();
     });
   };
 
