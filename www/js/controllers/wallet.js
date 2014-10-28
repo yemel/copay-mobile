@@ -42,6 +42,7 @@ angular.module('copay.controllers')
       }
 
       Notifications.toast('Wallet joined');
+      $scope.$emit('new-wallet');
       return $state.go('profile.wallet.home', {walletId: wallet.id});
     });
   };
