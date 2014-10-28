@@ -6,7 +6,7 @@ var defaultConfig = {
   defaultLanguage: 'en',
   // DEFAULT network (livenet or testnet)
   networkName: 'livenet',
-  logLevel: 'info',
+  logLevel: 'debug',
 
 
   // wallet limits
@@ -1084,6 +1084,8 @@ module.exports = HDPath;
 
 },{"lodash":"K2RcUv","preconditions":"s3Os0O"}],"../js/models/HDPath":[function(require,module,exports){
 module.exports=require('SuUu6u');
+},{}],"../js/models/Identity":[function(require,module,exports){
+module.exports=require('7huykZ');
 },{}],"7huykZ":[function(require,module,exports){
 'use strict';
 var preconditions = require('preconditions').singleton();
@@ -1092,6 +1094,7 @@ var _ = require('lodash');
 var bitcore = require('bitcore');
 var log = require('../log');
 var async = require('async');
+var cryptoUtil = require('../util/crypto');
 
 var version = require('../../version').version;
 var TxProposals = require('./TxProposals');
@@ -1238,9 +1241,10 @@ Identity.createFromPartialJson = function(jsonString, opts, callback) {
   }
   var identity = new Identity(_.extend(opts, exported));
   async.map(exported.walletIds, function(walletId, callback) {
-    identity.retrieveWalletFromStorage(walletId, function(error, wallet) {
+    identity.retrieveWalletFromStorage(walletId, {}, function(error, wallet) {
       if (!error) {
         identity.wallets[wallet.getId()] = wallet;
+        identity.bindWallet(wallet);
         wallet.netStart();
       }
       callback(error, wallet);
@@ -1252,10 +1256,15 @@ Identity.createFromPartialJson = function(jsonString, opts, callback) {
 
 /**
  * @param {string} walletId
+ * @param {} opts
+ *           opts.importWallet
  * @param {Function} callback
  */
-Identity.prototype.retrieveWalletFromStorage = function(walletId, callback) {
+Identity.prototype.retrieveWalletFromStorage = function(walletId, opts, callback) {
   var self = this;
+
+  var importFunction = opts.importWallet || Wallet.fromUntrustedObj;
+
   this.storage.getItem(Wallet.getStorageKey(walletId), function(error, walletData) {
     if (error) {
       return callback(error);
@@ -1270,7 +1279,8 @@ Identity.prototype.retrieveWalletFromStorage = function(walletId, callback) {
         blockchainOpts: self.blockchainOpts,
         skipFields: []
       };
-      return callback(null, Wallet.fromUntrustedObj(walletData, readOpts));
+
+      return callback(null, importFunction(walletData, readOpts));
 
     } catch (e) {
 
@@ -1304,9 +1314,9 @@ Identity.prototype.storeWallet = function(wallet, cb) {
   this.storage.setItem(key, val, function(err) {
     if (err) {
       log.debug('Wallet:' + wallet.getName() + ' couldnt be stored');
-      return cb(err);
     }
-    return cb();
+    if (cb)
+      return cb(err);
   });
 };
 
@@ -1332,8 +1342,14 @@ Identity.prototype.exportWithWalletInfo = function() {
  */
 Identity.prototype.store = function(opts, cb) {
   var self = this;
+  opts = opts || {};
+
   self.storage.setItem(this.getId(), this.toObj(), function(err) {
     if (err) return cb(err);
+
+    if (opts.noWallets) 
+      return cb();
+
     async.map(self.wallets, self.storeWallet, cb);
   });
 };
@@ -1355,28 +1371,39 @@ Identity.prototype.close = function(cb) {
  * @desc Imports a wallet from an encrypted base64 object
  * @param {string} base64 - the base64 encoded object
  * @param {string} passphrase - passphrase to decrypt it
- * @param {string[]} skipFields - fields to ignore when importing
+ * @param {string[]} opts.skipFields - fields to ignore when importing
+ * @param {string[]} opts.salt - 
+ * @param {string[]} opts.iterations - 
+ * @param {string[]} opts.importFunction - for stubbing
  * @return {Wallet}
  */
-Identity.prototype.importWallet = function(base64, password, skipFields, cb) {
+Identity.prototype.importWallet = function(base64, password, opts, cb) {
   var self = this;
   preconditions.checkArgument(password);
   preconditions.checkArgument(cb);
-
-  var obj = this.storage.decrypt(base64, password);
+  var importFunction = opts.importWallet || Wallet.fromUntrustedObj;
+  var crypto = opts.cryptoUtil || cryptoUtil;
 
   var readOpts = {
     networkOpts: this.networkOpts,
     blockchainOpts: this.blockchainOpts,
-    skipFields: skipFields
+    skipFields: opts.skipFields,
   };
 
-  if (!obj) return cb(null);
-  var w = Identity._walletFromObj(obj, readOpts);
+  // TODO set iter and salt using config.js
+  var key = crypto.kdf(password);
+  var obj = crypto.decrypt(key, base64);
+  if (!obj) return cb(new Error('Could not decrypt'));
+
+
+  var w = importFunction(obj, readOpts);
+  if (!w) return cb(new Error('Could not decrypt'));
+
   this._checkVersion(w.version);
   this.addWallet(w, function(err) {
     if (err) return cb(err, null);
     self.wallets[w.getId()] = w;
+    self.bindWallet(w);
     self.store(null, function(err) {
       return cb(err, w);
     });
@@ -1413,7 +1440,7 @@ Identity.importFromFullJson = function(str, password, opts, cb) {
 
   json.wallets = json.wallets || {};
   async.map(json.wallets, function(walletData, callback) {
-    iden.importWallet(wstr, password, opts.skipFields, function(err, w) {
+    iden.importWallet(wstr, password, opts, function(err, w) {
       if (err) return callback(err);
       log.debug('Wallet ' + w.getId() + ' imported');
       callback();
@@ -1437,8 +1464,28 @@ Identity.prototype.bindWallet = function(w) {
   self.wallets[w.getId()] = w;
   log.debug('Binding wallet ' + w.getName());
 
-  w.on('hasChange', function() {
-    log.debug('<hasChange> Wallet' + w.getName());
+  w.on('txProposalsUpdated', function() {
+    log.debug('<txProposalsUpdated>> Wallet' + w.getName());
+    self.storeWallet(w);
+  });
+  w.on('newAddresses', function() {
+    log.debug('<newAddresses> Wallet' + w.getName());
+    self.storeWallet(w);
+  });
+  w.on('settingsUpdated', function() {
+    log.debug('<newAddresses> Wallet' + w.getName());
+    self.storeWallet(w);
+  });
+  w.on('txProposalEvent', function() {
+    log.debug('<txProposalEvent> Wallet' + w.getName());
+    self.storeWallet(w);
+  });
+  w.on('ready', function() {
+    log.debug('<ready> Wallet' + w.getName());
+    self.storeWallet(w);
+  });
+  w.on('addressBookUpdated', function() {
+    log.debug('<addressBookUpdated> Wallet' + w.getName());
     self.storeWallet(w);
   });
 };
@@ -1499,6 +1546,8 @@ Identity.prototype.createWallet = function(opts, cb) {
   opts.txProposals = opts.txProposals || new TxProposals({
     networkName: opts.networkName,
   });
+  var walletClass =  opts.walletClass || Wallet;
+
   log.debug('\t### TxProposals Initialized');
 
 
@@ -1512,16 +1561,14 @@ Identity.prototype.createWallet = function(opts, cb) {
   opts.version = opts.version || this.version;
 
   var self = this;
-  var w = new Wallet(opts);
+
+  var w = new walletClass(opts);
   this.addWallet(w, function(err) {
     if (err) return cb(err);
     self.bindWallet(w);
-    self.storage.setItem(self.getId(), self.toObj(), function(error) {
-      if (error) {
-        return callback(error);
-      }
-      w.netStart();
-      return cb(null, w);
+    w.netStart();
+    self.store({noWallets:true},function(err){
+      return cb(err,w);
     });
   });
 };
@@ -1715,9 +1762,7 @@ Identity.prototype.joinWallet = function(opts, cb) {
 
 module.exports = Identity;
 
-},{"../../version":"RvaLt1","../log":"MsXNHD","./Async":7,"./PluginManager":"GBuNT8","./PrivateKey":"T9anyq","./PublicKeyRing":"XAmkZ6","./TxProposals":25,"./Wallet":"CxreE2","async":41,"bitcore":42,"lodash":"K2RcUv","preconditions":"s3Os0O"}],"../js/models/Identity":[function(require,module,exports){
-module.exports=require('7huykZ');
-},{}],"../js/models/Insight":[function(require,module,exports){
+},{"../../version":"RvaLt1","../log":"MsXNHD","../util/crypto":"YxFgg4","./Async":7,"./PluginManager":"GBuNT8","./PrivateKey":"T9anyq","./PublicKeyRing":"XAmkZ6","./TxProposals":25,"./Wallet":"CxreE2","async":41,"bitcore":42,"lodash":"K2RcUv","preconditions":"s3Os0O"}],"../js/models/Insight":[function(require,module,exports){
 module.exports=require('BSr44Z');
 },{}],"BSr44Z":[function(require,module,exports){
 'use strict';
@@ -4129,7 +4174,6 @@ Wallet.prototype._onIndexes = function(senderId, data) {
   var hasChanged = this.publicKeyRing.mergeIndexes(inIndexes);
   if (hasChanged) {
     this._newAddresses();
-    this.emitAndKeepAlive('hasChange');
   }
 };
 
@@ -4146,7 +4190,7 @@ Wallet.prototype._onIndexes = function(senderId, data) {
  */
 Wallet.prototype.changeSettings = function(settings) {
   this.settings = settings;
-  this.emitAndKeepAlive('hasChange');
+  this.emitAndKeepAlive('settingsUpdated');
 };
 
 /**
@@ -4190,7 +4234,6 @@ Wallet.prototype._onPublicKeyRing = function(senderId, data) {
       this._lockIncomming();
     }
     this._newAddresses();
-    this.emitAndKeepAlive('hasChange');
   }
 };
 
@@ -4331,7 +4374,6 @@ Wallet.prototype._onTxProposal = function(senderId, data) {
           if (!m.txp.getSent()) {
             m.txp.setSent(m.ntxid);
             self.emitAndKeepAlive('txProposalsUpdated');
-            self.emit('hasChange');
           }
         }
       });
@@ -4342,7 +4384,6 @@ Wallet.prototype._onTxProposal = function(senderId, data) {
     }
 
     this.emitAndKeepAlive('txProposalsUpdated');
-    this.emit('hasChange');
   }
   this._processProposalEvents(senderId, m);
 };
@@ -4370,10 +4411,7 @@ Wallet.prototype._onReject = function(senderId, data) {
     throw new Error('Received Reject for an already signed TX from:' + senderId);
 
   txp.setRejected(senderId);
-  this.emitAndKeepAlive('hasChange');
-
-  this.emit('txProposalsUpdated');
-  this.emit('txProposalEvent', {
+  this.emitAndKeepAlive('txProposalEvent', {
     type: 'rejected',
     cId: senderId,
     txId: data.ntxid,
@@ -4396,9 +4434,7 @@ Wallet.prototype._onSeen = function(senderId, data) {
 
   var txp = this.txProposals.get(data.ntxid);
   txp.setSeen(senderId);
-  this.emitAndKeepAlive('hasChange');
-  this.emit('txProposalsUpdated');
-  this.emit('txProposalEvent', {
+  this.emitAndKeepAlive('txProposalEvent', {
     type: 'seen',
     cId: senderId,
     txId: data.ntxid,
@@ -4434,7 +4470,6 @@ Wallet.prototype._onAddressBook = function(senderId, data) {
   }
   if (hasChange) {
     this.emitAndKeepAlive('addressBookUpdated');
-    this.emit('hasChange');
   }
 };
 
@@ -4756,8 +4791,6 @@ Wallet.prototype.netStart = function() {
     self.emitAndKeepAlive('ready', net.getPeer());
     setTimeout(function() {
       self._newAddresses(true);
-      // no connection logic for now
-      self.emitAndKeepAlive('txProposalsUpdated');
     }, 0);
   });
 };
@@ -4850,13 +4883,13 @@ Wallet.prototype.toObj = function() {
 
 
 Wallet.fromUntrustedObj = function(obj, readOpts) {
-  obj =  _.clone(obj);
+  obj = _.clone(obj);
   var o = {};
   _.each(Wallet.PERSISTED_PROPERTIES, function(p) {
     o[p] = obj[p];
   });
 
-  return Wallet.fromObj(o,readOpts);
+  return Wallet.fromObj(o, readOpts);
 };
 
 /**
@@ -5117,7 +5150,7 @@ Wallet.prototype._doGenerateAddress = function(isChange) {
 Wallet.prototype.generateAddress = function(isChange, cb) {
   var addr = this._doGenerateAddress(isChange);
   this.sendIndexes();
-  this.emitAndKeepAlive('hasChange');
+  this._newAddresses();
   if (cb) return cb(addr);
   return addr;
 };
@@ -5158,7 +5191,7 @@ Wallet.prototype.purgeTxProposals = function(deleteAll) {
   } else {
     this.txProposals.deletePending(this.maxRejectCount());
   }
-  this.emitAndKeepAlive('hasChange');
+  this.emitAndKeepAlive('txProposalsUpdated');
 
   var n = this.txProposals.length();
   return m - n;
@@ -5172,8 +5205,7 @@ Wallet.prototype.purgeTxProposals = function(deleteAll) {
 Wallet.prototype.reject = function(ntxid) {
   var txp = this.txProposals.reject(ntxid, this.getMyCopayerId());
   this.sendReject(ntxid);
-  this.emitAndKeepAlive('hasChange');
-  this.emit('txProposalsUpdated');
+  this.emitAndKeepAlive('txProposalsUpdated');
 };
 
 /**
@@ -5214,8 +5246,7 @@ Wallet.prototype.sign = function(ntxid, cb) {
     if (txp.countSignatures() > before) {
       txp.signedBy[myId] = Date.now();
       self.sendTxProposal(ntxid);
-      self.emitAndKeepAlive('hasChange');
-      self.emit('txProposalsUpdated');
+      self.emitAndKeepAlive('txProposalsUpdated');
       ret = true;
     }
     if (cb) return cb(ret);
@@ -5253,13 +5284,13 @@ Wallet.prototype.sendTx = function(ntxid, cb) {
     if (txid) {
       self.txProposals.get(ntxid).setSent(txid);
       self.sendTxProposal(ntxid);
-      self.emitAndKeepAlive('hasChange');
+      self.emitAndKeepAlive('txProposalsUpdated');
       return cb(txid);
     } else {
       log.debug('Wallet:' + self.id + ' Sent failed. Checking if the TX was sent already');
       self._checkSentTx(ntxid, function(txid) {
         if (txid)
-          self.emitAndKeepAlive('hasChange');
+          self.emitAndKeepAlive('txProposalsUpdated');
 
         return cb(txid);
       });
@@ -5469,7 +5500,6 @@ Wallet.prototype.receivePaymentRequest = function(options, pr, cb) {
     if (ntxid) {
       self.sendIndexes();
       self.sendTxProposal(ntxid);
-      self.emitAndKeepAlive('hasChange');
       self.emit('txProposalsUpdated');
     }
 
@@ -5601,9 +5631,8 @@ Wallet.prototype.sendPaymentTx = function(ntxid, options, cb) {
       log.debug('Sending to server was not met with a returned tx.');
       log.debug('XHR status: ' + status);
       return self._checkSentTx(ntxid, function(txid) {
-        log.debug('[Wallet.js.1581:txid:%s]', txid);
         if (txid)
-          self.emitAndKeepAlive('hasChange');
+          self.emitAndKeepAlive('txProposalsUpdated');
         return cb(txid, txp.merchant);
       });
     });
@@ -5636,7 +5665,7 @@ Wallet.prototype.receivePaymentRequestACK = function(ntxid, tx, txp, ack, cb) {
       return this._checkSentTx(ntxid, function(txid) {
         log.debug('[Wallet.js.1613:txid:%s]', txid);
         if (txid)
-          self.emitAndKeepAlive('hasChange');
+          self.emitAndKeepAlive('txProposalUpdated');
         return cb(txid, txp.merchant);
       });
     }
@@ -5663,13 +5692,13 @@ Wallet.prototype.receivePaymentRequestACK = function(ntxid, tx, txp, ack, cb) {
     if (txid) {
       self.txProposals.get(ntxid).setSent(txid);
       self.sendTxProposal(ntxid);
-      self.emitAndKeepAlive('hasChange');
+      self.emitAndKeepAlive('txProposalsUpdated');
       return cb(txid, txp.merchant);
     } else {
       log.debug('Sent failed. Checking if the TX was sent already');
       self._checkSentTx(ntxid, function(txid) {
         if (txid)
-          self.emitAndKeepAlive('hasChange');
+          self.emitAndKeepAlive('txProposalsUpdated');
 
         return cb(txid, txp.merchant);
       });
@@ -6155,7 +6184,6 @@ Wallet.prototype.removeTxWithSpentInputs = function(cb) {
 
     if (proposalsChanged) {
       self.emitAndKeepAlive('txProposalsUpdated');
-      self.emit('hasChange');
     }
 
     return cb();
@@ -6190,8 +6218,7 @@ Wallet.prototype.createTx = function(toAddress, amountSatStr, comment, opts, cb)
 
     self.sendIndexes();
     self.sendTxProposal(ntxid);
-    self.emitAndKeepAlive('hasChange');
-    self.emit('txProposalsUpdated');
+    self.emitAndKeepAlive('txProposalsUpdated');
     return cb(null, ntxid);
   });
 };
@@ -6289,7 +6316,6 @@ Wallet.prototype.updateIndexes = function(callback) {
     if (err) callback(err);
     log.debug('Wallet:' + self.id + ' Indexes updated');
     self._newAddresses();
-    self.emitAndKeepAlive('hasChange');
     callback();
   });
 };
@@ -6398,10 +6424,10 @@ Wallet.prototype.close = function(cb) {
   this.blockchain.destroy();
 
   log.debug('## CLOSING Wallet: ' + this.id);
-// TODO
-//  this.lock.release(function() {
-    if (cb) return cb();
-//  });
+  // TODO
+  //  this.lock.release(function() {
+  if (cb) return cb();
+  //  });
 };
 
 /**
@@ -6447,7 +6473,7 @@ Wallet.prototype.setAddressBook = function(key, label) {
   };
   this.addressBook[key] = newEntry;
   this.sendAddressBook();
-  this.emitAndKeepAlive('hasChange');
+  this.emitAndKeepAlive('addressBookUpdated');
 };
 
 /**
@@ -6477,7 +6503,7 @@ Wallet.prototype.verifyAddressbookEntry = function(rcvEntry, senderId, key) {
 Wallet.prototype.toggleAddressBookEntry = function(key) {
   if (!key) throw new Error('Key is required');
   this.addressBook[key].hidden = !this.addressBook[key].hidden;
-  this.emitAndKeepAlive('hasChange');
+  this.emitAndKeepAlive('addressBookUpdated');
 };
 
 /**
@@ -6514,7 +6540,7 @@ Wallet.prototype.setBackupReady = function(forcedLogin) {
   this.forcedLogin = forcedLogin;
   this.publicKeyRing.setBackupReady();
   this.sendPublicKeyRing();
-  this.emitAndKeepAlive('hasChange');
+  this.emitAndKeepAlive('txProposalsUpdated');
 };
 
 /**
@@ -6786,6 +6812,8 @@ Wallet.prototype.getTransactionHistory = function(cb) {
     tx.labelTo = firstOut ? firstOut.label : undefined;
     tx.amountSat = Math.abs(amount);
     tx.amount = tx.amountSat * satToUnit;
+    tx.sentTs = proposal ? proposal.sentTs : undefined;
+    tx.minedTs = tx.time * 1000;
   };
 
   if (addresses.length > 0) {
@@ -7329,6 +7357,8 @@ LocalStorage.prototype.allKeys = function(cb) {
 
 module.exports = LocalStorage;
 
+},{}],"../util/crypto":[function(require,module,exports){
+module.exports=require('YxFgg4');
 },{}],"YxFgg4":[function(require,module,exports){
 /**
  * Small module for some helpers that wrap sjcl with some good practices.
@@ -7337,21 +7367,35 @@ var sjcl = require('../../lib/sjcl');
 var log = require('../log.js');
 var _ = require('lodash');
 
-var SALT = 'copay random string NWRlNmExMTE4NzIzYzYyYWMwODU1MTdkN';
-var SEPARATOR = '&';
-var defaultOptions = {
-  adata: '',
-  cipher: 'aes',
+var defaultSalt = 'mjuBtGybi/4=';
+var defaultIterations = 100;
+
+sjcl.defaults = {
+  v: 1,
+  iter: 100,
   ks: 128,
-  iter: 2000,
-  mode: 'ccm',
-  ts: 64
-};
+  ts: 64,
+  mode: "ccm",
+  adata: "",
+  cipher: "aes"
+},
 
 module.exports = {
 
-  kdf: function(value1, value2) {
-    return sjcl.codec.base64.fromBits(sjcl.misc.pbkdf2(value1 + value2, SALT));
+  kdf: function(value1, value2, salt, iterations) {
+    iterations = iterations || defaultIterations;
+    salt = salt || defaultSalt;
+
+    var password = value1 + (value2 || '');
+    var hash = sjcl.hash.sha256.hash(sjcl.hash.sha256.hash(password));
+    var salt = sjcl.codec.base64.toBits(salt);
+    var prff = function(key) {
+      return new sjcl.misc.hmac(hash, sjcl.hash.sha1);
+    };
+
+    var bits = sjcl.misc.pbkdf2(hash, salt, iterations, 64 * 8, prff);
+    var base64 = sjcl.codec.base64.fromBits(bits);
+    return base64;
   },
 
   /**
@@ -7367,10 +7411,10 @@ module.exports = {
   /**
    * Decrypts symmetrically using a passphrase
    */
-  decrypt: function(key, cypher) {
+  decrypt: function(key, cyphertext) {
     var output = {};
     try {
-      return sjcl.decrypt(key, cypher);
+      return sjcl.decrypt(key, cyphertext);
     } catch (e) {
       log.error('Decryption failed due to error: ' + e.message);
       return null;
@@ -7378,9 +7422,7 @@ module.exports = {
   }
 };
 
-},{"../../lib/sjcl":40,"../log.js":"MsXNHD","lodash":"K2RcUv"}],"../util/crypto":[function(require,module,exports){
-module.exports=require('YxFgg4');
-},{}],40:[function(require,module,exports){
+},{"../../lib/sjcl":40,"../log.js":"MsXNHD","lodash":"K2RcUv"}],40:[function(require,module,exports){
 "use strict";function q(a){throw a;}var r=void 0,u=!1;var sjcl={cipher:{},hash:{},keyexchange:{},mode:{},misc:{},codec:{},exception:{corrupt:function(a){this.toString=function(){return"CORRUPT: "+this.message};this.message=a},invalid:function(a){this.toString=function(){return"INVALID: "+this.message};this.message=a},bug:function(a){this.toString=function(){return"BUG: "+this.message};this.message=a},notReady:function(a){this.toString=function(){return"NOT READY: "+this.message};this.message=a}}};
 "undefined"!==typeof module&&module.exports&&(module.exports=sjcl);
 sjcl.cipher.aes=function(a){this.m[0][0][0]||this.G();var b,c,d,e,f=this.m[0][4],g=this.m[1];b=a.length;var h=1;4!==b&&(6!==b&&8!==b)&&q(new sjcl.exception.invalid("invalid aes key size"));this.b=[d=a.slice(0),e=[]];for(a=b;a<4*b+28;a++){c=d[a-1];if(0===a%b||8===b&&4===a%b)c=f[c>>>24]<<24^f[c>>16&255]<<16^f[c>>8&255]<<8^f[c&255],0===a%b&&(c=c<<8^c>>>24^h<<24,h=h<<1^283*(h>>7));d[a]=d[a-b]^c}for(b=0;a;b++,a--)c=d[b&3?a:a-4],e[b]=4>=a||4>b?c:g[0][f[c>>>24]]^g[1][f[c>>16&255]]^g[2][f[c>>8&255]]^g[3][f[c&
@@ -49840,7 +49882,7 @@ Network.prototype.cleanUp = function() {
 module.exports = Network;
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":111,"events":120,"util":137}],"../../mocks/FakePayProServer":[function(require,module,exports){
+},{"buffer":111,"events":120,"util":137}],"./mocks/FakePayProServer":[function(require,module,exports){
 module.exports=require('BTnq1B');
 },{}],"BTnq1B":[function(require,module,exports){
 (function (process){
@@ -50175,9 +50217,9 @@ function startServer(cb) {
 module.exports = startServer;
 
 }).call(this,require("/Users/yemeljardi/code/copay/node_modules/browserify/node_modules/insert-module-globals/node_modules/process/browser.js"))
-},{"../../copay":"hxYaTp","/Users/yemeljardi/code/copay/node_modules/browserify/node_modules/insert-module-globals/node_modules/process/browser.js":122,"bitcore":42,"copay":"hxYaTp"}],"RvaLt1":[function(require,module,exports){
-module.exports.version="0.6.4";
-module.exports.commitHash="5f7f60f";
-},{}],"./version":[function(require,module,exports){
+},{"../../copay":"hxYaTp","/Users/yemeljardi/code/copay/node_modules/browserify/node_modules/insert-module-globals/node_modules/process/browser.js":122,"bitcore":42,"copay":"hxYaTp"}],"./version":[function(require,module,exports){
 module.exports=require('RvaLt1');
+},{}],"RvaLt1":[function(require,module,exports){
+module.exports.version="0.6.4";
+module.exports.commitHash="7afe921";
 },{}]},{},[])
