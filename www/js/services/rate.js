@@ -4,6 +4,7 @@ var RateService = function($http, Config) {
   this.isAvailable = false;
   this.UNAVAILABLE_ERROR = 'Service is not available - check for service.isAvailable or use service.whenAvailable';
 
+  // Unit Name: SatoshisToUnit, Decimal Places
   this.UNITS = {
     "BTC": [1e8, 8],
     "bits": [1e6, 6],

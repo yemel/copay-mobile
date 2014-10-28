@@ -9,10 +9,18 @@ angular.module('copay.services')
   var config = {};
 
   // TODO: This should be a Profile preference
-  config.currency = {
-    btc: "BTC",
-    fiat: "USD"
+  config.savePreferences = function() {
+    localStorage.setItem('preferences', JSON.stringify(config.currency));
   }
+
+  config.loadPreferences = function() {
+    var currency = localStorage.getItem('preferences');
+    return currency ? JSON.parse(currency) : {btc: "BTC", fiat: "USD"};
+  }
+
+  config.currency = config.loadPreferences();
+  //config.currency = {btc: "BTC", fiat: "USD"};
+  console.log('Config Currency', config.currency);
 
   config.network = {
     testnet: {

@@ -18,21 +18,25 @@
           </label>
           <label class="item item-input item-select">
             <span class="input-label" disabled>Bitcoin unit</span>
-            <select>
-              <option selected>BTC</option>
-              <option>bits (1,000,000 bits = 1 BTC)</option>
-              <option>mBTC (1,000 bits = 1 BTC)</option>
-              <option>Satoshis (100,000,000 bits = 1 BTC)</option>
+            <select ng-model="unit" ng-change="updateUnit(this)">
+              <option value="BTC">BTC</option>
+              <option value="bits">bits (1,000,000 bits = 1 BTC)</option>
+              <option value="mBTC">mBTC (1,000 bits = 1 BTC)</option>
+              <option value="Satoshis">Satoshis (100,000,000 bits = 1 BTC)</option>
             </select>
           </label>
           <label class="item item-input item-select">
             <span class="input-label" disabled>Alternative currency</span>
-            <select>
-              <option selected>US Dollar</option>
-              <option>Eurozone Euro</option>
-              <option>Pound Sterling</option>
-              <option>Japanese Yen</option>
-              <option>Argentine Peso</option>
+            <select ng-model="fiat" ng-change="updateFiat(this)">
+              <option value="USD">US Dollar</option>
+              <option value="EUR">Eurozone Euro</option>
+              <option value="GBP">Pound Sterling</option>
+              <option value="JPY">Japanese Yen</option>
+              <option value="JPY">Canadian Dollar</option>
+              <option value="AUD">Australian Dollar</option>
+              <option value="BRL">Brasilian Real</option>
+              <option value="ARS">Argentine Peso</option>
+              <option value="MXN">Mexican Peso</option>
             </select>
           </label>
         </div>
