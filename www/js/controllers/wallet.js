@@ -10,7 +10,6 @@ angular.module('copay.controllers')
   $scope.data = {copayers: 1, threshold: 1}; // form defaults
   $scope.threshold = 1;
 
-
   $scope.create = function(form) {
     if (!form.$valid) return;
 
@@ -23,6 +22,7 @@ angular.module('copay.controllers')
       if (err) throw err;
 
       Notifications.toast('Wallet created');
+      $scope.$emit('new-wallet');
       return $state.go('profile.wallet.home', {walletId: wallet.id});
     });
   };

@@ -6,6 +6,10 @@ angular.module('copay.controllers')
   $scope.profile = Session.profile;
   $scope.wallets = Wallets.all();
 
+  $scope.$on('new-wallet', function(ev) {
+    $scope.wallets = Wallets.all();
+  });
+
   $scope.openCamera = function() {
 
     if (!$window.cordova) {
