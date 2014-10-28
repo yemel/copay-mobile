@@ -8,7 +8,6 @@ angular.module('copay.controllers')
   $scope.fiat = Config.currency.fiat;
 
   $scope.updateUnit = function(scope) {
-    console.log('Saving!');
     Config.currency.btc = scope.unit;
     Config.savePreferences();
   };
@@ -16,7 +15,6 @@ angular.module('copay.controllers')
   $scope.updateFiat = function(scope) {
     Config.currency.fiat = scope.fiat;
     Config.savePreferences();
-    console.log('Saving!');
   };
 
   $scope.backup = function() {

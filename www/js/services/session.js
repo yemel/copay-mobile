@@ -28,6 +28,10 @@ angular.module('copay.services')
     return !!$window.localStorage.getItem('session:data');
   };
 
+  Session.prototype.clearCredentials = function() {
+    $window.localStorage.removeItem('session:data');
+  }
+
   Session.prototype.setCredentials = function(pin, credentials) {
     var data = JSON.stringify({
       pin: pin,
