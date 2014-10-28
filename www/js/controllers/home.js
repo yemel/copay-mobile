@@ -14,6 +14,12 @@ angular.module('copay.controllers')
     $scope.modal = modal;
   });
 
+  // TODO: This is a HACK to Set Backup Ready ASAP
+  var ring = $scope.wallet.publicKeyRing;
+  if (ring.isComplete() && !ring.isBackupReady()) {
+    $scope.wallet.setBackupReady();
+  }
+
   $scope.openModal = function() {
     $scope.modal.title = "Invite copayers";
     $scope.modal.data = $scope.wallet.getSecret();
