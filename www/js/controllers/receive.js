@@ -3,8 +3,13 @@
 angular.module('copay.controllers')
 
 .controller('ReceiveCtrl', function($scope, $state, $ionicModal, $window, $cordovaSocialSharing, $cordovaClipboard, Session, Addresses, Notifications) {
-  $scope.addresses = Addresses.filter($scope.wallet);
-  console.log($scope.addresses);
+
+  loadAddresses();
+  function loadAddresses() {
+    $scope.addresses = Addresses.filter($scope.wallet);
+  }
+
+  $scope.$on('new-address', loadAddresses);
 
   $scope.modal = {};
   $ionicModal.fromTemplateUrl('templates/qr.html', {
@@ -17,6 +22,7 @@ angular.module('copay.controllers')
   $scope.createAddress = function() {
     var addr = Addresses.createAddress($scope.wallet);
     $scope.openModal('bitcoin://' + addr);
+    $scope.$emit('new-address');
   }
 
   $scope.openModal = function(data) {
