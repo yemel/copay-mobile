@@ -1,8 +1,6 @@
-/* Empty. Add your own CSS if you like */
 .pane, .view {
 	background-color: #F2F5F8;
 }
-
 
 .card {
 	-moz-box-shadow:    1px 1px 0px 0px rgba(32,48,64,0.20);
@@ -26,6 +24,17 @@
 
 .menu h4 {
 	color: #fff;
+}
+
+.item-avatar .ion-loading-c {
+	position: absolute;
+	top: 23px;
+	left: 23px;
+	font-size: 26px;
+}
+
+.item-avatar h2 {
+	margin-top: 10px;
 }
 
 .item-complex .item-content, .item-radio .item-content {

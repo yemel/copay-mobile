@@ -29,10 +29,11 @@
       </div>
       <div class="item item-avatar" ng-repeat="copayer in copayers">
         <img src="img/example/tully.jpg">
-        <h3 class="text-gray">{{copayer|displayNick:wallet}}</h3>
+        <h2 class="text-gray">{{copayer|displayNick:wallet}}</h2>
       </div>
       <div class="item item-avatar" ng-show="remaining > 0">
-        <h2><i class="icon ion-loading-c"></i> Waiting for {{remaining}} copayers to join...</h2>
+        <i class="icon ion-loading-c"></i>
+        <h2>Waiting for {{remaining}} copayers to join...</h2>
       </div>
     </div>
 
