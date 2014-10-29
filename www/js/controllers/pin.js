@@ -48,7 +48,7 @@ angular.module('copay.controllers')
 
 })
 
-.controller('SetPinCtrl', function($scope, $state, $stateParams, Identity, Session, Notifications) {
+.controller('SetPinCtrl', function($scope, $state, $stateParams, Identity, Session) {
   var PIN = null;
   $scope.digits = [];
   $scope.confirm = false;
@@ -71,7 +71,6 @@ angular.module('copay.controllers')
   function onConfirm() {
     if (angular.equals(PIN, $scope.digits)) {
       Session.setCredentials(PIN, $stateParams);
-      Notifications.toast('Profile created');
       return $state.go('profile.wallet.home');
     }
 
