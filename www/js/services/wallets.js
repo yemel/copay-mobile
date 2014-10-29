@@ -23,7 +23,10 @@ angular.module('copay.services')
     Session.identity.createWallet(opts, createWalletCallback); // TODO: Use directlly
     // TODO: Add event handler to store this instead of doing it this way
     function createWalletCallback(err, wallet) {
-      Session.identity.store({}, cb);
+      if (err) return cb(err);
+      Session.identity.store({}, function(err) {
+        cb(err, wallet);
+      });
     }
   };
 
