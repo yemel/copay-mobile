@@ -64,32 +64,18 @@ angular.module('copay.directives', [])
   ])
 
   .directive('enoughBalance', function enoughBalance(Session, Rates) {
-      var balance = null;
-      var executed = false;
-      function retrieveBalance($scope) {
-        if (!executed) {
-          Session.currentWallet.getBalance(
-            function(err, balanceSat, balanceByAddrSat, safeBalanceSat) {
-              executed = true;
-              if (!err) {
-                balance = safeBalanceSat;
-              }
-            }
-          );
-        }
-      }
       return {
         require: 'ngModel',
         link: function (scope, element, attrs, ctrl) {
-          scope.$evalAsync(retrieveBalance);
           var validator = function(value) {
             value = -(-value);
             var satoshis = scope.unitFiat
               ? Rates.fromFiat(value, scope.primaryCode)
               : Rates.toSatoshis(value, scope.primaryCode);
-            ctrl.$setValidity('enoughBalance', !balance || balance >= satoshis)
+            scope.enough = Session.currentWallet.availableBalance >= satoshis;
+            ctrl.$setValidity('enoughBalance', scope.enough);
             return value;
-          }
+          };
           ctrl.$parsers.unshift(validator);
         }
       };
