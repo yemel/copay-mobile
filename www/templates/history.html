@@ -10,7 +10,7 @@
         Transaction history
       </div>
       <div class="item item-text-wrap" ng-repeat="trans in transactions">
-        <span ng-show="trans.time">{{trans.time | timeAgo}}</span>
+        <span ng-show="trans.time">{{trans.time * 1000| timeAgo}}</span>
         <span ng-show="!trans.time">Unconfirmed</span>
         <span ng-show="trans.comment">{{trans.comment}}</span>
         <span class="badge badge-assertive" ng-show="trans.action == 'sent'">
