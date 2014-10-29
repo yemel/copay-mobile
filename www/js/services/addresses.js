@@ -20,13 +20,15 @@ angular.module('copay.services')
     // Update Addresses
     this.addresses[wallet.id] = wallet.getAddressesInfo();
     wallet.balance = 0;
+    wallet.availableBalance = 0;
 
     // Update Balances
     var self = this;
-    wallet.getBalance(function(err, balance, addressesBalance) {
+    wallet.getBalance(function(err, balance, addressesBalance, availableBalance) {
       if (err) throw err;
 
       wallet.balance = balance;
+      wallet.availableBalance = availableBalance;
       self.addresses[wallet.id].forEach(function(address) {
         address.balance = addressesBalance[address.addressStr] || 0;
       });

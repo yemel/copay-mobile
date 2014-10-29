@@ -16,7 +16,8 @@ angular.module('copay.services')
       name: data.name,
       totalCopayers: data.copayers,
       requiredCopayers: data.threshold,
-      networkName: data.testnet ? "testnet" : "livenet"
+      networkName: data.testnet ? "testnet" : "livenet",
+      password: Session.identity.password
     }
 
     Session.identity.createWallet(opts, createWalletCallback); // TODO: Use directlly

@@ -21,8 +21,9 @@ angular.module('copay.services')
       requiredCopayers: 1,
       totalCopayers: 1,
       password: identity.password,
-      name: 'My wallet',
+      name: 'Personal',
     };
+
     identity.createWallet(walletOptions, createWalletCallback);
     function createWalletCallback(err) {
       if (err) {
