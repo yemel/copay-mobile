@@ -2,7 +2,7 @@
 
 angular.module('copay.services')
 
-.factory('Session', function($window) {
+.factory('Session', function($window, crypto) {
 
   var Session = function() {
     this.identity = null;
@@ -33,20 +33,20 @@ angular.module('copay.services')
   }
 
   Session.prototype.setCredentials = function(pin, credentials) {
-    var data = JSON.stringify({
-      pin: pin,
-      credentials: credentials
-    });
+    var data = JSON.stringify(credentials);
 
-    $window.localStorage.setItem('session:data', data);
+    var key = crypto.kdf(pin);
+    $window.localStorage.setItem('session:data', crypto.encrypt(key, data));
   };
 
   Session.prototype.getCredentials = function(pin) {
     var data = $window.localStorage.getItem('session:data');
     if (!data) return null;
 
-    data = JSON.parse(data);
-    return angular.equals(data.pin, pin) ? data.credentials : null;
+    var key = crypto.kdf(pin);
+    data = crypto.decrypt(key, data);
+    var matches = !!data;
+    return matches ? JSON.parse(data) : null;
   };
 
   return new Session();
