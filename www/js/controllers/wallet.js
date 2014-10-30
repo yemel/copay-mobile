@@ -22,7 +22,7 @@ angular.module('copay.controllers')
       if (err) throw err;
 
       Notifications.toast('Wallet created');
-      $scope.$emit('new-wallet');
+      $scope.$emit('new-wallet', wallet);
       return $state.go('profile.wallet.home', {walletId: wallet.id});
     });
   };
@@ -42,7 +42,7 @@ angular.module('copay.controllers')
       }
 
       Notifications.toast('Wallet joined');
-      $scope.$emit('new-wallet');
+      $scope.$emit('new-wallet', wallet);
       return $state.go('profile.wallet.home', {walletId: wallet.id});
     });
   };

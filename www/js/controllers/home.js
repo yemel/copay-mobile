@@ -10,7 +10,7 @@ angular.module('copay.controllers')
   function loadCopayers() {
     $scope.copayers = $scope.wallet.getRegisteredPeerIds(); // TODO: Rename method to getCopayers
     $scope.remaining = $scope.wallet.publicKeyRing.remainingCopayers(); // TODO: Expose on Wallet
-    $scope.$apply();
+    setTimeout(function(){ $scope.$apply(); }, 10);
   }
 
   $scope.modal = {};
