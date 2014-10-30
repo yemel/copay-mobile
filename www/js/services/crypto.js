@@ -3,5 +3,5 @@
 angular.module('copay.services')
 
 .factory('crypto', function() {
-  return require('copay').cryptoUtils;
+  return require('copay').crypto;
 });
