@@ -11,6 +11,10 @@ angular.module('copay.services')
     var self = this;
     Wallets.all().forEach(function(wallet) {
       self.loadAddresses(wallet);
+
+      wallet.on('tx', function() {
+          self.loadAddresses(wallet);
+      });
     });
 
     $rootScope.$on('new-wallet', function(ev, wallet) {

@@ -12,6 +12,10 @@ angular.module('copay.services')
     var self = this;
     Wallets.all().forEach(function(wallet) {
       self.update(wallet);
+
+      wallet.on('tx', function() {
+        self.update(wallet);
+      });
     });
   };
 
