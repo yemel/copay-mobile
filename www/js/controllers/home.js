@@ -3,8 +3,15 @@
 angular.module('copay.controllers')
 
 .controller('HomeCtrl', function($scope, $state, $ionicModal, $window, $cordovaSocialSharing, $cordovaClipboard, Rates, Notifications) {
-  $scope.copayers = $scope.wallet.getRegisteredPeerIds(); // TODO: Rename method to getCopayers
-  $scope.remaining = $scope.wallet.publicKeyRing.remainingCopayers(); // TODO: Expose on Wallet
+
+  loadCopayers();
+  $scope.wallet.on('publicKeyRingUpdated', loadCopayers);
+
+  function loadCopayers() {
+    $scope.copayers = $scope.wallet.getRegisteredPeerIds(); // TODO: Rename method to getCopayers
+    $scope.remaining = $scope.wallet.publicKeyRing.remainingCopayers(); // TODO: Expose on Wallet
+    $scope.$apply();
+  }
 
   $scope.modal = {};
   $ionicModal.fromTemplateUrl('templates/qr.html', {
