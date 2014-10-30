@@ -86,6 +86,11 @@ RateService.prototype.fromSatoshis = function(satoshis, code) {
   return this.toFiat(satoshis, code);
 };
 
+RateService.prototype.convert = function(amount, fromCode, toCode) {
+  var satoshis = this.toSatoshis(amount, fromCode);
+  return this.fromSatoshis(satoshis, toCode);
+}
+
 RateService.prototype.listAlternatives = function() {
   if (!this.isAvailable) {
     throw new Error(this.UNAVAILABLE_ERROR);

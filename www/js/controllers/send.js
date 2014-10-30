@@ -2,44 +2,45 @@
 
 angular.module('copay.controllers')
 
-.controller('SendCtrl', function($scope, $filter, $state, $ionicLoading, $stateParams, Proposals, Config, Rates, Notifications) {
+.controller('SendCtrl', function($scope, $filter, $state, $ionicLoading, $stateParams, Proposals, Config, Rates, Notifications, Bitcore) {
   $scope.proposals = Proposals.filter($scope.wallet, {status: Proposals.STATUS.pending});
   $scope.needsApproval = $scope.wallet.requiresMultipleSignatures();
 
-  window.P = $scope.proposals;
-
   $scope.primaryCode = Config.currency.fiat;
   $scope.secondaryCode = Config.currency.btc;
-  $scope.unitFiat = true;
+  $scope.displayPrimary = false;
 
   var displayBtc = $filter('displayBtc');
   var displayFiat = $filter('displayFiat');
 
   $scope.toggleUnit = function(value) {
+    $scope.setUnit(value, !$scope.displayPrimary);
+  };
+
+  $scope.setUnit = function(value, displayPrimary) {
     var currency = Config.currency;
 
-    $scope.unitFiat = !$scope.unitFiat;
-    $scope.primaryCode =   $scope.unitFiat ? currency.fiat : currency.btc;
-    $scope.secondaryCode = !$scope.unitFiat ? currency.fiat : currency.btc;
-
+    $scope.displayPrimary = displayPrimary;
+    $scope.primaryCode = $scope.displayPrimary ? currency.btc : currency.fiat;
+    $scope.secondaryCode = !$scope.displayPrimary ? currency.btc : currency.fiat;
     $scope.convert(value);
   };
 
   var getSatoshis = function(value) {
-    if ($scope.unitFiat) {
-      return Rates.fromFiat(value, Config.currency.fiat);
-    } else {
+    if ($scope.displayPrimary) {
       return Rates.toSatoshis(value, Config.currency.btc);
+    } else {
+      return Rates.fromFiat(value, Config.currency.fiat);
     }
-  }
+  };
 
   $scope.convert = function(value) {
     if (!value) return $scope.secondaryAmount = null;
 
-    if ($scope.unitFiat) {
-      $scope.secondaryAmount = displayBtc(getSatoshis(value));
-    } else {
+    if ($scope.displayPrimary) {
       $scope.secondaryAmount = displayFiat(getSatoshis(value));
+    } else {
+      $scope.secondaryAmount = displayBtc(getSatoshis(value));
     }
   };
 
@@ -77,6 +78,21 @@ angular.module('copay.controllers')
       $ionicLoading.hide();
       Notifications.toast('Transaction sent');
       $scope.clearForm(form);
+    }
+  }
+
+  // Fill the form with the payment info
+  if ($stateParams.data) {
+    var paymentInfo = new Bitcore.BIP21($stateParams.data);
+
+    $scope.data = {
+      address: paymentInfo.address + '',
+      reference: paymentInfo.data.message
+    };
+
+    if (paymentInfo.data.amount) {
+      $scope.data.amount = Rates.convert(paymentInfo.data.amount, "BTC", Config.currency.btc);
+      $scope.setUnit($scope.data.amount, true);
     }
   }
 
