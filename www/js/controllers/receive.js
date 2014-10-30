@@ -21,7 +21,7 @@ angular.module('copay.controllers')
 
   $scope.createAddress = function() {
     var addr = Addresses.createAddress($scope.wallet);
-    $scope.openModal('bitcoin://' + addr);
+    $scope.openModal('bitcoin:' + addr);
     $scope.$emit('new-address');
   }
 
