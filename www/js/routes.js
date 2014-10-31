@@ -133,6 +133,16 @@ angular.module('copay')
       }
     })
 
+    .state('profile.import', {
+      url: "/import",
+      views: {
+        'content' :{
+          templateUrl: "templates/import.html",
+          controller: 'ImportCtrl'
+        }
+      }
+    })
+
     .state('profile.payment', {
       url: "/payment",
       views: {

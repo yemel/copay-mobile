@@ -2,12 +2,20 @@
 
 angular.module('copay.controllers')
 
-.controller('SidebarCtrl', function($scope, $state, $window, $cordovaBarcodeScanner, $ionicModal, $ionicPopup, Session, Wallets, Notifications) {
+.controller('SidebarCtrl', function($scope, $state, $window, $cordovaBarcodeScanner, $ionicModal, $ionicPopup, Session, Wallets, Notifications, Compatibility) {
   $scope.profile = Session.profile;
   $scope.wallets = Wallets.all();
+  
+  var updateOldWallets = function() {
+    Compatibility.listWalletsPre8(function(wallets) {
+      $scope.anyWallet = wallets.length > 0 ? true : false;
+    });
+  };
+  updateOldWallets();
 
   $scope.$on('new-wallet', function(ev) {
     $scope.wallets = Wallets.all();
+    updateOldWallets();
   });
 
   $scope.openCamera = function() {
