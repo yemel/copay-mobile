@@ -8,9 +8,9 @@ angular.module('copay.controllers')
     $scope.wallet = wallets[0];
   });
 
-  $scope.tryImport = function() {
+  $scope.tryImport = function(form) {
     var wallet = $scope.wallet;
-    var password = $scope.password;
+    var password = form.password;
     $ionicLoading.show({
       template: '<i class="icon ion-loading-c"></i> Importing wallet...'
     });
