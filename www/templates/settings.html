@@ -1,11 +1,26 @@
 <ion-view title="Settings">
 
-   <ion-content>
-    <form ng-submit="">
+   <ion-content class="has-header">
+    <form ng-submit="submit(form)">
       <div class="list">
+        <label class="item item-toggle">
+          Insight server
+        </label>
         <label class="item item-input">
-          <span class="input-label">Server</span>
-          <input type="text" ng-model="settingsData.insight" placeholder="https://insight.bitpay.com:433">
+          <input type="text" ng-model="data.insight" placeholder="https://insight.bitpay.com:433">
+        </label>
+        <label class="item item-toggle ">
+          Testnet Insight server
+        </label>
+        <label class="item item-input">
+          <input type="text" ng-model="data.testinsight" placeholder="https://test-insight.bitpay.com:433">
+        </label>
+        <label class="item item-toggle">
+          Remote storage
+          <label class="toggle toggle-positive">
+            <input type="checkbox" ng-model="data.useRemote">
+            <div class="track"><div class="handle"></div></div>
+          </label>
         </label>
         <label class="item">
           <button class="button button-block button-positive" type="submit">Save</button>

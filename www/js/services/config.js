@@ -10,17 +10,22 @@ angular.module('copay.services')
 
   // TODO: This should be a Profile preference
   config.savePreferences = function() {
-    localStorage.setItem('preferences', JSON.stringify(config.currency));
-  }
+    config.pluginManager = new copay.PluginManager(config);
+    config.identity.pluginManager = config.pluginManager;
+    localStorage.setItem('preferences', JSON.stringify(config));
+  };
 
   config.loadPreferences = function() {
-    var currency = localStorage.getItem('preferences');
-    return currency ? JSON.parse(currency) : {btc: "BTC", fiat: "USD"};
-  }
+    var readConfig = localStorage.getItem('preferences');
+    return _.extend(config, JSON.parse(readConfig));
+  };
 
-  config.currency = config.loadPreferences();
-  //config.currency = {btc: "BTC", fiat: "USD"};
-  console.log('Config Currency', config.currency);
+  config.currency = {btc: "BTC", fiat: "USD"};
+  config.useRemote = true;
+
+  config.EncryptedInsightStorage = {
+    url: 'https://insight.bitpay.com:443/api/email',
+  };
 
   config.network = {
     testnet: {
@@ -38,9 +43,7 @@ angular.module('copay.services')
     updateFrequencySeconds: 60 * 60
   };
 
-  config.pluginManager = new copay.PluginManager({
-    plugins: { EncryptedLocalStorage: true }
-  });
+  config.plugins = { EncryptedInsightStorage: true };
 
   var walletConfig = {
     idleDurationMin: 4,
@@ -55,7 +58,10 @@ angular.module('copay.services')
       unitName: "bits",
       unitToSatoshi: 100,
     }
-  }
+  };
+
+  config.loadPreferences();
+  config.pluginManager = new copay.PluginManager(config);
 
   config.identity = {
     pluginManager: config.pluginManager,
@@ -66,7 +72,6 @@ angular.module('copay.services')
       iterations: 100,
       storageSalt: "mjuBtGybi/4="
     }
-  }
-
+  };
   return config;
 });
