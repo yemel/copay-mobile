@@ -52,8 +52,8 @@
         Go Proposal
       </div>
       <div class="item item-text-wrap" ng-repeat="proposal in proposals" ui-sref="profile.wallet.proposal({proposalId:proposal.id})">
-        {{proposal.total|displayBtc}} ~= {{proposal.total|displayFiat }} <br ng-show="proposal.comment"/>
-        {{proposal.comment}}
+        {{proposal.total|displayBtc}} ~= {{proposal.total|displayFiat }}
+        <span class="comment" ng-show="proposal.comment"/>{{proposal.comment}}</span>
         <span class="badge badge-energized" ng-show="proposal.awaitingAction">
           <i class="icon ion-alert"></i>
         </span>
