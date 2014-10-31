@@ -7,8 +7,8 @@ var RateService = function($http, Config) {
   // Unit Name: SatoshisToUnit, Decimal Places
   this.UNITS = {
     "BTC": [1e8, 8],
-    "bits": [1e6, 6],
-    "mBTC": [1e3, 3],
+    "mBTC": [1e5, 5],
+    "bits": [1e3, 2],
     "Satoshis": [1, 0]
   };
 
@@ -89,7 +89,7 @@ RateService.prototype.fromSatoshis = function(satoshis, code) {
 RateService.prototype.convert = function(amount, fromCode, toCode) {
   var satoshis = this.toSatoshis(amount, fromCode);
   return this.fromSatoshis(satoshis, toCode);
-}
+};
 
 RateService.prototype.listAlternatives = function() {
   if (!this.isAvailable) {
