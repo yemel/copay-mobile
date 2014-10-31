@@ -13,11 +13,15 @@ using the multisig power of Copay and making it context aware.
 
 ## Cordova Plugins
 
-    cordova plugin add https://github.com/EddyVerbruggen/Toast-PhoneGap-Plugin.git
+    cordova plugin add org.apache.cordova.vibration
+    cordova plugin add org.apache.cordova.splashscreen
+    cordova plugin add de.appplant.cordova.plugin.local-notification
     cordova plugin add https://github.com/wildabeast/BarcodeScanner.git
-    cordova plugin add https://github.com/EddyVerbruggen/SocialSharing-PhoneGap-Plugin.git
     cordova plugin add https://github.com/VersoSolutions/CordovaClipboard
+    cordova plugin add https://github.com/EddyVerbruggen/Toast-PhoneGap-Plugin.git
     cordova plugin add de.appplant.cordova.plugin.email-composer & cordova prepare
+    cordova plugin add https://github.com/EddyVerbruggen/SocialSharing-PhoneGap-Plugin.git
+    cordova plugin add https://github.com/EddyVerbruggen/LaunchMyApp-PhoneGap-Plugin.git --variable URL_SCHEME=bitcoin
 
 ## Run
 
