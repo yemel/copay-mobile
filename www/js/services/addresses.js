@@ -9,17 +9,17 @@ angular.module('copay.services')
     this.addresses = {};
 
     var self = this;
-    Wallets.all().forEach(function(wallet) {
-      self.loadAddresses(wallet);
-
-      wallet.on('tx', function() {
-          self.loadAddresses(wallet);
-      });
-    });
+    Wallets.all().forEach(self.subscribeWallet.bind(self));
 
     $rootScope.$on('new-wallet', function(ev, wallet) {
-      self.loadAddresses(wallet);
+      self.subscribeWallet(wallet);
     });
+  };
+
+  Addresses.prototype.subscribeWallet = function(wallet) {
+      var self = this;
+      self.loadAddresses(wallet);
+      wallet.on('tx', self.loadAddresses.bind(self, wallet));
   };
 
   Addresses.prototype.loadAddresses = function(wallet) {
