@@ -17,6 +17,7 @@ using the multisig power of Copay and making it context aware.
     cordova plugin add https://github.com/wildabeast/BarcodeScanner.git
     cordova plugin add https://github.com/EddyVerbruggen/SocialSharing-PhoneGap-Plugin.git
     cordova plugin add https://github.com/VersoSolutions/CordovaClipboard
+    cordova plugin add de.appplant.cordova.plugin.email-composer & cordova prepare
 
 ## Run
 

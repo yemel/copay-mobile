@@ -2,7 +2,7 @@
 
 angular.module('copay.controllers')
 
-.controller('ProfileCtrl', function($scope, $cordovaSocialSharing, Session, Config) {
+.controller('ProfileCtrl', function($scope, $window, Session, Config) {
 
   $scope.email = Session.identity.email;
   $scope.unit = Config.currency.btc;
@@ -24,13 +24,12 @@ angular.module('copay.controllers')
     var file = identity.exportEncryptedWithWalletInfo(identity.password);
     var filename = identity.email + '-profile.json';
 
-    $cordovaSocialSharing.shareViaEmail(
-      'Here is your encrypted backup for the profile ' + identity.email,
-      'Copay - Profile Backup',
-      [identity.email],
-      file
-    );
-
+    $window.plugin.email.open({
+      subject: 'Copay - Profile Backup',
+      body: 'Here is your encrypted backup for the profile ' + identity.email,
+      to: [identity.email],
+      attachments: ['base64:' + filename + '//' + btoa(file)]
+    });
   };
 
 });
