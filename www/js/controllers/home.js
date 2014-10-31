@@ -23,7 +23,7 @@ angular.module('copay.controllers')
 
   $scope.openModal = function() {
     $scope.modal.title = "Invite copayers";
-    $scope.modal.data = $scope.wallet.getSecret();
+    $scope.modal.qrData = $scope.modal.data = $scope.wallet.getSecret();
 
     $scope.modal.show();
   };

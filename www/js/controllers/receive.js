@@ -21,13 +21,15 @@ angular.module('copay.controllers')
 
   $scope.createAddress = function() {
     var addr = Addresses.createAddress($scope.wallet);
-    $scope.openModal('bitcoin:' + addr);
+    $scope.openModal(addr);
     $scope.$emit('new-address');
   }
 
-  $scope.openModal = function(data) {
+  $scope.openModal = function(address) {
+    console.log(address);
     $scope.modal.title = "Address";
-    $scope.modal.data = data;
+    $scope.modal.data = address;
+    $scope.modal.qrData = 'bitcoin:' + address;
 
     $scope.modal.show();
   };
