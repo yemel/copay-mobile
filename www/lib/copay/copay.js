@@ -1,6 +1,4 @@
-require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"../config":[function(require,module,exports){
-module.exports=require('4itQ50');
-},{}],"4itQ50":[function(require,module,exports){
+require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"4itQ50":[function(require,module,exports){
 'use strict';
 var defaultConfig = {
   defaultLanguage: 'en',
@@ -58,10 +56,10 @@ var defaultConfig = {
 
   plugins: {
     //LocalStorage: true,
-    EncryptedLocalStorage: true,
+//    EncryptedLocalStorage: true,
     //GoogleDrive: true,
     //InsightStorage: true
-    //EncryptedInsightStorage: true
+    EncryptedInsightStorage: true,
   },
 
   EncryptedInsightStorage: {
@@ -88,6 +86,8 @@ var defaultConfig = {
 if (typeof module !== 'undefined')
   module.exports = defaultConfig;
 
+},{}],"../config":[function(require,module,exports){
+module.exports=require('4itQ50');
 },{}],"hxYaTp":[function(require,module,exports){
 // core
 module.exports.PublicKeyRing = require('./js/models/PublicKeyRing');
@@ -97,6 +97,7 @@ module.exports.PrivateKey = require('./js/models/PrivateKey');
 module.exports.HDPath = require('./js/models/HDPath');
 module.exports.HDParams = require('./js/models/HDParams');
 module.exports.crypto = require('./js/util/crypto');
+module.exports.logger = require('./js/log');
 
 
 // components
@@ -113,13 +114,14 @@ module.exports.commitHash = require('./version').commitHash;
 // test hack :s, will fix 
 module.exports.FakePayProServer = require('./test/mocks/FakePayProServer');
 
-},{"./js/models/Async":7,"./js/models/Compatibility":"8ecKdB","./js/models/HDParams":11,"./js/models/HDPath":"SuUu6u","./js/models/Identity":"7huykZ","./js/models/Insight":"BSr44Z","./js/models/PluginManager":"GBuNT8","./js/models/PrivateKey":"T9anyq","./js/models/PublicKeyRing":"XAmkZ6","./js/models/TxProposal":24,"./js/models/TxProposals":25,"./js/models/Wallet":"CxreE2","./js/util/crypto":38,"./test/mocks/FakePayProServer":"BTnq1B","./version":"RvaLt1"}],"copay":[function(require,module,exports){
+},{"./js/log":"MsXNHD","./js/models/Async":7,"./js/models/Compatibility":"8ecKdB","./js/models/HDParams":11,"./js/models/HDPath":"SuUu6u","./js/models/Identity":"7huykZ","./js/models/Insight":"BSr44Z","./js/models/PluginManager":"GBuNT8","./js/models/PrivateKey":"T9anyq","./js/models/PublicKeyRing":"XAmkZ6","./js/models/TxProposal":24,"./js/models/TxProposals":25,"./js/models/Wallet":"CxreE2","./js/util/crypto":38,"./test/mocks/FakePayProServer":"BTnq1B","./version":"RvaLt1"}],"copay":[function(require,module,exports){
 module.exports=require('hxYaTp');
 },{}],"../log.js":[function(require,module,exports){
 module.exports=require('MsXNHD');
 },{}],"MsXNHD":[function(require,module,exports){
-var config = require('../config');
+var config = config || require('../config');
 var _ = require('lodash');
+
 
 /**
  * @desc
@@ -140,6 +142,10 @@ var _ = require('lodash');
 var Logger = function(name) {
   this.name = name || 'log';
   this.level = 2;
+};
+
+Logger.prototype.getLevels = function() {
+  return levels;
 };
 
 
@@ -232,7 +238,17 @@ Logger.prototype.setLevel = function(level) {
  */
 
 var logger = new Logger('copay');
-logger.setLevel(config.logLevel);
+var error = new Error();
+
+var logLevel = config.logLevel;
+
+if (typeof localStorage !== "undefined" && localStorage.getItem) {
+  var localConfig = JSON.parse(localStorage.getItem("config"));
+  if (localConfig && localConfig.logLevel)
+    logLevel = localConfig.logLevel;
+}
+
+logger.setLevel(logLevel);
 module.exports = logger;
 
 },{"../config":"4itQ50","lodash":"K2RcUv"}],7:[function(require,module,exports){
@@ -806,9 +822,10 @@ Compatibility.getWallets_Old = function(cb) {
 Compatibility.getWallets2 = function(cb) {
   var self = this;
   var re = /wallet::([^_]+)(_?(.*))/;
+  var va = /^{+/;
 
-  var keys = [];
   var key;
+  var keys = [];
   for (key in localStorage) {
     keys.push(key);
   }
@@ -816,11 +833,15 @@ Compatibility.getWallets2 = function(cb) {
     if (key.indexOf('wallet::') !== 0)
       return null;
     var match = key.match(re);
+    var matchValue = localStorage[key].match(va);
     if (match.length != 4)
+      return null;
+    if (matchValue)
       return null;
     return {
       id: match[1],
       name: match[3] ? match[3] : undefined,
+      value: localStorage[key]
     };
   }));
 
@@ -852,7 +873,6 @@ Compatibility.readWalletPre8 = function(walletId, password, cb) {
   var passphrase = cryptoUtils.kdf(password);
   var obj = {};
 
-  var key;
   for (key in localStorage) {
     if (key.indexOf('wallet::' + walletId) !== -1) {
       var ret = self._read(localStorage.getItem(key), passphrase);
@@ -883,7 +903,7 @@ Compatibility.readWalletPre8 = function(walletId, password, cb) {
 };
 
 Compatibility.importEncryptedWallet = function(identity, cypherText, password, opts, cb) {
-  var crypto = opts.cryptoUtil || cryptoUtils;
+  var crypto = (opts && opts.cryptoUtil) || cryptoUtils;
   var key = crypto.kdf(password);
   var obj = crypto.decrypt(key, cypherText);
   if (!obj) {
@@ -922,6 +942,11 @@ Compatibility.kdf = function(password) {
   var key512 = crypto2(hash, salt, this.iterations, 64, 'sha1');
   var sbase64 = sjcl.codec.base64.fromBits(sjcl.codec.hex.toBits(key512));
   return sbase64;
+};
+
+Compatibility.deleteOldWallet = function(walletObj) {
+  localStorage.removeItem('wallet::'+walletObj.id+'_'+walletObj.name);
+  log.info('Old wallet ' + walletObj.name + ' deleted: ' + walletObj.id);
 };
 
 
@@ -1323,6 +1348,8 @@ module.exports = HDPath;
 
 },{"lodash":"K2RcUv","preconditions":"s3Os0O"}],"../js/models/HDPath":[function(require,module,exports){
 module.exports=require('SuUu6u');
+},{}],"../js/models/Identity":[function(require,module,exports){
+module.exports=require('7huykZ');
 },{}],"7huykZ":[function(require,module,exports){
 'use strict';
 var preconditions = require('preconditions').singleton();
@@ -1385,8 +1412,12 @@ function Identity(opts) {
   this.wallets = opts.wallets || {};
 };
 
+Identity.getStoragePrefix = function() {
+  return 'profile::';
+};
+
 Identity.getKeyForEmail = function(email) {
-  return 'profile::' + bitcore.util.sha256ripe160(email).toString('hex');
+  return Identity.getStoragePrefix() + bitcore.util.sha256ripe160(email).toString('hex');
 };
 
 Identity.prototype.getId = function() {
@@ -1404,10 +1435,14 @@ Identity.prototype.getName = function() {
  * @param cb
  * @return {undefined}
  */
-Identity.create = function(opts) {
+Identity.create = function(opts, cb) {
   opts = _.extend({}, opts);
 
-  return new Identity(opts);
+  var iden = new Identity(opts);
+  iden.store(opts, function(err) {
+    if (err) return cb(err);
+    return cb(null, iden);
+  });
 };
 
 
@@ -1708,7 +1743,9 @@ Identity.prototype.bindWallet = function(w) {
   });
   w.on('ready', function() {
     log.debug('<ready> Wallet' + w.getName());
-    self.store({noWallets:true}, function() {
+    self.store({
+      noWallets: true
+    }, function() {
       self.storeWallet(w);
     });
   });
@@ -1811,7 +1848,6 @@ Identity.prototype.addWallet = function(wallet, cb) {
   // TODO (eordano): Consider not saving automatically after this
   this.storage.setItem(wallet.getStorageKey(), wallet.toObj(), cb);
 };
-
 
 /**
  * @desc Checks if a version is compatible with the current version
@@ -1997,9 +2033,7 @@ Identity.prototype.joinWallet = function(opts, cb) {
 
 module.exports = Identity;
 
-},{"../../version":"RvaLt1","../log":"MsXNHD","../util/crypto":38,"./Async":7,"./PluginManager":"GBuNT8","./PrivateKey":"T9anyq","./PublicKeyRing":"XAmkZ6","./TxProposals":25,"./Wallet":"CxreE2","async":40,"bitcore":41,"lodash":"K2RcUv","preconditions":"s3Os0O"}],"../js/models/Identity":[function(require,module,exports){
-module.exports=require('7huykZ');
-},{}],"../js/models/Insight":[function(require,module,exports){
+},{"../../version":"RvaLt1","../log":"MsXNHD","../util/crypto":38,"./Async":7,"./PluginManager":"GBuNT8","./PrivateKey":"T9anyq","./PublicKeyRing":"XAmkZ6","./TxProposals":25,"./Wallet":"CxreE2","async":40,"bitcore":41,"lodash":"K2RcUv","preconditions":"s3Os0O"}],"../js/models/Insight":[function(require,module,exports){
 module.exports=require('BSr44Z');
 },{}],"BSr44Z":[function(require,module,exports){
 'use strict';
@@ -4161,8 +4195,12 @@ Wallet.COPAYER_PAIR_LIMITS = {
   12: 1,
 };
 
+Wallet.getStoragePrefix = function() {
+  return 'wallet::';
+};
+
 Wallet.getStorageKey = function(str) {
-  return 'wallet::' + str;
+  return Wallet.getStoragePrefix() + str;
 };
 
 Wallet.prototype.getStorageKey = function() {
@@ -4241,13 +4279,6 @@ Wallet.prototype._newAddresses = function(dontUpdateUx) {
 };
 
 
-Wallet.prototype._publicKeyRingUpdated = function(isComplete) {
-  if (isComplete) {
-    this.subscribeToAddresses();
-  };
-  this.emitAndKeepAlive('publicKeyRingUpdated');
-};
-
 /**
  * @desc Handles an 'indexes' message.
  *
@@ -4325,7 +4356,7 @@ Wallet.prototype._onPublicKeyRing = function(senderId, data) {
       this._lockIncomming();
     }
 
-    this._publicKeyRingUpdated(this.publicKeyRing.isComplete());
+    this.emitAndKeepAlive('publicKeyRingUpdated');
   }
 };
 
@@ -4426,7 +4457,7 @@ Wallet.prototype._checkSentTx = function(ntxid, cb) {
 
   this.blockchain.getTransaction(txid, function(err, tx) {
     if (err) return cb(false);
-    return cb(ret);
+    return cb(txid);
   });
 };
 
@@ -4461,10 +4492,10 @@ Wallet.prototype._onTxProposal = function(senderId, data) {
 
     var tx = m.txp.builder.build();
     if (tx.isComplete()) {
-      this._checkSentTx(m.ntxid, function(ret) {
-        if (ret) {
+      this._checkSentTx(m.ntxid, function(txid) {
+        if (txid) {
           if (!m.txp.getSent()) {
-            m.txp.setSent(m.ntxid);
+            m.txp.setSent(txid);
             self.emitAndKeepAlive('txProposalsUpdated');
           }
         }
@@ -6838,7 +6869,10 @@ Wallet.prototype.getTransactionHistory = function(cb) {
     tx.amountSat = Math.abs(amount);
     tx.amount = tx.amountSat * satToUnit;
     tx.sentTs = proposal ? proposal.sentTs : undefined;
-    tx.minedTs = tx.time * 1000;
+    tx.minedTs = !_.isNaN(tx.time) ? tx.time * 1000 : undefined;
+    tx.merchant = proposal ? proposal.merchant : undefined;
+    tx.peerActions = proposal ? proposal.peerActions : undefined;
+    tx.finallyRejected = proposal ? proposal.finallyRejected : undefined;
   };
 
   if (addresses.length > 0) {
@@ -7275,7 +7309,9 @@ GoogleDrive.prototype.allKeys = function(cb) {
 
 module.exports = GoogleDrive;
 
-},{"../log":"MsXNHD","preconditions":"s3Os0O"}],"Ovu7Zc":[function(require,module,exports){
+},{"../log":"MsXNHD","preconditions":"s3Os0O"}],"../plugins/InsightStorage":[function(require,module,exports){
+module.exports=require('Ovu7Zc');
+},{}],"Ovu7Zc":[function(require,module,exports){
 var request = require('request');
 var cryptoUtil = require('../util/crypto');
 var querystring = require('querystring');
@@ -7315,6 +7351,9 @@ InsightStorage.prototype.getItem = function(name, callback) {
       if (err) {
         return callback('Connection error');
       }
+      if (response.statusCode === 403) {
+        return callback('PNOTFOUND: Profile not found');
+      }
       if (response.statusCode !== 200) {
         return callback('Connection error');
       }
@@ -7339,6 +7378,9 @@ InsightStorage.prototype.setItem = function(name, value, callback) {
     if (err) {
       return callback('Connection error');
     }
+    if (response.statusCode === 409) {
+      return callback('Invalid username or password');
+    }
     if (response.statusCode !== 200) {
       return callback('Unable to store data on insight');
     }
@@ -7356,19 +7398,20 @@ InsightStorage.prototype.clear = function(callback) {
 };
 
 InsightStorage.prototype.allKeys = function(callback) {
-  // NOOP
-  // TODO: Add functionality?
-  callback();
+  // TODO: compatibility with localStorage
+  return callback(null);
+};
+
+InsightStorage.prototype.getFirst = function(prefix, opts, callback) {
+  // TODO: compatibility with localStorage
+  return callback(null, true, true);
 };
 
 module.exports = InsightStorage;
 
-},{"../models/Identity":"7huykZ","../util/crypto":38,"querystring":"SZ5xis","request":"jhzXOo"}],"../plugins/InsightStorage":[function(require,module,exports){
-module.exports=require('Ovu7Zc');
-},{}],"../plugins/LocalStorage":[function(require,module,exports){
-module.exports=require('zbhKTM');
-},{}],"zbhKTM":[function(require,module,exports){
+},{"../models/Identity":"7huykZ","../util/crypto":38,"querystring":"SZ5xis","request":"jhzXOo"}],"zbhKTM":[function(require,module,exports){
 'use strict';
+var _ = require('lodash');
 
 function LocalStorage() {
   this.type = 'DB';
@@ -7421,8 +7464,34 @@ LocalStorage.prototype.allKeys = function(cb) {
   return cb(null, ret);    
 };
 
+LocalStorage.prototype.getFirst = function(prefix, opts, cb) {
+  opts = opts || {};
+  var that = this;
+
+  this.allKeys(function(err, allKeys) {
+    var keys = _.filter(allKeys, function(k) {
+      if ((k === prefix) || k.indexOf(prefix) === 0) return true;
+    });
+
+    if (keys.length === 0)
+      return cb(new Error('not found'));
+
+    if (opts.onlyKey)
+      return cb(null, null, keys[0]);
+
+    that.getItem(keys[0], function(err, data) {
+      if (err) {
+        return cb(err);
+      }
+      return cb(null, data, keys[0]);
+    });
+  });
+};
+
 module.exports = LocalStorage;
 
+},{"lodash":"K2RcUv"}],"../plugins/LocalStorage":[function(require,module,exports){
+module.exports=require('zbhKTM');
 },{}],38:[function(require,module,exports){
 /**
  * Small module for some helpers that wrap sjcl with some good practices.
@@ -52701,5 +52770,5 @@ module.exports = startServer;
 module.exports=require('RvaLt1');
 },{}],"RvaLt1":[function(require,module,exports){
 module.exports.version="0.6.4";
-module.exports.commitHash="24fa7fe";
+module.exports.commitHash="b6f9a45";
 },{}]},{},[])
