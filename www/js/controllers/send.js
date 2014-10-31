@@ -83,7 +83,11 @@ angular.module('copay.controllers')
 
   // Fill the form with the payment info
   if ($stateParams.data) {
-    var paymentInfo = new Bitcore.BIP21($stateParams.data);
+    try {
+      var paymentInfo = new Bitcore.BIP21($stateParams.data);
+    } catch (e) {
+      Notifications.toast('The scanned code is invalid');
+    }
 
     $scope.data = {
       address: paymentInfo.address + '',
