@@ -114,6 +114,13 @@ i.ion-alert-circled.error {
 	font-size: 14px;
 }
 
+span.comment {
+  display: block;
+  font-style: italic;
+  margin-top: 5px;
+  color: gray;
+}
+
 .pin .col {
   text-align: center;
   font-size: 20px;
@@ -187,7 +194,7 @@ h3.pin-title {
 }
 
 .box-pin {
-	margin: 20px 10px;
+	margin: 20px 1%;
 	padding: 25px 0;
 	border-radius: 2px;
 	background: #FFFFFF;

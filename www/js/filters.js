@@ -32,6 +32,18 @@ angular.module('copay.filters', [])
       return copayer.nick + me;
     }
   }])
+  .filter("bubbleEmpty", function () {
+    return function (array, key) {
+        if(!angular.isArray(array)) return;
+        var present = array.filter(function (item) {
+            return item[key];
+        });
+        var empty = array.filter(function (item) {
+            return !item[key]
+        });
+        return empty.concat(present);
+    };
+  })
   .filter('range', function() {
     return function(input, from, to) {
       var min = parseInt(from, 10);

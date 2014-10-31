@@ -44,12 +44,12 @@ angular.module('copay.controllers')
     }
   };
 
-  $scope.clearForm = function(form) {
-    form.address = form.amount = $scope.altAmount = form.reference = "";
+  $scope.clearForm = function(form, data) {
+    data.address = data.amount = data.reference = $scope.altAmount = "";
     form.$setPristine();
   }
 
-  $scope.submit = function(form) {
+  $scope.submit = function(form, data) {
     if (!form.$valid) return;
 
     var wallet = $scope.wallet;
@@ -58,8 +58,8 @@ angular.module('copay.controllers')
       template: '<i class="icon ion-loading-c"></i> ' + message + '...'
     });
 
-    var satoshis = getSatoshis(form.amount);
-    wallet.createTx(form.address, satoshis, form.reference, onCreate);
+    var satoshis = getSatoshis(data.amount);
+    wallet.createTx(data.address, satoshis, data.reference, onCreate);
 
     function onCreate(err, proposalId) {
       if (err) throw err; // TODO: Handle this!
@@ -77,7 +77,7 @@ angular.module('copay.controllers')
       if (!txid) throw 'Problem Sending!'; // TODO: Handle this!
       $ionicLoading.hide();
       Notifications.toast('Transaction sent');
-      $scope.clearForm(form);
+      $state.go('profile.wallet.history');
     }
   }
 
@@ -112,7 +112,7 @@ angular.module('copay.controllers')
 
       var message = broadcasted ? 'Transaction sent' : 'Proposal approved';
       Notifications.toast(message);
-      return $state.go('profile.wallet.history', {walletId: $scope.wallet.id});
+      return $state.go('profile.wallet.history');
     });
   };
 

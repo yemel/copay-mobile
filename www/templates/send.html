@@ -11,7 +11,7 @@
         <span class="item-note" ng-class="{error: data.amount && !enough}" >{{wallet.availableBalance|displayBtc}} | {{wallet.availableBalance|displayFiat}}</span>
       </div>
 
-      <form name="form" ng-submit="submit(form)" class="error-icons" novalidate>
+      <form name="form" ng-submit="submit(form, data)" class="error-icons" novalidate>
           <label class="item item-input">
             <input
               type="text" ng-model="data.address"
