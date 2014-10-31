@@ -120,6 +120,11 @@ i.ion-alert-circled.error {
   color: #1ABC9C;
 }
 
+h3.pin-title {
+  margin-top: 10px;
+  text-align: center;
+}
+
 .icon.big {
   font-size: 19px;
 }
