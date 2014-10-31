@@ -117,7 +117,8 @@ angular.module('copay.controllers')
       var message = broadcasted ? 'Transaction sent' : 'Proposal approved';
       Notifications.toast(message);
 
-      return $state.go('profile.wallet.history');
+      var next = broadcasted ? 'profile.wallet.history' : 'profile.wallet.send';
+      return $state.go(next);
     });
   };
 

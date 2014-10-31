@@ -20,6 +20,10 @@ angular.module('copay.services')
     wallet.on('tx', function(address) {
       self.notify('Incoming transaction', wallet.name + ' Wallet', wallet.id + address);
     });
+
+    wallet.on('txProposalEvent', function(proposal) {;
+      self.notify("Spendig Proposal", wallet.name + ' Wallet', proposal.cId);
+    });
   };
 
   Notifications.prototype.notify = function(title, message, id) {
