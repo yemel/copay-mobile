@@ -8,7 +8,7 @@
     <div class="card">
       <div class="item item-divider">
         {{needsApproval ? 'New proposal' : 'Send'}}
-        <span class="item-note">{{wallet.availableBalance|displayBtc}} | {{wallet.availableBalance|displayFiat}}</span>
+        <span class="item-note" ng-class="{error: data.amount && !enough}" >{{wallet.availableBalance|displayBtc}} | {{wallet.availableBalance|displayFiat}}</span>
       </div>
 
       <form name="form" ng-submit="submit(form)" class="error-icons" novalidate>
@@ -26,8 +26,9 @@
               min="0.00000001" max="10000000000" required>
             <i class="icon ion-alert-circled error"></i>
           </label>
-          <label class="item item-input">
+          <label class="item item-input amount-secondary">
             <input
+              class="amount"
               type="text" value="{{secondaryAmount}}"
               placeholder="Amount in {{secondaryCode}}"
               disabled="disabled">

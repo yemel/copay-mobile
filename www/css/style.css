@@ -54,6 +54,19 @@
 	font-weight: 700;
 }
 
+.item-input.amount-secondary {
+  background-color: #F8F8F8;
+}
+
+i.ion-alert-circled.error {
+  margin-right: 10px;
+}
+
+.item-note.error {
+  color: #DD0C53;
+  font-weight: bold;
+}
+
 .bar {
 	height: 55px;
 }
