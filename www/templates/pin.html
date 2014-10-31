@@ -5,8 +5,9 @@
   </div>
 
   <ion-content class="has-header padding">
-    <h3 ng-hide="confirm" class="pin-title">Enter a 4 digit pin</h3>
-    <h3 ng-show="confirm" class="pin-title">Confirm your 4 digit pin</h3>
+    <h3 ng-hide="create" class="pin-title">Enter your pin</h3>
+    <h3 ng-show="create && !confirm" class="pin-title">Enter a 4 digit pin</h3>
+    <h3 ng-show="create && confirm" class="pin-title">Confirm your 4 digit pin</h3>
     <div class="row pin">
       <div class="col">&nbsp;</div>
       <div class="col box-pin">&nbsp;<i class="icon ion-record" ng-show="digits[0]|defined"></i>&nbsp;</div>

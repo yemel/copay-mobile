@@ -1,13 +1,22 @@
 'use strict'
 
+
 angular.module('copay.controllers')
 
 // TODO: Abstract SetPinCtrl and PinCtrl
-.controller('PinCtrl', function($scope, $state, $ionicLoading, $ionicPopup, Identity, Session) {
+.controller('PinCtrl', function($scope, $state, $ionicLoading, $cordovaToast, $ionicPopup, Identity, Session) {
+
   $scope.digits = [];
 
   $scope.clear = function() {
     $scope.digits = [];
+  };
+
+  $scope.press = function(digit) {
+    $scope.digits.push(digit);
+    if ($scope.digits.length == 4) {
+      return $scope.confirm ? onConfirm() : onPIN();
+    }
   };
 
   $scope.logout = function() {
@@ -22,10 +31,13 @@ angular.module('copay.controllers')
    });
   };
 
-  $scope.press = function(digit) {
-    $scope.digits.push(digit);
-    if ($scope.digits.length == 4) {
-      return onPIN();
+  // TODO: Make Notifications work without a wallet
+  var toast = function(message) {
+    // Show somethig at the browser, for developing ease
+    if (!this.isNative) {
+      $ionicLoading.show({ template: message, noBackdrop: true, duration: 2000 });
+    } else {
+      $cordovaToast.showLongBottom(message);
     }
   };
 
@@ -39,7 +51,9 @@ angular.module('copay.controllers')
 
     Identity.openProfile(credentials, function(err, identity, wallet) {
       $ionicLoading.hide();
-      if (err) throw err;
+      if (err) {
+        toast('Invalid PIN, please try again');
+      }
 
       Session.signin(identity);
       $state.go('profile.wallet.home');
@@ -48,9 +62,10 @@ angular.module('copay.controllers')
 
 })
 
-.controller('SetPinCtrl', function($scope, $state, $stateParams, Identity, Session) {
+.controller('SetPinCtrl', function($scope, $state, $stateParams, $ionicLoading, $cordovaToast, Identity, Session) {
   var PIN = null;
   $scope.digits = [];
+  $scope.create = true;
   $scope.confirm = false;
 
   $scope.clear = function() {
@@ -68,10 +83,22 @@ angular.module('copay.controllers')
     setPIN($scope.digits);
   }
 
+  // TODO: Make Notifications work without a wallet
+  var toast = function(message) {
+    // Show somethig at the browser, for developing ease
+    if (!this.isNative) {
+      $ionicLoading.show({ template: message, noBackdrop: true, duration: 2000 });
+    } else {
+      $cordovaToast.showLongBottom(message);
+    }
+  };
+
   function onConfirm() {
     if (angular.equals(PIN, $scope.digits)) {
       Session.setCredentials(PIN, $stateParams);
       return $state.go('profile.wallet.home');
+    } else {
+      toast('PINs don\'t match, please try again');
     }
 
     setPIN(null);

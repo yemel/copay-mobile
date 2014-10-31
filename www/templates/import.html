@@ -11,14 +11,14 @@
         Import existing Wallet
       </div>
 
-      <form name="form" ng-submit="tryImport()" class="error-icons" novalidate>
+      <form name="form" ng-submit="tryImport(form)" class="error-icons" novalidate>
           <label class="item item-input item-select">
             <span class="input-label">Wallet</span>
             <select ng-model="wallet" ng-options="w.name for w in wallets" required>
             </select>
           </label>
           <label class="item item-input">
-            <input type="password" ng-model="password" placeholder="Wallet Password" required>
+            <input type="password" ng-model="form.password" placeholder="Wallet Password" required>
           </label>
           <label class="item">
             <button class="button button-block button-positive" type="submit" ng-disabled="!form.$valid">
