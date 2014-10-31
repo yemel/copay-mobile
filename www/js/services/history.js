@@ -16,6 +16,10 @@ angular.module('copay.services')
       wallet.on('tx', function() {
         self.update(wallet);
       });
+
+      wallet.on('txProposalsUpdated', function() {
+        self.update(wallet);
+      });
     });
   };
 
