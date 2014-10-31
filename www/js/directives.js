@@ -69,9 +69,9 @@ angular.module('copay.directives', [])
         link: function (scope, element, attrs, ctrl) {
           var validator = function(value) {
             value = -(-value);
-            var satoshis = scope.unitFiat
-              ? Rates.fromFiat(value, scope.primaryCode)
-              : Rates.toSatoshis(value, scope.primaryCode);
+            var satoshis = scope.displayPrimary
+              ? Rates.toSatoshis(value, scope.primaryCode)
+              : Rates.fromFiat(value, scope.primaryCode);
             scope.enough = Session.currentWallet.availableBalance >= satoshis;
             ctrl.$setValidity('enoughBalance', scope.enough);
             return value;
