@@ -17,7 +17,8 @@ angular.module('copay')
 
     .state('start.settings', {
       url: "/settings",
-      templateUrl: "templates/settings.html"
+      templateUrl: "templates/settings.html",
+      controller: "SettingsCtrl"
     })
 
     .state('start.register', {
