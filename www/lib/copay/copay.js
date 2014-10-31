@@ -459,6 +459,11 @@ Network.prototype._onMessage = function(enc) {
   }
   log.debug('Async: receiving ' + JSON.stringify(payload));
 
+  if (this.ignoreMessageFromTs && this.ignoreMessageFromTs === enc.ts) {
+    log.debug('Ignoring message from ', enc.ts);
+    return;
+  }
+
   var self = this;
   switch (payload.type) {
     case 'hello':
@@ -502,7 +507,15 @@ Network.prototype._setupConnectionHandlers = function(opts, cb) {
   });
 
   self.socket.on('subscribed', function(m) {
-    var fromTs = (opts.lastTimestamp || 0) + 1;
+    var fromTs = opts.syncedTimestamp || 0;
+
+    // We ask for this message, and then ignore it, only to see if the
+    // server has erased our old messages.
+    
+    if (fromTs) {
+      self.ignoreMessageFromTs = fromTs;
+    }
+    log.info('Async: synchronizing from: ',fromTs);
     self.socket.emit('sync', fromTs);
     self.started = true;
   });
@@ -872,6 +885,7 @@ Compatibility.readWalletPre8 = function(walletId, password, cb) {
   var self = this;
   var passphrase = cryptoUtils.kdf(password);
   var obj = {};
+  var key;
 
   for (key in localStorage) {
     if (key.indexOf('wallet::' + walletId) !== -1) {
@@ -1439,7 +1453,7 @@ Identity.create = function(opts, cb) {
   opts = _.extend({}, opts);
 
   var iden = new Identity(opts);
-  iden.store(opts, function(err) {
+  iden.store(_.extend(opts, {failIfExists: true}), function(err) {
     if (err) return cb(err);
     return cb(null, iden);
   });
@@ -1536,13 +1550,6 @@ Identity.prototype.retrieveWalletFromStorage = function(walletId, opts, callback
 };
 
 /**
- * TODO (matiu): What is this supposed to do?
- */
-Identity.isAvailable = function(email, opts, cb) {
-  return cb();
-};
-
-/**
  * @param {Wallet} wallet
  * @param {Function} cb
  */
@@ -1551,15 +1558,28 @@ Identity.prototype.storeWallet = function(wallet, cb) {
 
   var val = wallet.toObj();
   var key = wallet.getStorageKey();
+  log.debug('Storing wallet:' + wallet.getName());
 
   this.storage.setItem(key, val, function(err) {
     if (err) {
-      log.debug('Wallet:' + wallet.getName() + ' couldnt be stored');
+      log.debug('Wallet:' + wallet.getName() + ' couldnt be stored:', err);
     }
     if (cb)
       return cb(err);
   });
 };
+
+
+/**
+ * @param {Identity} identity
+ * @param {Wallet} wallet
+ * @param {Function} cb
+ */
+Identity.storeWalletDebounced = _.debounce(function(identity, wallet, cb) {
+  identity.storeWallet(wallet,cb);
+}, 3000);
+
+
 
 Identity.prototype.toObj = function() {
   return _.extend({
@@ -1726,36 +1746,29 @@ Identity.prototype.bindWallet = function(w) {
   log.debug('Binding wallet ' + w.getName());
 
   w.on('txProposalsUpdated', function() {
-    log.debug('<txProposalsUpdated>> Wallet' + w.getName());
-    self.storeWallet(w);
+    Identity.storeWalletDebounced(self, w);
   });
   w.on('newAddresses', function() {
-    log.debug('<newAddresses> Wallet' + w.getName());
-    self.storeWallet(w);
+    Identity.storeWalletDebounced(self, w);
   });
   w.on('settingsUpdated', function() {
-    log.debug('<newAddresses> Wallet' + w.getName());
-    self.storeWallet(w);
+    Identity.storeWalletDebounced(self, w);
   });
   w.on('txProposalEvent', function() {
-    log.debug('<txProposalEvent> Wallet' + w.getName());
-    self.storeWallet(w);
+    Identity.storeWalletDebounced(self, w);
   });
   w.on('ready', function() {
-    log.debug('<ready> Wallet' + w.getName());
     self.store({
       noWallets: true
     }, function() {
-      self.storeWallet(w);
+      Identity.storeWalletDebounced(self, w);
     });
   });
   w.on('addressBookUpdated', function() {
-    log.debug('<addressBookUpdated> Wallet' + w.getName());
-    self.storeWallet(w);
+    Identity.storeWalletDebounced(self, w);
   });
   w.on('publicKeyRingUpdated', function() {
-    log.debug('<publicKeyRingUpdated> Wallet' + w.getName());
-    self.storeWallet(w);
+    Identity.storeWalletDebounced(self, w);
   });
 };
 
@@ -1919,7 +1932,7 @@ Identity.prototype.decodeSecret = function(secret) {
 Identity.prototype.getLastFocusedWallet = function() {
   if (_.keys(this.wallets).length == 0) return;
   return _.max(this.wallets, function(wallet) {
-    return wallet.lastTimestamp || 0;
+    return wallet.focusedTimestamp || 0;
   });
 };
 
@@ -4121,7 +4134,8 @@ function Wallet(opts) {
   this.registeredPeerIds = [];
   this.addressBook = opts.addressBook || {};
   this.publicKey = this.privateKey.publicHex;
-  this.lastTimestamp = opts.lastTimestamp || 0;
+  this.focusedTimestamp = opts.focusedTimestamp || 0;
+  this.syncedTimestamp = opts.syncedTimestamp || 0;
   this.lastMessageFrom = {};
 
   this.paymentRequests = opts.paymentRequests || {};
@@ -4176,7 +4190,8 @@ Wallet.PERSISTED_PROPERTIES = [
   'txProposals',
   'privateKey',
   'addressBook',
-  'lastTimestamp',
+  'focusedTimestamp',
+  'syncedTimestamp',
   'secretNumber',
 ];
 
@@ -4600,24 +4615,31 @@ Wallet.prototype._onAddressBook = function(senderId, data) {
  * @desc Updates the wallet's last modified timestamp and triggers a save
  * @param {number} ts - the timestamp
  */
-Wallet.prototype.updateTimestamp = function(ts, callback) {
+Wallet.prototype.updateFocusedTimestamp = function(ts) {
   preconditions.checkArgument(ts);
   preconditions.checkArgument(_.isNumber(ts));
-  this.lastTimestamp = ts;
-  // we dont store here
-  if (callback) {
-    return callback(null);
-  }
+  preconditions.checkArgument(ts > 2999999999, 'use miliseconds');
+  this.focusedTimestamp = ts;
 };
+
+
+Wallet.prototype.updateSyncedTimestamp = function(ts) {
+  preconditions.checkArgument(ts);
+  preconditions.checkArgument(_.isNumber(ts));
+  preconditions.checkArgument(ts > 2999999999999, 'use microseconds');
+  this.syncedTimestamp = ts;
+};
+
 
 /**
  * @desc Called when there are no messages in the server
  * Triggers a call to {@link Wallet#sendWalletReady}
  */
 Wallet.prototype._onNoMessages = function() {
-  log.debug('Wallet:' + this.id + ' No messages at the server. Requesting peer sync from: ' + (this.lastTimestamp + 1));
-  this.sendWalletReady(null, parseInt((this.lastTimestamp + 1) / 1000));
-  this.updateTimestamp(parseInt(Date.now() / 1000));
+  if (!this.isShared()) return;
+
+  log.debug('Wallet:' + this.id + ' No messages at the server. Requesting peer sync from: ' + (this.syncedTimestamp + 1));
+  this.sendWalletReady(null, parseInt((this.syncedTimestamp + 1) / 1000000));
 };
 
 /**
@@ -4637,7 +4659,8 @@ Wallet.prototype._onData = function(senderId, data, ts) {
   preconditions.checkArgument(_.isNumber(ts));
   log.debug('Wallet:' + this.id + ' RECV', senderId, data);
 
-  this.updateTimestamp(ts);
+
+  this.updateSyncedTimestamp(ts);
 
   if (data.type !== 'walletId' && this.id !== data.walletId) {
     log.debug('Wallet:' + this.id + ' Received corrupt message:', data)
@@ -4651,7 +4674,6 @@ Wallet.prototype._onData = function(senderId, data, ts) {
       this.sendWalletReady(senderId);
       break;
     case 'walletReady':
-
       if (this.lastMessageFrom[senderId] !== 'walletReady') {
         log.debug('Wallet:' + this.id + ' peer Sync received. since: ' + (data.sinceTs || 0));
         this.sendPublicKeyRing(senderId);
@@ -4901,7 +4923,7 @@ Wallet.prototype.netStart = function() {
     copayerId: myId,
     privkey: myIdPriv,
     maxPeers: self.totalCopayers,
-    lastTimestamp: this.lastTimestamp || 0,
+    syncedTimestamp: this.syncedTimestamp || 0,
     secretNumber: self.secretNumber,
   };
 
@@ -4996,7 +5018,8 @@ Wallet.prototype.toObj = function() {
     txProposals: this.txProposals.toObj(),
     privateKey: this.privateKey ? this.privateKey.toObj() : undefined,
     addressBook: this.addressBook,
-    lastTimestamp: this.lastTimestamp || 0,
+    syncedTimestamp: this.syncedTimestamp || 0,
+    focusedTimestamp: this.focusedTimestamp || 0,
     secretNumber: this.secretNumber,
   };
 
@@ -5022,7 +5045,8 @@ Wallet.fromUntrustedObj = function(obj, readOpts) {
  * @param {Object} o.privateKey - Private key to be deserialized by {@link PrivateKey#fromObj}
  * @param {string} o.networkName - 'livenet' or 'testnet'
  * @param {Object} o.publicKeyRing - PublicKeyRing to be deserialized by {@link PublicKeyRing#fromObj}
- * @param {number} o.lastTimestamp - last time this wallet object was deserialized
+ * @param {number} o.syncedTimestamp - ts of the last synced message with insifht (in microseconds, as insight returns ts)
+ * @param {number} o.focusedTimestamp - last time this wallet was focused (open) by a user (in miliseconds)
  * @param {Object} o.txProposals - TxProposals to be deserialized by {@link TxProposals#fromObj}
  * @param {string} o.nickname - user's nickname
  *
@@ -5094,13 +5118,15 @@ Wallet.fromObj = function(o, readOpts) {
     });
   }
 
-  opts.lastTimestamp = o.lastTimestamp || 0;
+  opts.syncedTimestamp = o.syncedTimestamp || 0;
+  opts.focusedTimestamp = o.focusedTimestamp || 0;
 
   opts.blockchainOpts = readOpts.blockchainOpts;
   opts.networkOpts = readOpts.networkOpts;
 
   return new Wallet(opts);
 };
+
 
 /**
  * @desc Send a message to other peers
@@ -5463,7 +5489,7 @@ Wallet.prototype.createPaymentTx = function(options, cb) {
       return self.receivePaymentRequest(options, pr, cb);
     })
     .error(function(data, status, headers, config) {
-      log.debug('Server was did not return PaymentRequest.');
+      log.debug('Server did not return PaymentRequest.');
       log.debug('XHR status: ' + status);
       if (options.fetch) {
         return cb(new Error('Status: ' + status));
@@ -5621,6 +5647,8 @@ Wallet.prototype.receivePaymentRequest = function(options, pr, cb) {
       self.sendIndexes();
       self.sendTxProposal(ntxid);
       self.emit('txProposalsUpdated');
+    } else {
+      return cb(new Error('Error creating the transaction'));
     }
 
     log.debug('You are currently on this BTC network:', network);
@@ -5896,9 +5924,15 @@ Wallet.prototype.createPaymentTxSync = function(options, merchantData, unspent) 
 
   merchantData.total = merchantData.total.toString(10);
 
-  var b = new Builder(opts)
-    .setUnspent(unspent)
-    .setOutputs(outs);
+  var b;
+  try {
+    b = new Builder(opts)
+      .setUnspent(unspent)
+      .setOutputs(outs);
+  } catch (e) {
+    log.debug(e.message);
+    return;
+  };
 
   merchantData.pr.pd.outputs.forEach(function(output, i) {
     var script = {
@@ -6333,7 +6367,7 @@ Wallet.prototype.createTx = function(toAddress, amountSatStr, comment, opts, cb)
 
     var ntxid = self.createTxSync(toAddress, amountSatStr, comment, safeUnspent, opts);
     if (!ntxid) {
-      return cb(new Error('Error creating the Transaction'));
+      return cb(new Error('Error creating the transaction'));
     }
 
     self.sendIndexes();
@@ -52770,5 +52804,5 @@ module.exports = startServer;
 module.exports=require('RvaLt1');
 },{}],"RvaLt1":[function(require,module,exports){
 module.exports.version="0.6.4";
-module.exports.commitHash="b6f9a45";
+module.exports.commitHash="0fa8007";
 },{}]},{},[])
