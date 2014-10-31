@@ -4,6 +4,7 @@ angular.module('copay.controllers')
 
 .controller('ProfileCtrl', function($scope, $cordovaSocialSharing, Session, Config) {
 
+  $scope.email = Session.identity.email;
   $scope.unit = Config.currency.btc;
   $scope.fiat = Config.currency.fiat;
 

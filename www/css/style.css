@@ -26,6 +26,11 @@
 	color: #fff;
 }
 
+.logo {
+  height: 33px;
+  margin-top: 5px;
+}
+
 .item-avatar .ion-loading-c {
 	position: absolute;
 	top: 23px;
@@ -60,6 +65,10 @@
 
 .item-input.disabled {
   background-color: #F8F8F8;
+}
+
+.item-input input.right {
+  text-align: right;
 }
 
 i.ion-alert-circled.error {
