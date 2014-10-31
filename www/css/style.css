@@ -54,7 +54,11 @@
 	font-weight: 700;
 }
 
-.item-input.amount-secondary {
+.item-divider span {
+  text-transform: none;
+}
+
+.item-input.disabled {
   background-color: #F8F8F8;
 }
 
