@@ -27,6 +27,9 @@
         <ion-item nav-clear menu-close ui-sref="profile.add">
           <i class="icon ion-plus"></i> New Wallet
         </ion-item>
+        <ion-item nav-clear menu-close ng-show="anyWallet" ui-sref="profile.import">
+          <i class="icon ion-plus"></i> Import existing Wallets
+        </ion-item>
       </ion-list>
 
     </ion-content>
