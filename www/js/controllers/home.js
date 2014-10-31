@@ -33,8 +33,7 @@ angular.module('copay.controllers')
   };
 
   $scope.shareData = function() {
-    var message = "Here is the secret to join the wallet:<br/><br/>" + $scope.wallet.getSecret();
-    $cordovaSocialSharing.shareViaEmail(message, "Join my Copay Wallet");
+    $cordovaSocialSharing.share($scope.wallet.getSecret());
   }
 
   $scope.copyData = function() {

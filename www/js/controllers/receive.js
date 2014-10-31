@@ -37,8 +37,7 @@ angular.module('copay.controllers')
   };
 
   $scope.shareData = function() {
-    var message = "Here is my bitcoin address:<br/><br/>" + $scope.modal.data;
-    $cordovaSocialSharing.shareViaEmail(message, "My bitcoin address");
+    $cordovaSocialSharing.share($scope.modal.data);
   };
 
   $scope.copyData = function() {
