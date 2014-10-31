@@ -16,7 +16,7 @@ angular.module('copay.services')
     this.create(opts, createIdentityCallback);
 
     function createIdentityCallback(err, identity) {
-      if (err) return cb(err);
+      if (err) return callback(err);
 
       var walletOptions = {
         nickname: identity.fullName,

@@ -15,7 +15,14 @@ angular.module('copay.controllers')
 
     Identity.openProfile($scope.profile, function(err, identity, wallet) {
       $ionicLoading.hide();
-      if (err) return $scope.error = err.message;
+      if (err) {
+        if (err.indexOf('PNOTFOUND') !== -1) {
+          $scope.error = 'Invalid credentials, please try again';
+        } else {
+          $scope.error = 'Couldn\'t establish a connection to the server';
+        }
+        return;
+      }
 
       Session.signin(identity);
       $state.go('setPin', $scope.profile);
