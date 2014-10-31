@@ -116,6 +116,7 @@ angular.module('copay.controllers')
 
       var message = broadcasted ? 'Transaction sent' : 'Proposal approved';
       Notifications.toast(message);
+
       return $state.go('profile.wallet.history');
     });
   };
@@ -130,7 +131,7 @@ angular.module('copay.controllers')
       if (err) throw err; // TODO: Handle this error!
 
       Notifications.toast('Proposal rejected');
-      $state.reload();
+      return $state.go('profile.wallet.send');
     });
   };
 
