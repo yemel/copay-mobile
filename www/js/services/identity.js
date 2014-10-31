@@ -13,27 +13,31 @@ angular.module('copay.services')
     var opts = angular.copy(Config.identity);
     opts.email = p.email;
     opts.password = p.password;
-    var identity = this.create(opts);
+    this.create(opts, createIdentityCallback);
 
-    var walletOptions = {
-      nickname: identity.fullName,
-      networkName: opts.networkName,
-      requiredCopayers: 1,
-      totalCopayers: 1,
-      password: identity.password,
-      name: 'Personal',
-    };
+    function createIdentityCallback(err, identity) {
+      if (err) return cb(err);
 
-    identity.createWallet(walletOptions, createWalletCallback);
-    function createWalletCallback(err) {
-      if (err) {
-        return callback(err);
-      } else {
-        identity.store({failIfExists: true}, function(err) {
+      var walletOptions = {
+        nickname: identity.fullName,
+        networkName: opts.networkName,
+        requiredCopayers: 1,
+        totalCopayers: 1,
+        password: identity.password,
+        name: 'Personal',
+      };
+
+      identity.createWallet(walletOptions, createWalletCallback);
+
+      function createWalletCallback(err) {
+        if (err) return callback(err);
+
+        identity.store(null, function(err) {
           return callback(err, identity);
         });
       }
     }
+
   }
 
   Identity.openProfile = function(p, callback) {
