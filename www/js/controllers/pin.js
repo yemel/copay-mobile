@@ -21,14 +21,14 @@ angular.module('copay.controllers')
 
   $scope.logout = function() {
     $ionicPopup.confirm({
-     title: 'Log out',
-     template: 'Are you sure you want to logout?'
-   }).then(function(res) {
-    if (!res) return;
-    Session.clearCredentials();
-    Session.signout();
-    $state.go('start.welcome');
-   });
+      title: 'Log out',
+      template: 'Are you sure you want to logout?'
+    }).then(function(res) {
+      if (!res) return;
+      Session.clearCredentials();
+      Session.signout();
+      $state.go('start.welcome');
+    });
   };
 
   // TODO: Make Notifications work without a wallet
