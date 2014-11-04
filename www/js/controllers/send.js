@@ -2,7 +2,7 @@
 
 angular.module('copay.controllers')
 
-.controller('AbstractSendCtrl', function($scope, $rootScope, $filter, $state, $ionicLoading, $ionicPopup, $stateParams, Config, Rates, Notifications, Addresses, Bitcore) {
+.controller('AbstractSendCtrl', function($scope, $rootScope, $filter, $state, $ionicLoading, $ionicPopup, $stateParams, Config, Rates, Notifications, Addresses, Bitcore, PayPro) {
   $scope.primaryCode = Config.currency.fiat;
   $scope.secondaryCode = Config.currency.btc;
   $scope.displayPrimary = false;
