@@ -11,48 +11,48 @@
       </div>
 
       <form name="form" ng-submit="submit(form, data)" class="error-icons" novalidate>
-          <label class="item item-input item-select">
-            <span class="input-label">Wallet</span>
-            <select
-              ng-options="wallet as wallet.name for wallet in walletList"
-              ng-model="data.wallet"
-              ng-change="changeWallet()">
-            </select>
-          </label>
-          <label class="item item-input" ng-class="{disabled: lock.address}">
-            <input
-              type="text" ng-model="data.address" ng-disabled="lock.address"
-              placeholder="Bitcoin address" valid-address="data.wallet" required>
-            <i class="icon ion-alert-circled error"></i>
-          </label>
-          <button type="button" class="button aside" ng-click="toggleUnit(data.amount)" ng-disabled="lock.amount">
-            {{primaryCode}}
+        <label class="item item-input item-select">
+          <span class="input-label">Wallet</span>
+          <select
+            ng-options="wallet as wallet.name for wallet in walletList"
+            ng-model="data.wallet"
+            ng-change="changeWallet()">
+          </select>
+        </label>
+        <label class="item item-input" ng-class="{disabled: lock.address}">
+          <input
+            type="text" ng-model="data.address" ng-disabled="lock.address"
+            placeholder="Bitcoin address" valid-address="data.wallet" required>
+          <i class="icon ion-alert-circled error"></i>
+        </label>
+        <button type="button" class="button aside" ng-click="toggleUnit(data.amount)" ng-disabled="lock.amount">
+          {{primaryCode}}
+        </button>
+        <label class="item item-input" ng-class="{disabled: lock.amount}">
+          <input
+            type="number" ng-model="data.amount" enough-balance="data.wallet" ng-disabled="lock.amount"
+            placeholder="Amount in {{primaryCode}}" ng-change="convert(data.amount)"
+            min="0.00000001" max="10000000000" required>
+          <i class="icon ion-alert-circled error"></i>
+        </label>
+        <label class="item item-input disabled">
+          <input
+            class="amount"
+            type="text" value="{{secondaryAmount}}"
+            placeholder="Amount in {{secondaryCode}}"
+            disabled="disabled">
+        </label>
+        <label class="item item-input" ng-class="{disabled: lock.reference}">
+          <input type="text" ng-model="data.reference" placeholder="Reference" ng-disabled="lock.referece">
+        </label>
+        <label class="item">
+          <button
+            type="submit"
+            class="button button-block button-positive"
+            ng-disabled="!form.$valid">
+            {{needsApproval ? 'Create proposal' : 'Send'}}
           </button>
-          <label class="item item-input" ng-class="{disabled: lock.amount}">
-            <input
-              type="number" ng-model="data.amount" enough-balance="data.wallet" ng-disabled="lock.amount"
-              placeholder="Amount in {{primaryCode}}" ng-change="convert(data.amount)"
-              min="0.00000001" max="10000000000" required>
-            <i class="icon ion-alert-circled error"></i>
-          </label>
-          <label class="item item-input disabled">
-            <input
-              class="amount"
-              type="text" value="{{secondaryAmount}}"
-              placeholder="Amount in {{secondaryCode}}"
-              disabled="disabled">
-          </label>
-          <label class="item item-input" ng-class="{disabled: lock.reference}">
-            <input type="text" ng-model="data.reference" placeholder="Reference" ng-disabled="lock.referece">
-          </label>
-          <label class="item">
-            <button
-              type="submit"
-              class="button button-block button-positive"
-              ng-disabled="!form.$valid">
-              {{needsApproval ? 'Create proposal' : 'Send'}}
-            </button>
-        </div>
+        </label>
       </form>
     </div>
 
