@@ -41,7 +41,7 @@ angular.module('copay.services')
         address.balance = addressesBalance[address.addressStr] || 0;
       });
 
-      $rootScope.$apply();
+      $rootScope.$emit('balance', wallet);
     });
   };
 

@@ -1,6 +1,6 @@
 'use strict';
 
-var RateService = function($http, Config) {
+var RateService = function($rootScope, $http, Config) {
   this.isAvailable = false;
   this.UNAVAILABLE_ERROR = 'Service is not available - check for service.isAvailable or use service.whenAvailable';
 
@@ -36,6 +36,8 @@ var RateService = function($http, Config) {
         });
         that.isAvailable = true;
         that.rates = rates;
+        $rootScope.$emit('rates');
+
         that.queued.forEach(function(callback) {
           setTimeout(callback, 1);
         });

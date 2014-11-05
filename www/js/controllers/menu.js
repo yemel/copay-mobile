@@ -18,6 +18,7 @@ angular.module('copay.controllers')
     updateOldWallets();
   });
 
+  // TODO: Move this to scann service
   $scope.openCamera = function() {
 
     if (!$window.cordova) {

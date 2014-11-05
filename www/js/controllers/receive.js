@@ -2,7 +2,7 @@
 
 angular.module('copay.controllers')
 
-.controller('ReceiveCtrl', function($scope, $state, $ionicModal, $window, $cordovaSocialSharing, $cordovaClipboard, Session, Addresses, Notifications) {
+.controller('ReceiveCtrl', function($scope, $rootScope, $state, $ionicModal, $window, $cordovaSocialSharing, $cordovaClipboard, Session, Addresses, Notifications) {
 
   loadAddresses();
   function loadAddresses() {
@@ -17,6 +17,17 @@ angular.module('copay.controllers')
     animation: 'slide-in-up'
   }).then(function(modal) {
     $scope.modal = modal;
+  });
+
+  $rootScope.$on('balance', function(ev, wallet) {
+    if ($scope.wallet.id == wallet.id) $scope.$apply();
+  });
+
+  $rootScope.$on('balance', function(ev, wallet) {
+    if ($scope.wallet.id != wallet.id) return;
+
+    loadAddresses();
+    $scope.$apply();
   });
 
   $scope.createAddress = function() {

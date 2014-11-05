@@ -74,7 +74,7 @@ angular.module('copay.directives', [])
     }
   ])
 
-  .directive('enoughBalance', function enoughBalance(Session, Rates) {
+  .directive('enoughBalance', function enoughBalance($rootScope, Session, Rates) {
       return {
         require: 'ngModel',
         restrict: 'A',
@@ -92,6 +92,10 @@ angular.module('copay.directives', [])
             ctrl.$setValidity('enoughBalance', scope.enough);
             return value;
           };
+
+          $rootScope.$on('balance', function() {
+            validator(value);
+          });
 
           scope.$watch(attrs.enoughBalance, function(w) {
             wallet = w;

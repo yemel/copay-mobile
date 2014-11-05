@@ -2,7 +2,7 @@
 
 angular.module('copay.controllers')
 
-.controller('AbstractSendCtrl', function($scope, $filter, $state, $ionicLoading, $stateParams, Config, Rates, Notifications, Bitcore) {
+.controller('AbstractSendCtrl', function($scope, $rootScope, $filter, $state, $ionicLoading, $stateParams, Config, Rates, Notifications, Addresses, Bitcore) {
   $scope.primaryCode = Config.currency.fiat;
   $scope.secondaryCode = Config.currency.btc;
   $scope.displayPrimary = false;
@@ -49,6 +49,7 @@ angular.module('copay.controllers')
     $scope.data = {};
     $scope.lock = null;
     $scope.convert();
+    if (!$scope.wallet) return $state.go('profile.wallet.home');
   }
 
   $scope.submit = function(form, data) {
@@ -85,6 +86,15 @@ angular.module('copay.controllers')
       $state.go('profile.wallet.history', {walletId: wallet.id});
     }
   }
+
+  $rootScope.$on('rates', function() {
+    if (!$scope.data.amount) return;
+    $scope.convert($scope.data.amount);
+  });
+
+  $rootScope.$on('balance', function() {
+    $scope.$apply();
+  });
 
   // Fill the form with the payment info
   $scope.data = {};

@@ -2,7 +2,7 @@
 
 angular.module('copay.controllers')
 
-.controller('HomeCtrl', function($scope, $state, $ionicModal, $window, $cordovaSocialSharing, $cordovaClipboard, Rates, Notifications) {
+.controller('HomeCtrl', function($scope, $rootScope, $state, $ionicModal, $window, $cordovaSocialSharing, $cordovaClipboard, Rates, Notifications) {
 
   loadCopayers();
   $scope.wallet.on('publicKeyRingUpdated', loadCopayers);
@@ -46,5 +46,9 @@ angular.module('copay.controllers')
       Notifications.toast('Secret copied');
     });
   };
+
+  $rootScope.$on('balance', function(ev, wallet) {
+    if ($scope.wallet.id == wallet.id) $scope.$apply();
+  });
 
 });
