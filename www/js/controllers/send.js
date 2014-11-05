@@ -2,10 +2,7 @@
 
 angular.module('copay.controllers')
 
-.controller('SendCtrl', function($scope, $filter, $state, $ionicLoading, $stateParams, Proposals, Config, Rates, Notifications, Bitcore) {
-  $scope.proposals = Proposals.filter($scope.wallet, {status: Proposals.STATUS.pending});
-  $scope.needsApproval = $scope.wallet.requiresMultipleSignatures();
-
+.controller('AbstractSendCtrl', function($scope, $filter, $state, $ionicLoading, $stateParams, Config, Rates, Notifications, Bitcore) {
   $scope.primaryCode = Config.currency.fiat;
   $scope.secondaryCode = Config.currency.btc;
   $scope.displayPrimary = false;
@@ -44,15 +41,14 @@ angular.module('copay.controllers')
     }
   };
 
-  $scope.clearForm = function(form, data) {
-    data.address = data.amount = data.reference = $scope.altAmount = "";
-    form.$setPristine();
-  }
+  $scope.getWallet = function() {
+    throw "Error, this method should be defined by child controller";
+  };
 
   $scope.submit = function(form, data) {
     if (!form.$valid) return;
 
-    var wallet = $scope.wallet;
+    var wallet = $scope.getWallet();
     var message = $scope.needsApproval ? 'Creating proposal' : 'Sending';
     $ionicLoading.show({
       template: '<i class="icon ion-loading-c"></i> ' + message + '...'
@@ -67,7 +63,10 @@ angular.module('copay.controllers')
       if ($scope.needsApproval) {
         $ionicLoading.hide();
         Notifications.toast('Proposal created');
-        $state.go('profile.wallet.proposal', {proposalId: proposalId});
+        $state.go('profile.wallet.proposal', {
+          walletId: wallet.id,
+          proposalId: proposalId
+        });
       } else {
         wallet.sendTx(proposalId, onSend);
       }
@@ -77,11 +76,12 @@ angular.module('copay.controllers')
       if (!txid) throw 'Problem Sending!'; // TODO: Handle this!
       $ionicLoading.hide();
       Notifications.toast('Transaction sent');
-      $state.go('profile.wallet.history');
+      $state.go('profile.wallet.history', {walletId: wallet.id});
     }
   }
 
   // Fill the form with the payment info
+  $scope.data = {};
   if ($stateParams.data) {
     try {
       var paymentInfo = new Bitcore.BIP21($stateParams.data);
@@ -89,20 +89,65 @@ angular.module('copay.controllers')
       Notifications.toast('The scanned code is invalid');
     }
 
-    $scope.data = {
-      address: paymentInfo.address + '',
-      reference: paymentInfo.data.message
-    };
+    $scope.data.reference = paymentInfo.data.message;
+
+    if (paymentInfo.address) {
+      $scope.data.address = paymentInfo.address + '';
+      $scope.data.network = paymentInfo.address.network().name;
+    }
 
     if (paymentInfo.data.amount) {
       $scope.data.amount = Rates.convert(paymentInfo.data.amount, "BTC", Config.currency.btc);
       $scope.setUnit($scope.data.amount, true);
     }
+
+    $scope.lock = angular.copy($scope.data);
   }
 
 })
 
-.controller('ProposalCtrl', function($scope, $state, $ionicLoading, $stateParams, Proposals, Notifications) {
+.controller('SendCtrl', function($scope, $controller, Proposals) {
+  angular.extend(this, $controller('AbstractSendCtrl', {$scope: $scope}));
+
+  $scope.proposals = Proposals.filter($scope.wallet, {status: Proposals.STATUS.pending});
+  $scope.needsApproval = $scope.wallet.requiresMultipleSignatures();
+
+  $scope.getWallet = function() {
+    return $scope.wallet;
+  };
+})
+
+.controller('PaymentCtrl', function($scope, $state, $controller, Wallets, Notifications) {
+  angular.extend(this, $controller('AbstractSendCtrl', {$scope: $scope}));
+
+  // Filter wallets by address network
+  var filterTestnet = ($scope.data.network || 'livenet') == 'testnet';
+  $scope.walletList = Wallets.all().filter(function(wallet) {
+    return filterTestnet == wallet.isTestnet();
+  });
+
+  // Exit if no available wallet
+  if ($scope.walletList.length == 0) {
+    Notifications.toast('No wallets avaiable for ' + $scope.data.network + ' network');
+    return $state.go('profile.wallet.home');
+  }
+
+  $scope.changeWallet = function() {
+    // refresh balance
+    $scope.needsApproval = $scope.data.wallet.requiresMultipleSignatures();;
+  };
+
+  $scope.data.wallet = $scope.walletList[0];
+  $scope.changeWallet();
+
+  $scope.getWallet = function() {
+    return $scope.data.wallet;
+  };
+
+})
+
+
+.controller('ProposalCtrl', function($scope, $rootScope, $state, $ionicLoading, $stateParams, Proposals, Notifications) {
   $scope.proposal = Proposals.get($scope.wallet, $stateParams.proposalId);
 
   $scope.sign = function() {

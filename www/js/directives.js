@@ -38,8 +38,11 @@ angular.module('copay.directives', [])
       return {
         require: 'ngModel',
         link: function(scope, elem, attrs, ctrl) {
+          var wallet, value;
+
           var validator = function(value) {
-            var network = Session.currentWallet.getNetworkName();
+            if (!wallet) return;
+            var network = wallet.getNetworkName();
 
             // Bip21 uri
             if (/^bitcoin:/.test(value)) {
@@ -55,9 +58,17 @@ angular.module('copay.directives', [])
             return value;
           };
 
+          scope.$watch(attrs.validAddress, function(w) {
+            wallet = w;
+            validator(value);
+          });
+
+          scope.$watch(attrs.ngModel, function(v) {
+            value = v;
+            validator(value);
+          });
 
           ctrl.$parsers.unshift(validator);
-          ctrl.$formatters.unshift(validator);
         }
       };
     }
@@ -66,16 +77,32 @@ angular.module('copay.directives', [])
   .directive('enoughBalance', function enoughBalance(Session, Rates) {
       return {
         require: 'ngModel',
+        restrict: 'A',
         link: function (scope, element, attrs, ctrl) {
+          var wallet, value;
+
           var validator = function(value) {
+            if (!wallet) return;
+
             value = -(-value);
             var satoshis = scope.displayPrimary
               ? Rates.toSatoshis(value, scope.primaryCode)
               : Rates.fromFiat(value, scope.primaryCode);
-            scope.enough = Session.currentWallet.availableBalance >= satoshis;
+            scope.enough = wallet.availableBalance >= satoshis;
             ctrl.$setValidity('enoughBalance', scope.enough);
             return value;
           };
+
+          scope.$watch(attrs.enoughBalance, function(w) {
+            wallet = w;
+            validator(value);
+          });
+
+          scope.$watch(attrs.ngModel, function(v) {
+            value = v;
+            validator(value);
+          });
+
           ctrl.$parsers.unshift(validator);
         }
       };

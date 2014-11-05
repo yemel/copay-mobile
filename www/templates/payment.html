@@ -1,21 +1,28 @@
-<ion-view title="{{wallet.name|capitalize}} Wallet">
-  <ion-nav-buttons side="left">
-    <button menu-toggle="left"class="button button-icon icon ion-navicon"></button>
-  </ion-nav-buttons>
+<ion-view title="Payment">
 
   <ion-content class="has-header">
 
     <div class="card">
       <div class="item item-divider">
         {{needsApproval ? 'New proposal' : 'Send'}}
-        <span class="item-note" ng-class="{error: data.amount && !enough}" >{{wallet.availableBalance|displayBtc}} | {{wallet.availableBalance|displayFiat}}</span>
+        <span class="item-note" ng-class="{error: data.amount && !enough}" >
+          {{data.wallet.availableBalance|displayBtc}} | {{data.wallet.availableBalance|displayFiat}}
+        </span>
       </div>
 
       <form name="form" ng-submit="submit(form, data)" class="error-icons" novalidate>
+          <label class="item item-input item-select">
+            <span class="input-label">Wallet</span>
+            <select
+              ng-options="wallet as wallet.name for wallet in walletList"
+              ng-model="data.wallet"
+              ng-change="changeWallet()">
+            </select>
+          </label>
           <label class="item item-input" ng-class="{disabled: lock.address}">
             <input
               type="text" ng-model="data.address" ng-disabled="lock.address"
-              placeholder="Bitcoin address" valid-address="wallet" required>
+              placeholder="Bitcoin address" valid-address="data.wallet" required>
             <i class="icon ion-alert-circled error"></i>
           </label>
           <button type="button" class="button aside" ng-click="toggleUnit(data.amount)" ng-disabled="lock.amount">
@@ -23,7 +30,7 @@
           </button>
           <label class="item item-input" ng-class="{disabled: lock.amount}">
             <input
-              type="number" ng-model="data.amount" enough-balance="wallet" ng-disabled="lock.amount"
+              type="number" ng-model="data.amount" enough-balance="data.wallet" ng-disabled="lock.amount"
               placeholder="Amount in {{primaryCode}}" ng-change="convert(data.amount)"
               min="0.00000001" max="10000000000" required>
             <i class="icon ion-alert-circled error"></i>
@@ -49,19 +56,6 @@
       </form>
     </div>
 
-    <div class="card" ng-show="wallet.isShared() && proposals">
-      <div class="item item-divider">
-        Go Proposal
-      </div>
-      <div class="item item-text-wrap" ng-repeat="proposal in proposals" ui-sref="profile.wallet.proposal({proposalId:proposal.id})">
-        {{proposal.total|displayBtc}} ~= {{proposal.total|displayFiat }}
-        <span class="comment" ng-show="proposal.comment"/>{{proposal.comment}}</span>
-        <span class="badge badge-energized" ng-show="proposal.awaitingAction">
-          <i class="icon ion-alert"></i>
-        </span>
-      </div>
-    </div> 
-    
 
   </ion-content>
 </ion-view>

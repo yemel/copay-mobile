@@ -4,7 +4,7 @@
 angular.module('copay.controllers')
 
 // TODO: Abstract SetPinCtrl and PinCtrl
-.controller('PinCtrl', function($scope, $state, $ionicLoading, $cordovaToast, $ionicPopup, Identity, Session) {
+.controller('PinCtrl', function($scope, $state, $stateParams, $ionicLoading, $cordovaToast, $ionicPopup, Identity, Session) {
 
   $scope.digits = [];
 
@@ -56,7 +56,12 @@ angular.module('copay.controllers')
       }
 
       Session.signin(identity);
-      $state.go('profile.wallet.home');
+
+      if ($stateParams.data) {
+        $state.go('profile.payment', $stateParams);
+      } else {
+        $state.go('profile.wallet.home');
+      }
     });
   }
 

@@ -48,11 +48,15 @@ angular.module('copay.controllers')
         return $state.go('profile.add', { secret: data });
       }
 
-      // Check if its an Bitcoin Address
-      $state.go('profile.wallet.send', {
-        walletId: Session.currentWallet.id,
-        data: data
-      });
+      // TODO: Check if its an Bitcoin Address
+      if (Session.currentWallet) {
+        $state.go('profile.wallet.send', {
+          walletId: Session.currentWallet.id,
+          data: data
+        });
+      } else {
+        $state.go('profile.payment', {data: data});
+      }
     }
 
     function onError(error) {

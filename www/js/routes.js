@@ -40,7 +40,7 @@ angular.module('copay')
     })
 
     .state('pin', {
-      url: "/pin",
+      url: "/pin?data",
       templateUrl: "templates/pin.html",
       controller: 'PinCtrl'
     })
@@ -144,10 +144,11 @@ angular.module('copay')
     })
 
     .state('profile.payment', {
-      url: "/payment",
+      url: "/payment?data",
       views: {
         'content' :{
-          templateUrl: "templates/paypro.html"
+          templateUrl: "templates/payment.html",
+          controller: 'PaymentCtrl'
         }
       }
     })
@@ -155,6 +156,15 @@ angular.module('copay')
   $urlRouterProvider.otherwise('/');
 })
 
+.run(['$state', '$window', function ($state, $window) {
+
+  function handleBitcoinIntent(url) {
+    if (!url) return;
+    $state.go('profile.payment', {data: url});
+  }
+
+  $window.handleOpenURL = handleBitcoinIntent;
+}])
 
 .run(['$rootScope', '$state', 'Session', function ($rootScope, $state, Session) {
 
@@ -163,7 +173,7 @@ angular.module('copay')
     // Redirect to PIN screen
     if (!Session.isLogged() && Session.hasCredentials() && toState.name != 'pin') {
       event.preventDefault();
-      return $state.go('pin');
+      return $state.go('pin', toParams);
     }
 
     // If not logged redirect to home
