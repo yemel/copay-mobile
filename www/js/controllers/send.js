@@ -67,6 +67,7 @@ angular.module('copay.controllers')
     function onCreate(err, proposalId) {
       if (err) throw err; // TODO: Handle this!
 
+      $scope.cancel();
       if ($scope.needsApproval) {
         $ionicLoading.hide();
         Notifications.toast('Proposal created');
