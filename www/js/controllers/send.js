@@ -45,6 +45,12 @@ angular.module('copay.controllers')
     throw "Error, this method should be defined by child controller";
   };
 
+  $scope.cancel = function() {
+    $scope.data = {};
+    $scope.lock = null;
+    $scope.convert();
+  }
+
   $scope.submit = function(form, data) {
     if (!form.$valid) return;
 
