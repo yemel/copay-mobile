@@ -2,7 +2,7 @@
 
 angular.module('copay.controllers')
 
-.controller('AbstractSendCtrl', function($scope, $rootScope, $filter, $state, $ionicLoading, $stateParams, Config, Rates, Notifications, Addresses, Bitcore) {
+.controller('AbstractSendCtrl', function($scope, $rootScope, $filter, $state, $ionicLoading, $ionicPopup, $stateParams, Config, Rates, Notifications, Addresses, Bitcore) {
   $scope.primaryCode = Config.currency.fiat;
   $scope.secondaryCode = Config.currency.btc;
   $scope.displayPrimary = false;
@@ -65,7 +65,19 @@ angular.module('copay.controllers')
     wallet.createTx(data.address, satoshis, data.reference, onCreate);
 
     function onCreate(err, proposalId) {
-      if (err) throw err; // TODO: Handle this!
+      if (err) {
+        $ionicLoading.hide();
+        var message = err.toString();
+        if (message.match('BIG')) {
+           message = 'The transaction is too big to be created. '
+                   + 'Try creating multiple transactions for smaller amounts.';
+        }
+        $ionicPopup.alert({
+          title: 'Couldn\'t create the transaction',
+          template: 'There was an unexpected problem: ' + message
+        });
+        return;
+      }
 
       $scope.cancel();
       if ($scope.needsApproval) {
