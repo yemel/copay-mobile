@@ -153,6 +153,7 @@ angular.module('copay.controllers')
     $scope.setUnit($scope.data.amount, true);
 
     $scope.lock = {amount: !!$scope.data.amount, reference: !!$scope.data.reference};
+    $scope.$apply();
   }
 
 })
