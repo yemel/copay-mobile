@@ -87,7 +87,7 @@ angular.module('copay.directives', [])
             value = -(-value);
             var satoshis = scope.displayPrimary
               ? Rates.toSatoshis(value, scope.primaryCode)
-              : Rates.fromFiat(value, scope.primaryCode);
+              : Rates.isAvailable ? Rates.fromFiat(value, scope.primaryCode) : 0;
             scope.enough = wallet.availableBalance >= satoshis;
             ctrl.$setValidity('enoughBalance', scope.enough);
             return value;
