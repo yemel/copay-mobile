@@ -115,7 +115,11 @@ angular.module('copay.controllers')
     try {
       var paymentInfo = new Bitcore.BIP21($stateParams.data);
     } catch (e) {
-      Notifications.toast('The scanned code is invalid');
+      return Notifications.toast('The scanned code is invalid');
+    }
+
+    if (paymentInfo.data.merchant) {
+      return PayPro.getPaymentRequest({uri: paymentInfo.data.merchant}, onPaymentRequest);
     }
 
     $scope.data.reference = paymentInfo.data.message;
@@ -131,6 +135,20 @@ angular.module('copay.controllers')
     }
 
     $scope.lock = angular.copy($scope.data);
+  }
+
+  function onPaymentRequest(err, data) {
+    if (err) return Notifications.toast("Could not processes the payment request");
+
+    $scope.data.paymentRequest = data;
+    $scope.data.domain = data.paymentRequest.paymentDetails.domain;
+    $scope.data.trusted = data.paymentRequest.trusted;
+    $scope.data.network = data.paymentRequest.paymentDetails.network;
+    $scope.data.reference = data.paymentRequest.paymentDetails.memo;
+    $scope.data.amount = Rates.convert(data.paymentRequest.paymentDetails.amount, "Satoshis", Config.currency.btc);
+    $scope.setUnit($scope.data.amount, true);
+
+    $scope.lock = {amount: !!$scope.data.amount, reference: !!$scope.data.reference};
   }
 
 })

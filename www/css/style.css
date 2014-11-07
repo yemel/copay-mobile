@@ -67,11 +67,23 @@
   background-color: #F8F8F8;
 }
 
+.item-input.trusted input {
+  color: green;
+}
+
+.domain .ion-locked {
+  color: green;
+}
+
+.domain .ion-unlocked {
+  color: red;
+}
+
 .item-input input.right {
   text-align: right;
 }
 
-i.ion-alert-circled.error {
+label i.icon {
   margin-right: 10px;
 }
 

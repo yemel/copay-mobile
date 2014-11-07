@@ -19,7 +19,13 @@
             ng-change="changeWallet()">
           </select>
         </label>
-        <label class="item item-input" ng-class="{disabled: lock.address}">
+        <label class="item item-input disabled domain" ng-show="data.domain" ng-class="{trusted: data.trusted}">
+          <input
+            type="text" ng-model="data.domain" disabled="disabled" required>
+          <i class="icon ion-locked success" ng-show="data.trusted"></i>
+          <i class="icon ion-unlocked success" ng-hide="data.trusted"></i>
+        </label>
+        <label class="item item-input" ng-class="{disabled: lock.address}" ng-hide="data.domain">
           <input
             type="text" ng-model="data.address" ng-disabled="lock.address"
             placeholder="Bitcoin address" valid-address="data.wallet" required>
@@ -43,7 +49,7 @@
             disabled="disabled">
         </label>
         <label class="item item-input" ng-class="{disabled: lock.reference}">
-          <input type="text" ng-model="data.reference" placeholder="Reference" ng-disabled="lock.referece">
+          <textarea type="text" ng-model="data.reference" placeholder="Reference" ng-disabled="lock.reference"></textarea>
         </label>
         <label class="item">
           <button

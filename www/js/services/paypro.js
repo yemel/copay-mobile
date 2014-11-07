@@ -2,9 +2,22 @@
 
 angular.module('copay.services')
 
-.factory('Bitcore', function(Wallets, Bitcore) {
+.factory('PayPro', function(Bitcore) {
 
   var PayPro = function() {};
+
+  // NOTES for PayPro@Bitcore:
+  // - makePaymentDetails should be a Static Function
+  // - getPaymentRequest request should be done by Bitcore
+
+  // # This should be a one liner
+  // data = Bitcore.PayPro.PaymentRequest.decode(data);
+  // var pr = new Bitcore.PayPro();
+  // pr = pr.makePaymentRequest(data);
+
+  // # Comments on payment request info
+  // network ["main", "test"] should be bitcore.netoworks['livenet'].name
+  // total is not what it's supposed to be
 
   PayPro.prototype.getPaymentRequest = function(options, cb) {
     var self = this;
@@ -16,10 +29,7 @@ angular.module('copay.services')
       },
       responseType: 'arraybuffer'
     }).success(function(data, status, headers, config) {
-          data = Bitcore.PayPro.PaymentRequest.decode(data);
-          var pr = new PayPro();
-          pr = pr.makePaymentRequest(data);
-          return self.receivePaymentRequest(options, pr, cb);
+      return self.parsePaymentRequest(options, data, cb);
     }).error(function(data, status, headers, config) {
       console.log('Server did not return PaymentRequest.');
       console.log('XHR status: ' + status);
@@ -27,29 +37,17 @@ angular.module('copay.services')
         return cb(new Error('Status: ' + status));
       } else {
         // Should never happen:
-        return cb(null, null, null);
+        return cb(null, null);
       }
     });
   };
 
-  Wallet.prototype.receivePaymentRequest = function(options, pr, cb) {
+  PayPro.prototype.parsePaymentRequest = function(options, data, cb) {
+    data = Bitcore.PayPro.PaymentRequest.decode(data);
+    var pr = new Bitcore.PayPro();
+    pr = pr.makePaymentRequest(data);
+
     var self = this;
-
-    var ver = pr.get('payment_details_version');
-    var pki_type = pr.get('pki_type');
-    var pki_data = pr.get('pki_data');
-    var details = pr.get('serialized_payment_details');
-    var sig = pr.get('signature');
-
-    var certs = Bitcore.PayPro.X509Certificates.decode(pki_data);
-    certs = certs.certificate;
-
-    // Fix for older versions of bitcore
-    if (!PayPro.RootCerts) {
-      PayPro.RootCerts = {
-        getTrusted: function() {}
-      };
-    }
 
     // Verify Signature
     var trust = pr.verify(true);
@@ -58,63 +56,58 @@ angular.module('copay.services')
       return cb(new Error('Server sent a bad signature.'));
     }
 
-    details = PayPro.PaymentDetails.decode(details);
-    var pd = new PayPro();
+    var details = pr.get('serialized_payment_details');
+
+    details = Bitcore.PayPro.PaymentDetails.decode(details);
+    var pd = new Bitcore.PayPro();
     pd = pd.makePaymentDetails(details);
 
-    var network = pd.get('network');
+    var network = pd.get('network') == "main" ? "livenet" : "testnet";
     var outputs = pd.get('outputs');
     var time = pd.get('time');
     var expires = pd.get('expires');
     var memo = pd.get('memo');
     var payment_url = pd.get('payment_url');
     var merchant_data = pd.get('merchant_data');
+    var domain = /^(?:https?)?:\/\/([^\/:]+).*$/.exec(payment_url)[1];
+
+    var outputs = outputs.map(function(output) {
+        return {
+          amount: output.get('amount'),
+          script: {
+            offset: output.get('script').offset,
+            limit: output.get('script').limit,
+            buffer: new Bitcore.Buffer(new Uint8Array(output.get('script').buffer)).toString('hex')
+          }
+        };
+      });
+    var amount = outputs.reduce(function(a,b) { return a + b.amount.toInt() }, 0);
+
 
     var merchantData = {
-      pr: {
-        payment_details_version: ver,
-        pki_type: pki_type,
-        pki_data: certs,
-        pd: {
+      paymentRequest: {
+        paymentDetails: {
           network: network,
-          outputs: outputs.map(function(output) {
-            return {
-              amount: output.get('amount'),
-              script: {
-                offset: output.get('script').offset,
-                limit: output.get('script').limit,
-                // NOTE: For some reason output.script.buffer
-                // is only an ArrayBuffer
-                buffer: new Buffer(new Uint8Array(
-                  output.get('script').buffer)).toString('hex')
-              }
-            };
-          }),
+          outputs: outputs,
+          amount: amount,
           time: time,
           expires: expires,
           memo: memo || 'This server would like some BTC from you.',
+          total: Bitcore.Bignum('0', 10).toString(10),
           payment_url: payment_url,
+          domain: domain,
           merchant_data: merchant_data ? merchant_data.toString('hex') : null
         },
-        signature: sig.toString('hex'),
-        ca: trust.caName,
-        untrusted: !trust.caTrusted,
-        selfSigned: trust.selfSigned
+        trusted: trust.caTrusted,
+        selfSigned: !!trust.selfSigned
       },
       request_url: options.uri,
-      total: bignum('0', 10).toString(10),
       // Expose so other copayers can verify signature
       // and identity, not to mention data.
       raw: pr.serialize().toString('hex')
     };
 
     return cb(null, merchantData);
-  };
-
-
-
-  PayPro.prototype.cratePaymentTx = function() {
-
   };
 
   PayPro.prototype.request = function(options, callback) {
@@ -196,15 +189,6 @@ angular.module('copay.services')
     return ret;
   };
 
-
-
-  return PayPro;
+  return new PayPro();
 });
-
-/**
- * @desc Create a HTTP request
- * @TODO: This shouldn't be a wallet responsibility
- */
-Wallet.request = function(options, callback) {
-};
 
