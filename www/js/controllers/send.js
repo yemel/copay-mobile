@@ -49,7 +49,11 @@ angular.module('copay.controllers')
     $scope.data = {};
     $scope.lock = null;
     $scope.convert();
-    if (!$scope.wallet) return $state.go('profile.wallet.home');
+    if ($scope.wallet) {
+      $state.go('profile.wallet.send', {data: null});
+    } else {
+      $state.go('profile.wallet.home');
+    }
   }
 
   $scope.submit = function(form, data) {
