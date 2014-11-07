@@ -163,6 +163,7 @@ angular.module('copay.controllers')
 
   $scope.proposals = Proposals.filter($scope.wallet, {status: Proposals.STATUS.pending});
   $scope.needsApproval = $scope.wallet.requiresMultipleSignatures();
+  $scope.data.wallet = $scope.wallet;
 
   $scope.getWallet = function() {
     return $scope.wallet;
