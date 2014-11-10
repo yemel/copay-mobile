@@ -10,7 +10,7 @@
       <form name="form" ng-submit="submit(form, data)" novalidate>
         <label class="item item-input disabled">
           <span class="input-label" disabled>Balance</span>
-          <input type="text" ng-model="data.balance" class="right" disabled>
+          <input type="text" value="{{data.balance|displayBtc}}" class="right" disabled>
         </label>
         <label class="item item-input item-select">
           <span class="input-label" disabled>Wallet</span>
