@@ -2,7 +2,8 @@
 
 angular.module('copay.controllers')
 
-.controller('SidebarCtrl', function($scope, $state, $window, $cordovaBarcodeScanner, $ionicModal, $ionicPopup, Session, Wallets, Notifications, Compatibility) {
+.controller('SidebarCtrl', function($scope, $state, $window, $cordovaBarcodeScanner, $ionicModal, $ionicPopup, Session, Wallets, Notifications, Compatibility, Sweep) {
+
   $scope.profile = Session.profile;
   $scope.wallets = Wallets.all();
   
@@ -45,6 +46,10 @@ angular.module('copay.controllers')
 
     function onScann(data) {
       var copay = require('copay');
+      if (Sweep.isPrivateKey(data)) {
+        console.log(Sweep.getAddress(data));
+        Sweep.getFunds(data, console.log);
+      }
       if (copay.Wallet.decodeSecret(data)) {
         return $state.go('profile.add', { secret: data });
       }
