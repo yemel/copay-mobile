@@ -18,6 +18,9 @@ angular.module('copay.services')
   // # Comments on payment request info
   // network ["main", "test"] should be bitcore.netoworks['livenet'].name
   // total is not what it's supposed to be
+  // expires and time should be in miliseconds
+  // consider renaming time to created
+  // payment details should have a funtion isExpired 
 
   PayPro.prototype.getPaymentRequest = function(options, cb) {
     var self = this;
@@ -90,8 +93,8 @@ angular.module('copay.services')
           network: network,
           outputs: outputs,
           amount: amount,
-          time: time,
-          expires: expires,
+          time: time ? new Date(time * 1000) : null,
+          expires: expires ? new Date(expires * 1000) : null,
           memo: memo || 'This server would like some BTC from you.',
           total: Bitcore.Bignum('0', 10).toString(10),
           payment_url: payment_url,

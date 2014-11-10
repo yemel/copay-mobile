@@ -26,6 +26,11 @@
 	color: #fff;
 }
 
+.progress-bar {
+  background-color: #2C3E50;
+  height: 5px;
+}
+
 .logo {
   height: 33px;
   margin-top: 5px;

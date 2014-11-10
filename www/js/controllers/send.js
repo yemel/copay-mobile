@@ -42,7 +42,11 @@ angular.module('copay.controllers')
   };
 
   $scope.getWallet = function() {
-    throw "Error, this method should be defined by child controller";
+    throw "Error, this method should be defined by the child controller";
+  };
+
+  $scope.loadWalletList = function() {
+    // this method may be overrited by the child controller
   };
 
   $scope.cancel = function() {
@@ -123,6 +127,9 @@ angular.module('copay.controllers')
     }
 
     if (paymentInfo.data.merchant) {
+      $ionicLoading.show({
+        template: '<i class="icon ion-loading-c"></i> Loading...'
+      });
       return PayPro.getPaymentRequest({uri: paymentInfo.data.merchant}, onPaymentRequest);
     }
 
@@ -144,15 +151,29 @@ angular.module('copay.controllers')
   function onPaymentRequest(err, data) {
     if (err) return Notifications.toast("Could not processes the payment request");
 
+    $ionicLoading.hide();
+    var paymentDetails = data.paymentRequest.paymentDetails;
+
     $scope.data.paymentRequest = data;
-    $scope.data.domain = data.paymentRequest.paymentDetails.domain;
+    $scope.data.domain = paymentDetails.domain;
     $scope.data.trusted = data.paymentRequest.trusted;
-    $scope.data.network = data.paymentRequest.paymentDetails.network;
-    $scope.data.reference = data.paymentRequest.paymentDetails.memo;
-    $scope.data.amount = Rates.convert(data.paymentRequest.paymentDetails.amount, "Satoshis", Config.currency.btc);
+    $scope.data.network = paymentDetails.network;
+    $scope.data.reference = paymentDetails.memo;
+    $scope.data.amount = Rates.convert(paymentDetails.amount, "Satoshis", Config.currency.btc);
     $scope.setUnit($scope.data.amount, true);
 
+    $scope.data.isExpired = paymentDetails.expires - new Date() <= 0;
+    $scope.data.created = paymentDetails.time;
+    $scope.data.expires = paymentDetails.expires;
+
+    $scope.onExpired = function() {
+      $scope.data.isExpired = true;
+    }
+
+    if ($scope.data.isExpired) Notifications.toast("The payment request has expired");
+
     $scope.lock = {amount: !!$scope.data.amount, reference: !!$scope.data.reference};
+    $scope.loadWalletList();
     $scope.$apply();
   }
 
@@ -173,24 +194,29 @@ angular.module('copay.controllers')
 .controller('PaymentCtrl', function($scope, $state, $controller, Wallets, Notifications) {
   angular.extend(this, $controller('AbstractSendCtrl', {$scope: $scope}));
 
-  // Filter wallets by address network
-  var filterTestnet = ($scope.data.network || 'livenet') == 'testnet';
-  $scope.walletList = Wallets.all().filter(function(wallet) {
-    return filterTestnet == wallet.isTestnet();
-  });
 
-  // Exit if no available wallet
-  if ($scope.walletList.length == 0) {
-    Notifications.toast('No wallets avaiable for ' + $scope.data.network + ' network');
-    return $state.go('profile.wallet.home');
+  $scope.loadWalletList = function() {
+    // Filter wallets by address network
+    var filterTestnet = ($scope.data.network || 'livenet') == 'testnet';
+    $scope.walletList = Wallets.all().filter(function(wallet) {
+      return filterTestnet == wallet.isTestnet();
+    });
+
+    // Exit if no available wallet
+    if ($scope.walletList.length == 0) {
+      Notifications.toast('No wallets avaiable for ' + $scope.data.network + ' network');
+      return $scope.cancel();
+    }
+
+    $scope.data.wallet = $scope.walletList[0];
   }
 
   $scope.changeWallet = function() {
-    // refresh balance
+    // TODO: refresh balance
     $scope.needsApproval = $scope.data.wallet.requiresMultipleSignatures();;
   };
 
-  $scope.data.wallet = $scope.walletList[0];
+  $scope.loadWalletList();
   $scope.changeWallet();
 
   $scope.getWallet = function() {

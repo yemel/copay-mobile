@@ -18,6 +18,53 @@ angular.module('copay.directives', [])
     };
   })
 
+  .directive('countdownBar', function($interval) {
+    return {
+      restrict: 'E',
+      template: '<div class="progress-bar" style="width: {{width}}%; margin-left: {{margin}}%; display: {{display}}"></div>',
+      link: function(scope, elem, attrs, ctrl) {
+        var start, end, timeoutId;
+
+        scope.display = 'none';
+        scope.$watch(attrs.start, function(value) {
+          start = value ? value-0 : 0;
+        });
+
+        scope.$watch(attrs.end, function(value) {
+          end = value ? value-0 : 0;
+        });
+
+        function updateBar() {
+          if (!start || !end || end <= start) {
+            return scope.display = 'none';
+          }
+
+          var now = new Date() - 0;
+
+          if (now >= end) {
+            $interval.cancel(timeoutId);
+            scope.display = 'none';
+            if (attrs.finish) scope.$eval(attrs.finish);
+            return;
+          }
+
+          scope.display = 'block';
+          scope.width = Math.max(parseInt((end - now) * 100 / (end-start)), 0);
+          scope.margin = 100 - scope.width;
+        }
+
+        elem.on('$destroy', function() {
+          $interval.cancel(timeoutId);
+        });
+
+        timeoutId = $interval(function() {
+          updateBar(); // update DOM
+        }, 1000);
+
+      }
+    };
+  })
+
   .directive('validSecret', function() {
     var copay = require('copay');
     return {

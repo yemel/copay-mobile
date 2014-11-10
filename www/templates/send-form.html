@@ -6,6 +6,8 @@
         </span>
       </div>
 
+      <countdown-bar start="data.created" end="data.expires" finish="onExpired()"></countdown-bar>
+
       <form name="form" ng-submit="submit(form, data)" class="error-icons" novalidate>
         <label class="item item-input item-select" ng-show="walletList">
           <span class="input-label">Wallet</span>
@@ -51,7 +53,7 @@
           <button
             type="submit"
             class="button button-block button-positive"
-            ng-disabled="!form.$valid">
+            ng-disabled="!form.$valid || !data.isExpired">
             {{needsApproval ? 'Create proposal' : 'Send'}}
           </button>
         </label>
