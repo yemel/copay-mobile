@@ -2,7 +2,7 @@
 
 angular.module('copay.controllers')
 
-.controller('SettingsCtrl', function($scope, $state, $ionicLoading, Config) {
+.controller('SettingsCtrl', function($scope, $state, $ionicNavBarDelegate, $ionicLoading, Config) {
 
   $scope.data = {
     insight: Config.network.livenet.url,
@@ -23,6 +23,6 @@ angular.module('copay.controllers')
       ) + '/api/email'
     };
     Config.savePreferences();
-    $state.go('start.welcome');
+    $ionicNavBarDelegate.back();
   };
 });
