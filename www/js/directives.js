@@ -88,7 +88,7 @@ angular.module('copay.directives', [])
           var wallet, value;
 
           var validator = function(value) {
-            if (!wallet) return;
+            if (!wallet || !value) return;
             var network = wallet.getNetworkName();
 
             // Bip21 uri

@@ -70,7 +70,15 @@ angular.module('copay.controllers')
     });
 
     var satoshis = getSatoshis(data.amount);
-    wallet.createTx(data.address, satoshis, data.reference, onCreate);
+
+    if (data.paymentRequest) {
+      wallet.createPaymentTx({
+        uri: data.paymentRequest.request_url,
+        memo: data.reference
+      }, onCreate);
+    } else {
+      wallet.createTx(data.address, satoshis, data.reference, onCreate);
+    }
 
     function onCreate(err, proposalId) {
       if (err) {

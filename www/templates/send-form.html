@@ -53,7 +53,7 @@
           <button
             type="submit"
             class="button button-block button-positive"
-            ng-disabled="!form.$valid || !data.isExpired">
+            ng-disabled="!form.$valid || data.isExpired">
             {{needsApproval ? 'Create proposal' : 'Send'}}
           </button>
         </label>
