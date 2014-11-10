@@ -20,10 +20,6 @@ angular.module('copay.controllers')
   });
 
   $rootScope.$on('balance', function(ev, wallet) {
-    if ($scope.wallet.id == wallet.id) $scope.$apply();
-  });
-
-  $rootScope.$on('balance', function(ev, wallet) {
     if ($scope.wallet.id != wallet.id) return;
 
     loadAddresses();
@@ -37,7 +33,6 @@ angular.module('copay.controllers')
   }
 
   $scope.openModal = function(address) {
-    console.log(address);
     $scope.modal.title = "Address";
     $scope.modal.data = address;
     $scope.modal.qrData = 'bitcoin:' + address;

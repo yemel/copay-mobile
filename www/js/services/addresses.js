@@ -22,6 +22,7 @@ angular.module('copay.services')
       wallet.on('tx', self.loadAddresses.bind(self, wallet));
       wallet.on('txProposalsUpdated', self.loadAddresses.bind(self, wallet));
       wallet.on('newAddresses', self.loadAddresses.bind(self, wallet));
+      wallet.on('publicKeyRingUpdated', self.loadAddresses.bind(self, wallet));
   };
 
   Addresses.prototype.loadAddresses = function(wallet) {
