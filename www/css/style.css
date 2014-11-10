@@ -97,6 +97,10 @@ label i.icon {
   font-weight: bold;
 }
 
+.wallet-list .list:last-child {
+  margin-bottom: 100px;
+}
+
 .bar {
 	height: 55px;
 }

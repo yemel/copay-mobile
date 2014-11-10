@@ -18,7 +18,7 @@
       <h1 class="title">Wallets</h1>
     </header>
     <ion-content class="has-header">
-      <ion-list>
+      <ion-list class="wallet-list">
         <ion-item ng-repeat="wallet in wallets" nav-clear menu-close ui-sref="profile.wallet.home({walletId:wallet.id})" class="item-icon-right">
           {{wallet.name|capitalize}}
           <span class="item-note">{{wallet.requiredCopayers}} of {{wallet.totalCopayers}}</span>
