@@ -116,10 +116,10 @@ label i.icon {
 }
 
 .numbers {
-	position: absolute;
-	bottom: 0;
-	width: 100%;
-	height: 0%;
+  position: absolute;
+  height: 320px;
+  bottom: 0px;
+  width: 100%;
 }
 
 .has-header {
