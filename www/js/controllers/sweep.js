@@ -13,7 +13,6 @@ angular.module('copay.controllers')
 
   $scope.data = {};
   $scope.data.wallet = $scope.walletList[0];
-
-  console.log()
+  $scope.data.balance = 21000;
 
 });
