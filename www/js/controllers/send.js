@@ -176,6 +176,7 @@ angular.module('copay.controllers')
 
     $scope.onExpired = function() {
       $scope.data.isExpired = true;
+      $scope.$apply();
     }
 
     if ($scope.data.isExpired) Notifications.toast("The payment request has expired");
@@ -187,7 +188,7 @@ angular.module('copay.controllers')
 
 })
 
-.controller('SendCtrl', function($scope, $controller, Proposals) {
+.controller('SendCtrl', function($scope, $state, $stateParams, $controller, Proposals) {
   angular.extend(this, $controller('AbstractSendCtrl', {$scope: $scope}));
 
   $scope.proposals = Proposals.filter($scope.wallet, {status: Proposals.STATUS.pending});
@@ -197,6 +198,18 @@ angular.module('copay.controllers')
   $scope.getWallet = function() {
     return $scope.wallet;
   };
+
+  // Refactor this to use events
+  $scope.loadWalletList = function() {
+    if (!$scope.data.network) return;
+
+    // Redirect to payment if wrong network
+    var walletNetwork = $scope.wallet.isTestnet() ? 'testnet' : 'livenet';
+    if ($scope.data.network != walletNetwork) {
+      $state.go('profile.payment', {data: $stateParams.data});
+    }
+  };
+
 })
 
 .controller('PaymentCtrl', function($scope, $state, $controller, Wallets, Notifications) {
