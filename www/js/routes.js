@@ -153,6 +153,16 @@ angular.module('copay')
       }
     })
 
+    .state('profile.sweep', {
+      url: "/sweep?data",
+      views: {
+        'content' :{
+          templateUrl: "templates/sweep.html",
+          controller: 'SweepCtrl'
+        }
+      }
+    })
+
   $urlRouterProvider.otherwise('/');
 })
 
