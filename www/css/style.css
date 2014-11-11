@@ -121,7 +121,7 @@ label i.icon {
 
 .numbers {
   position: absolute;
-  height: 320px;
+  height: 205px;
   bottom: 0px;
   width: 100%;
 }
@@ -197,10 +197,6 @@ h3.pin-title {
 
 .button.button-positive.activated {
 	background: #10856E;
-}
-
-.button-bar > .button {
-	padding: 16px;
 }
 
 .tabs-striped.tabs-light .tab-item.tab-item-active, .tabs-striped.tabs-light .tab-item.active, .tabs-striped.tabs-light .tab-item.activated {
