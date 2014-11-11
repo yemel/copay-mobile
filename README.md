@@ -13,6 +13,7 @@ using the multisig power of Copay and making it context aware.
 
 ## Cordova Plugins
 
+    cordova plugin add org.apache.cordova.statusbar
     cordova plugin add org.apache.cordova.vibration
     cordova plugin add org.apache.cordova.splashscreen
     cordova plugin add de.appplant.cordova.plugin.local-notification

@@ -20,10 +20,6 @@ angular.module('copay', [
     if(window.cordova && window.cordova.plugins.Keyboard) {
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
     }
-    if(window.StatusBar) {
-      // org.apache.cordsova.statusbar required
-      StatusBar.styleDefault();
-    }
   });
 })
 

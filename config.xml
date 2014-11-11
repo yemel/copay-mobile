@@ -15,6 +15,7 @@
   <preference name="BackupWebStorage" value="none"/>
   <preference name="SplashScreen" value="copayscreen" />
   <preference name="SplashScreenDelay" value="5000"/>
+  <preference name="StatusBarStyle" value="lightcontent" />
   <feature name="StatusBar">
     <param name="ios-package" value="CDVStatusBar" onload="true"/>
   </feature>
