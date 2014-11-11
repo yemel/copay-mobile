@@ -1,22 +1,32 @@
 'use strict'
 
 angular.module('copay.services')
-.factory('Sweep', function(Session, Bitcore) {
+.factory('Sweep', function(Bitcore) {
 
   var sweep = {};
+  var copay = require('copay');
 
   sweep.isPrivateKey = function isPrivateKey(wif) {
-    var walletKey = new Bitcore.WalletKey();
-    walletKey.fromObj({priv: wif});
-    return !!walletKey.priv;
+    try {
+      var walletKey = new Bitcore.WalletKey();
+      walletKey.fromObj({priv: wif});
+      return !!walletKey.privKey.public;
+    } catch (e) {
+      return false;
+    }
   };
 
-  sweep.getAddress = function getAddress(wif) {
+  sweep.getAddress = function getAddress(wif, network) {
     var walletKey = new Bitcore.WalletKey();
     walletKey.fromObj({priv: wif});
-    var pubKeyHash = Bitcore.coinUtil.sha256ripe160(walletKey.priv.public);
-    var addr = new Address(walletKey.network(), pubKeyHash);
-    return addr.toString();
+    return Bitcore.Address.fromKey(walletKey.privKey, network).toString();
+  };
+
+  sweep.getNetwork = function getAddress(wif) {
+    if (wif[0] === '5' || wif[0] === '6') {
+      return 'livenet';
+    }
+    return 'testnet';
   };
 
   function countUnspent(callback) {
@@ -28,7 +38,7 @@ angular.module('copay.services')
       _.each(unspent, function(unspent) {
         value += unspent.amount;
       });
-      return callback(null, Math.round(value * Bitcore.coinUtil.COIN), unspent);
+      return callback(null, Math.round(value * Bitcore.util.COIN), unspent);
     };
   }
 
@@ -37,33 +47,29 @@ angular.module('copay.services')
    * @param {string} address - base58 encoded address
    * @param {Function} callback - to be called with params (err, balance) (in satoshis)
    */
-  sweep.getFunds = function getFunds(address, callback) {
-    var blockchain = Session.currentWallet.blockchain;
+  sweep.getFunds = function getFunds(blockchain, address, callback) {
     blockchain.getUnspent([address], countUnspent(callback));
   };
 
-  /**
-   * Sends all funds to the given address
-   */
-  sweep.send = function send(wif, toAddress, callback) {
-    var blockchain = Session.currentWallet.blockchain;
-    blockchain.getUnspent(sweep.getAddress(wif), countUnspent(
-      function(err, amountSat, unspent) {
-        if (err) {
-          return callback(err);
-        }
-        var rawTx = new Bitcore.TransactionBuilder()
-          .setUtxos(unspent)
-          .setOutputs({
-            address: toAddress,
-            amountSat: amountSat
-          })
-          .sign([wif])
-          .build().serialize().toString('hex');
-
-        return blockchain.broadcast(rawTx, callback);
+  sweep.sendOutputs = function sendOutputs(blockchain, wif, toAddress, amountSat, unspent, callback) {
+    var FEE_PER_KB = 10000;
+    var fee = FEE_PER_KB;
+    var builder = new Bitcore.TransactionBuilder({spendUnconfirmed: true})
+    builder.setUnspent(unspent);
+    do {
+      try {
+        builder.setOutputs([{
+          address: toAddress.toString(),
+          amountSatStr: amountSat - fee
+        }]);
+        break;
+      } catch(e) {
+        fee += FEE_PER_KB;
       }
-    ));
+    } while (true);
+    builder.sign([wif]);
+
+    return blockchain.broadcast(builder.build().serialize().toString('hex'), callback);
   };
 
   return sweep;
