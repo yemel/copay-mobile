@@ -28,17 +28,25 @@ angular.module('copay.services')
     return this.transactions[wallet.id] || [];
   }
 
+
   History.prototype.update = function(wallet) {
     if (!wallet.publicKeyRing.isComplete()) return;
-  
+
     var self = this;
-    wallet.getTransactionHistory(function(err, res) {
+    self.transactions[wallet.id] = [];
+    wallet.getTransactionHistory(processPage);
+
+    function processPage(err, history) {
       if (err) throw err;
 
-      self.transactions[wallet.id] = res;
-      $rootScope.$emit('transactions', wallet);
-    });
-
+      self.transactions[wallet.id] = self.transactions[wallet.id].concat(history.items);
+      if (history.currentPage < history.nbPages) {
+        var next = {currentPage: history.currentPage+1, itemsPerPage: history.itemsPerPage};
+        wallet.getTransactionHistory(processPage);
+      } else {
+        $rootScope.$emit('transactions', wallet);
+      }
+    }
   }
 
   return new History();
