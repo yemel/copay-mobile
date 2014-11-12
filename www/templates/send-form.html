@@ -19,7 +19,7 @@
         </label>
         <label class="item item-input disabled domain" ng-show="data.domain" ng-class="{trusted: data.trusted}">
           <input
-            type="text" ng-model="data.domain" disabled="disabled" required>
+            type="text" ng-model="data.domain" disabled="disabled" ng-required="!data.address">
           <i class="icon ion-locked success" ng-show="data.trusted"></i>
           <i class="icon ion-unlocked success" ng-hide="data.trusted"></i>
         </label>
@@ -53,7 +53,7 @@
           <button
             type="submit"
             class="button button-block button-positive"
-            ng-disabled="!form.$valid || data.isExpired">
+            ng-disabled="(!form.$valid) || (data.isExpired)">
             {{needsApproval ? 'Create proposal' : 'Send'}}
           </button>
         </label>
