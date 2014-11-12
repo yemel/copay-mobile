@@ -33,51 +33,39 @@ angular.module('copay.services')
   // TODO: All this processing should be done by Copay Lib!
   Proposals.prototype.all = function(wallet) {
     var self = this;
-
-    var txs = wallet.getTxProposals().sort(function(t1, t2) {
+    var copayerId = wallet.getMyCopayerId();
+    var proposals = wallet.getPendingTxProposals().sort(function(t1, t2) {
         return t2.createdTs - t1.createdTs;
     });
+    return proposals.txs.map(function(proposal) {
+      proposal.awaitingAction = proposal.isPending
+                                && copayerId != proposal.creator
+                                && !proposal.rejectedByUs
+                                && !proposal.signedByUs;
+      proposal.id = proposal.ntxid;
 
-    var proposals = [];
-    var copayerId = wallet.getMyCopayerId();
-    txs.forEach(function(tx) {
-      var t = tx.builder.build();
-      tx.outputs = [];
-      tx.total = 0;
-
-      t.outs.forEach(function(output) {
-        var address = Bitcore.Address.fromScriptPubKey(output.getScript(), wallet.getNetworkName())[0].toString();
-        var isOwnAddress = wallet.addressIsOwn(address, {excludeMain: true});
-        if (!isOwnAddress) {
-          tx.outputs.push({
-            address: address,
-            value: output.getValue()
-          });
-
-          tx.total += output.getValue();
-        }
+      proposal.total = 0;
+      _.each(proposal.outs, function(out) {
+        // TODO: This is totally backwards, it comes in the current configuration, be ready
+        // to have it changed.
+        proposal.total += out.value * wallet.settings.unitToSatoshi;
+        // TODO: Handle multiple outputs
+        proposal.address = out.address;
       });
 
-      tx.fee = tx.builder.feeSat;
-      tx.missingSignatures = t.countInputMissingSignatures(0);
-      tx.awaitingAction = tx.isPending && copayerId != tx.creator && !tx.rejectedByUs && !tx.signedByUs;
-      tx.id = tx.ntxid;
-      tx.status = tx.isPending
+      proposal.status = proposal.isPending
         ? self.STATUS.pending
-        : tx.finallyRejected ? self.STATUS.rejected : self.STATUS.approved;
+        : proposal.finallyRejected ? self.STATUS.rejected : self.STATUS.approved;
 
-      tx.signers = wallet.getRegisteredPeerIds().filter(function(copayer) {
-        return tx.signedBy[copayer.copayerId];
+      proposal.signers = wallet.getRegisteredPeerIds().filter(function(copayer) {
+        return proposal.signedBy[copayer.copayerId];
       });
 
-      tx.rejecters = wallet.getRegisteredPeerIds().filter(function(copayer) {
-        return tx.rejectedBy[copayer.copayerId];
+      proposal.rejecters = wallet.getRegisteredPeerIds().filter(function(copayer) {
+        return proposal.rejectedBy[copayer.copayerId];
       });
-
-      proposals.push(tx);
+      return proposal;
     });
-
-    return proposals;
   };
 
   Proposals.prototype.get = function(wallet, proposalId) {

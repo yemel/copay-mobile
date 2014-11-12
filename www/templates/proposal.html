@@ -11,7 +11,7 @@
         }">{{proposal.status|capitalize}}</span>
       </div>
       <div class="item item-text-wrap">
-        Address: {{proposal.outputs[0].address| characters:15}}
+        Address: {{proposal.address| characters:15}}
       </div>
       <div class="item item-text-wrap">
         Amount: {{proposal.total|displayBtc}} ({{proposal.total|displayFiat}})
