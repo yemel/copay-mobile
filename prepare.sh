@@ -29,10 +29,10 @@ checkOK
 cp -R $BUILDDIR/android/res/* $BUILDDIR/platforms/android/res
 checkOK
 
-# cp -R $BUILDDIR/ios/icons/* $BUILDDIR/platforms/ios/Copay/Resources/icons
-# checkOK
+cp -R $BUILDDIR/ios/icons/* $BUILDDIR/platforms/ios/Copay/Resources/icons
+checkOK
 
-# cp -R $BUILDDIR/ios/splash/* $BUILDDIR/platforms/ios/Copay/Resources/splash
-# checkOK
+cp -R $BUILDDIR/ios/splash/* $BUILDDIR/platforms/ios/Copay/Resources/splash
+checkOK
 
 echo "${OpenColor}${Green}Done!${CloseColor}"
