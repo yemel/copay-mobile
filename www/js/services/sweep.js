@@ -51,6 +51,29 @@ angular.module('copay.services')
     blockchain.getUnspent([address], countUnspent(callback));
   };
 
+  sweep.estimateFees = function sendOutputs(wif, unspent) {
+    var FEE_PER_KB = 10000;
+    var fee = FEE_PER_KB;
+    var value = 0;
+    _.each(unspent, function(unspent) {
+      value += unspent.amount;
+    });
+    var builder = new Bitcore.TransactionBuilder({spendUnconfirmed: true})
+    builder.setUnspent(unspent);
+    do {
+      try {
+        builder.setOutputs([{
+          address: sweep.getAddress(wif),
+          amountSatStr: value - fee
+        }]);
+        break;
+      } catch(e) {
+        fee += FEE_PER_KB;
+      }
+    } while (true);
+    return builder.feeSat;
+  };
+
   sweep.sendOutputs = function sendOutputs(blockchain, wif, toAddress, amountSat, unspent, callback) {
     var FEE_PER_KB = 10000;
     var fee = FEE_PER_KB;

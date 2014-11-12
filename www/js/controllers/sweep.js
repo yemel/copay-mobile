@@ -11,7 +11,7 @@ angular.module('copay.controllers')
     return (network == 'testnet') == wallet.isTestnet();
   });
   $ionicLoading.show({
-    template: '<i class="icon ion-loading-c"></i> Processing key...'
+    template: '<i class="icon ion-loading-c"></i> Fetching balance...'
   });
 
   if (!$scope.walletList) {
@@ -27,12 +27,14 @@ angular.module('copay.controllers')
 
   Sweep.getFunds($scope.walletList[0].blockchain, address,
     function(err, amountSat, outputs) {
+      $ionicLoading.hide();
       if (err) {
         console.error(err);
         $ionicPopup.alert({
           title: 'Couldn\'t retrieve funds',
           template: 'There was an error retrieving funds for that private key'
         });
+        $state.go('profile.wallet');
         return;
       }
       if (!amountSat) {
@@ -41,9 +43,10 @@ angular.module('copay.controllers')
           title: 'Couldn\'t retrieve funds',
           template: 'There are no funds left for that private key'
         });
+        $state.go('profile.wallet');
         return;
       }
-      $ionicLoading.hide();
+      $scope.data.estimatedFee = Sweep.estimateFees(wif, outputs);
       $scope.data.balance = amountSat;
       $scope.outputs = outputs;
     }
@@ -52,7 +55,9 @@ angular.module('copay.controllers')
   $scope.submit = function(form, data) {
     if (!form.$valid) return;
 
-    $ionicLoading.show();
+    $ionicLoading.show({
+      template: '<i class="icon ion-loading-c"></i> Importing bitcoins...'
+    });
     var newAddress = $scope.data.wallet.generateAddress();
     Sweep.sendOutputs(
       $scope.walletList[0].blockchain, wif, newAddress, $scope.data.balance, $scope.outputs,
@@ -70,7 +75,6 @@ angular.module('copay.controllers')
     );
   };
 
-  $scope.loading = true;
   $scope.data = {};
   $scope.data.wallet = $scope.walletList[0];
   $scope.data.balance = 0;
