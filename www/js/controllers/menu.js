@@ -2,10 +2,11 @@
 
 angular.module('copay.controllers')
 
-.controller('SidebarCtrl', function($scope, $state, $window, $cordovaBarcodeScanner, $ionicModal, $ionicPopup, Session, Wallets, Notifications, Compatibility) {
+.controller('SidebarCtrl', function($scope, $state, $window, $cordovaBarcodeScanner, $ionicModal, $ionicPopup, Session, Wallets, Notifications, Compatibility, Sweep) {
+
   $scope.profile = Session.profile;
   $scope.wallets = Wallets.all();
-  
+
   var updateOldWallets = function() {
     Compatibility.listWalletsPre8(function(wallets) {
       $scope.anyWallet = wallets.length > 0 ? true : false;
@@ -18,12 +19,12 @@ angular.module('copay.controllers')
     updateOldWallets();
   });
 
-  // TODO: Move this to scann service
+  // TODO: Move this to scan service
   $scope.openCamera = function() {
 
     if (!$window.cordova) {
       var data = $window.prompt("Insert scanned data");
-      return data ? onScann(data) : onError(null);
+      return data ? onScan(data) : onError(null);
     }
 
     $cordovaBarcodeScanner.scan().then(onCamera, onError);
@@ -39,12 +40,15 @@ angular.module('copay.controllers')
           });
         });
       } else {
-        onScann(result.text);
+        onScan(result.text);
       }
     }
 
-    function onScann(data) {
+    function onScan(data) {
       var copay = require('copay');
+      if (Sweep.isPrivateKey(data)) {
+        return $state.go('profile.sweep', { data: data});
+      }
       if (copay.Wallet.decodeSecret(data)) {
         return $state.go('profile.add', { secret: data });
       }
@@ -61,7 +65,7 @@ angular.module('copay.controllers')
     }
 
     function onError(error) {
-      Notifications.toast("Nothing to scann there");
+      Notifications.toast("Nothing to scan there");
     }
 
   };
