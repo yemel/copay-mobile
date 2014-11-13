@@ -219,6 +219,10 @@ h3.pin-title {
 	box-shadow:         2px 1px 0px 0px rgba(32,48,64,0.10);
 }
 
+qrcode.full canvas {
+  width: 95% !important;
+} 
+
 .tabs .tab-item .badge.badge-balanced, .badge.badge-balanced {
 	background-color: #1ABC9C;
 }
