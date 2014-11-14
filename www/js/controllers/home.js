@@ -2,7 +2,8 @@
 
 angular.module('copay.controllers')
 
-.controller('HomeCtrl', function($scope, $rootScope, $state, $ionicModal, $window, $cordovaSocialSharing, $cordovaClipboard, Rates, Notifications) {
+.controller('HomeCtrl', function($scope, $rootScope, $state, $controller, $ionicModal, $window, $cordovaSocialSharing, $cordovaClipboard, Rates, Notifications) {
+  angular.extend(this, $controller('AbstractModalCtrl', {$scope: $scope}));
 
   loadCopayers();
   $scope.wallet.on('publicKeyRingUpdated', loadCopayers);
@@ -13,39 +14,10 @@ angular.module('copay.controllers')
     setTimeout(function(){ $scope.$apply(); }, 10);
   }
 
-  $scope.modal = {};
-  $ionicModal.fromTemplateUrl('templates/qr.html', {
-    scope: $scope,
-    animation: 'slide-in-up'
-  }).then(function(modal) {
-    $scope.modal = modal;
-  });
-
-  $scope.openModal = function() {
-    $scope.modal.title = "Invite copayers";
-    $scope.modal.qrData = $scope.modal.data = $scope.wallet.getSecret();
-
-    $scope.modal.show();
-  };
-
-  $scope.closeModal = function() {
-    $scope.modal.hide();
-  };
-
-  $scope.shareData = function() {
-    $cordovaSocialSharing.share($scope.wallet.getSecret());
+  $scope.inviteCopayers = function() {
+    var secret = $scope.wallet.getSecret();
+    $scope.openModal("Wallet secret", secret, secret);
   }
-
-  $scope.copyData = function() {
-    var data = $scope.wallet.getSecret();
-    if (!$window.cordova) {
-      return $window.prompt("Copy to clipboard: Ctrl+C/⌘+C, Enter", data);
-    }
-
-    $cordovaClipboard.copy(data).then(function() {
-      Notifications.toast('Secret copied');
-    });
-  };
 
   $rootScope.$on('balance', function(ev, wallet) {
     if ($scope.wallet.id == wallet.id) $scope.$apply();
