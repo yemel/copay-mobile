@@ -2,10 +2,11 @@
 
 angular.module('copay.controllers')
 
-.controller('SidebarCtrl', function($scope, $state, $window, $cordovaBarcodeScanner, $ionicModal, $ionicPopup, Session, Wallets, Notifications, Compatibility, Sweep) {
+.controller('SidebarCtrl', function($scope, Session, Wallets, Compatibility, Camera) {
 
   $scope.profile = Session.profile;
   $scope.wallets = Wallets.all();
+  $scope.camera = Camera;
 
   var updateOldWallets = function() {
     Compatibility.listWalletsPre8(function(wallets) {
@@ -19,56 +20,6 @@ angular.module('copay.controllers')
     updateOldWallets();
   });
 
-  // TODO: Move this to scan service
-  $scope.openCamera = function() {
-
-    if (!$window.cordova) {
-      var data = $window.prompt("Insert scanned data");
-      return data ? onScan(data) : onError(null);
-    }
-
-    $cordovaBarcodeScanner.scan().then(onCamera, onError);
-
-    // TODO: Should this belong to a Camera Service ?
-    function onCamera(result) {
-      if (result.cancelled) {
-        // Copyrighted Hack: http://marsbomber.com/2014/05/29/BarcodeScanner-With-Ionic/
-        $ionicModal.fromTemplate('').show().then(function() {
-          $ionicPopup.alert({
-            title: 'QR Scan Cancelled',
-            template: 'You cancelled it!'
-          });
-        });
-      } else {
-        onScan(result.text);
-      }
-    }
-
-    function onScan(data) {
-      var copay = require('copay');
-      if (Sweep.isPrivateKey(data)) {
-        return $state.go('profile.sweep', { data: data});
-      }
-      if (copay.Wallet.decodeSecret(data)) {
-        return $state.go('profile.add', { secret: data });
-      }
-
-      // TODO: Check if its an Bitcoin Address
-      if (Session.currentWallet) {
-        $state.go('profile.wallet.send', {
-          walletId: Session.currentWallet.id,
-          data: data
-        });
-      } else {
-        $state.go('profile.payment', {data: data});
-      }
-    }
-
-    function onError(error) {
-      Notifications.toast("Nothing to scan there");
-    }
-
-  };
 })
 
 // Note that Addresses, History are only injected to initializate them ASAP

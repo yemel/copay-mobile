@@ -5,8 +5,9 @@ angular.module('copay.controllers')
 .controller('SweepCtrl', function($scope, $stateParams, $state, $ionicPopup, $ionicLoading, Wallets, Sweep) {
 
   var wif = $stateParams.data;
-  var network = Sweep.getNetwork($stateParams.data);
+  var network = Sweep.getNetwork(wif);
   var address = Sweep.getAddress(wif, network);
+
   $scope.walletList = Wallets.all().filter(function(wallet) {
     return (network == 'testnet') == wallet.isTestnet();
   });
