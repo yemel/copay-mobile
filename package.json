@@ -1,6 +1,6 @@
 {
   "name": "copay-mobile",
-  "version": "1.0.0",
+  "version": "0.8.2",
   "description": "copay-mobile: A bitcoin wallet for mobiles",
   "dependencies": {
     "bower": "^1.3.12",
