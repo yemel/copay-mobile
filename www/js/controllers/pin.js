@@ -4,7 +4,7 @@
 angular.module('copay.controllers')
 
 // TODO: Abstract SetPinCtrl and PinCtrl
-.controller('PinCtrl', function($scope, $state, $stateParams, $ionicLoading, $cordovaToast, $ionicPopup, Identity, Session) {
+.controller('PinCtrl', function($window, $scope, $state, $stateParams, $ionicLoading, $cordovaToast, $ionicPopup, Identity, Session) {
 
   $scope.digits = [];
 
@@ -34,16 +34,21 @@ angular.module('copay.controllers')
   // TODO: Make Notifications work without a wallet
   var toast = function(message) {
     // Show somethig at the browser, for developing ease
-    if (!this.isNative) {
+    if (!$window.cordova) {
       $ionicLoading.show({ template: message, noBackdrop: true, duration: 2000 });
     } else {
       $cordovaToast.showLongBottom(message);
     }
   };
 
+  function onInvalidPin() {
+    toast('Invalid PIN');
+    return $scope.clear();
+  }
+
   function onPIN() {
     var credentials = Session.getCredentials($scope.digits);
-    if (!credentials) return $scope.clear();
+    if (!credentials) return onInvalidPin();
 
     $ionicLoading.show({
       template: '<i class="icon ion-loading-c"></i> Opening profile...'
@@ -51,9 +56,7 @@ angular.module('copay.controllers')
 
     Identity.openProfile(credentials, function(err, identity, wallet) {
       $ionicLoading.hide();
-      if (err) {
-        toast('Invalid PIN, please try again');
-      }
+      if (err) return onInvalidPin();
 
       Session.signin(identity);
 
@@ -91,7 +94,7 @@ angular.module('copay.controllers')
   // TODO: Make Notifications work without a wallet
   var toast = function(message) {
     // Show somethig at the browser, for developing ease
-    if (!this.isNative) {
+    if (!$window.cordova) {
       $ionicLoading.show({ template: message, noBackdrop: true, duration: 2000 });
     } else {
       $cordovaToast.showLongBottom(message);
