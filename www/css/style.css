@@ -121,9 +121,13 @@ label i.icon {
 
 .numbers {
   position: absolute;
-  height: 205px;
+  height: 55%;
   bottom: 0px;
   width: 100%;
+}
+
+.numbers .button-bar {
+  height: 25%;
 }
 
 .has-header {
@@ -211,8 +215,8 @@ h3.pin-title {
 }
 
 .box-pin {
-	margin: 20px 1%;
-	padding: 25px 0;
+	margin: 7% 1%;
+	padding: 8% 0;
 	border-radius: 2px;
 	background: #FFFFFF;
 	-moz-box-shadow:    2px 1px 0px 0px rgba(32,48,64,0.10);
