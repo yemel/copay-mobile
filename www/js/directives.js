@@ -49,7 +49,8 @@ angular.module('copay.directives', [])
           }
 
           scope.display = 'block';
-          scope.width = Math.max(parseInt((end - now) * 100 / (end-start)), 0);
+          var width = ((end - now) * 100 / (end-start)).toFixed(2);
+          scope.width = Math.max(parseFloat(width), 0.0);
           scope.margin = 100 - scope.width;
         }
 
