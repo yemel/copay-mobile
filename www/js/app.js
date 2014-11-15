@@ -6,6 +6,7 @@ angular.module('copay', [
   'yaru22.angular-timeago',
   'truncate',
   'ngCordova',
+  'ui.gravatar',
 
   'copay.controllers',
   'copay.services',
@@ -21,7 +22,16 @@ angular.module('copay', [
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
     }
   });
-})
+});
+
+angular.module('ui.gravatar').config([
+  'gravatarServiceProvider', function(gravatarServiceProvider) {
+    gravatarServiceProvider.defaults = {
+      size     : 100,
+      "default": 'mm'
+    };
+  }
+]);
 
 angular.module('copay.services', []);
 angular.module('copay.controllers', []);
