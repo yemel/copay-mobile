@@ -3,8 +3,7 @@
 
 angular.module('copay.controllers')
 
-// TODO: Abstract SetPinCtrl and PinCtrl
-.controller('PinCtrl', function($window, $scope, $state, $stateParams, $ionicLoading, $cordovaToast, $ionicPopup, Identity, Session) {
+.controller('AbstractPinCtrl', function($window, $scope, $state, $stateParams, $ionicLoading, $cordovaToast, $ionicPopup, Identity, Session) {
 
   $scope.digits = [];
 
@@ -15,9 +14,32 @@ angular.module('copay.controllers')
   $scope.press = function(digit) {
     $scope.digits.push(digit);
     if ($scope.digits.length == 4) {
-      return $scope.confirm ? onConfirm() : onPIN();
+      return $scope.onPIN();
     }
   };
+
+  $scope.onPIN = function() {
+    throw 'This should be overridden by a child controller';
+  };
+
+  $scope.onInvalidPin = function() {
+    $scope.toast('Invalid PIN');
+    return $scope.clear();
+  };
+
+  // TODO: Make Notifications work without a wallet
+  $scope.toast = function(message) {
+    if (!$window.cordova) {
+      $ionicLoading.show({ template: message, noBackdrop: true, duration: 2000 });
+    } else {
+      $cordovaToast.showLongBottom(message);
+    }
+  };
+
+})
+
+.controller('PinCtrl', function($controller, $scope, $state, $stateParams, $ionicLoading, $ionicPopup, Identity, Session) {
+  angular.extend(this, $controller('AbstractPinCtrl', {$scope: $scope}));
 
   $scope.logout = function() {
     $ionicPopup.confirm({
@@ -31,24 +53,9 @@ angular.module('copay.controllers')
     });
   };
 
-  // TODO: Make Notifications work without a wallet
-  var toast = function(message) {
-    // Show somethig at the browser, for developing ease
-    if (!$window.cordova) {
-      $ionicLoading.show({ template: message, noBackdrop: true, duration: 2000 });
-    } else {
-      $cordovaToast.showLongBottom(message);
-    }
-  };
-
-  function onInvalidPin() {
-    toast('Invalid PIN');
-    return $scope.clear();
-  }
-
-  function onPIN() {
+  $scope.onPIN = function() {
     var credentials = Session.getCredentials($scope.digits);
-    if (!credentials) return onInvalidPin();
+    if (!credentials) return $scope.onInvalidPin();
 
     $ionicLoading.show({
       template: '<i class="icon ion-loading-c"></i> Opening profile...'
@@ -56,65 +63,47 @@ angular.module('copay.controllers')
 
     Identity.openProfile(credentials, function(err, identity, wallet) {
       $ionicLoading.hide();
-      if (err) return onInvalidPin();
+      if (err) return $scope.onInvalidPin();
 
       Session.signin(identity);
 
+      // TODO: This may be replaced by the Decoder
       if ($stateParams.data) {
         $state.go('profile.payment', $stateParams);
       } else {
         $state.go('profile.wallet.home');
       }
     });
-  }
+  };
 
 })
 
-.controller('SetPinCtrl', function($scope, $state, $stateParams, $ionicLoading, $cordovaToast, Identity, Session) {
+.controller('SetPinCtrl', function($controller, $scope, $state, $stateParams, Session) {
+  angular.extend(this, $controller('AbstractPinCtrl', {$scope: $scope}));
+
   var PIN = null;
-  $scope.digits = [];
   $scope.create = true;
   $scope.confirm = false;
 
-  $scope.clear = function() {
-    $scope.digits = [];
+  $scope.onPIN = function() {
+    return $scope.confirm ? $scope.onConfirm() : $scope.setPIN($scope.digits);
   };
 
-  $scope.press = function(digit) {
-    $scope.digits.push(digit);
-    if ($scope.digits.length == 4) {
-      return $scope.confirm ? onConfirm() : onPIN();
-    }
-  };
-
-  function onPIN() {
-    setPIN($scope.digits);
-  }
-
-  // TODO: Make Notifications work without a wallet
-  var toast = function(message) {
-    // Show somethig at the browser, for developing ease
-    if (!$window.cordova) {
-      $ionicLoading.show({ template: message, noBackdrop: true, duration: 2000 });
-    } else {
-      $cordovaToast.showLongBottom(message);
-    }
-  };
-
-  function onConfirm() {
+  $scope.onConfirm = function() {
     if (angular.equals(PIN, $scope.digits)) {
       Session.setCredentials(PIN, $stateParams);
       return $state.go('profile.wallet.home');
     } else {
-      toast('PINs don\'t match, please try again');
+      $scope.toast('PINs don\'t match, please try again');
     }
 
-    setPIN(null);
-  }
+    $scope.setPIN(null);
+  };
 
-  function setPIN(pin) {
+  $scope.setPIN = function(pin) {
     PIN = pin;
     $scope.clear();
     $scope.confirm = !$scope.confirm;
-  }
+  };
+
 });
