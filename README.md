@@ -6,7 +6,7 @@ using the multisig power of Copay and making it context aware.
 
 ## Install
 
-    sudo npm install -g cordova ionic
+    sudo npm install -g cordova ionic gulp
     git clone https://github.com/yemel/copay-mobile.git
     cd copay-mobile
     npm install

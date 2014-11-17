@@ -33,11 +33,4 @@ angular.module('copay.controllers')
     return Proposals.filter($scope.wallet, { status: Proposals.STATUS.pending }).length;
   };
 
-  // Inexistent Wallet, redirect to default one
-  if (!$scope.wallet) {
-    var defualtWallet = Wallets.all()[0]; // TODO: Use last opened wallet
-    return $state.go('profile.wallet.home', {walletId: defualtWallet.id});
-  }
-
-
 });
