@@ -7,7 +7,7 @@ angular.module('copay.services')
   var Session = function() {
     this.identity = null;
     this.pin = null;
-    this.currentWallet = null;
+    this.currentWallet = null; // TODO: Try to replace this with $stateParams.walletId
   };
 
   Session.prototype.signin = function(identity) {

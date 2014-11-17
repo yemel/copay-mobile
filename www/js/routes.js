@@ -166,11 +166,10 @@ angular.module('copay')
   $urlRouterProvider.otherwise('/');
 })
 
-.run(['$state', '$window', function ($state, $window) {
+.run(['$state', '$window', function ($state, $window, Decoder) {
 
   function handleBitcoinIntent(url) {
-    if (!url) return;
-    $state.go('profile.payment', {data: url});
+    Decoder.process(data);
   }
 
   $window.handleOpenURL = handleBitcoinIntent;
