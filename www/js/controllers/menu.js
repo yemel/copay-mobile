@@ -2,11 +2,13 @@
 
 angular.module('copay.controllers')
 
-.controller('SidebarCtrl', function($scope, Session, Wallets, Compatibility, Camera) {
+.controller('SidebarCtrl', function($scope, Session, Wallets, Compatibility, Camera, Notifications) {
 
   $scope.profile = Session.profile;
   $scope.wallets = Wallets.all();
   $scope.camera = Camera;
+
+  Notifications.subscribeAll($scope.wallets);
 
   var updateOldWallets = function() {
     Compatibility.listWalletsPre8(function(wallets) {

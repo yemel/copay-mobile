@@ -2,18 +2,20 @@
 
 angular.module('copay.services')
 
-.factory('Notifications', function($rootScope, $window, $ionicLoading, $cordovaToast, $cordovaLocalNotification, Wallets) {
+.factory('Notifications', function($rootScope, $window, $ionicLoading, $cordovaToast, $cordovaLocalNotification) {
 
   function Notifications() {
     this.isNative = !!$window.cordova;
 
     var self = this;
-    Wallets.all().forEach(self.subscribeWallet.bind(self));
-
     $rootScope.$on('new-wallet', function(ev, wallet) {
-      self.subscribeWallet(wallet); // TODO: Use bind method
+      self.subscribeWallet(wallet);
     });
   };
+
+  Notifications.prototype.subscribeAll = function(wallets) {
+    wallets.forEach(this.subscribeWallet.bind(this));
+  }
 
   Notifications.prototype.subscribeWallet = function(wallet) {
     var self = this;
