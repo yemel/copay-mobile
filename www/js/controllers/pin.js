@@ -27,6 +27,11 @@ angular.module('copay.controllers')
     return $scope.clear();
   };
 
+  $scope.goHome = function() {
+    var wallet = Session.identity.getLastFocusedWallet();
+    $state.go('profile.wallet.home', {walletId: wallet.id});
+  };
+
 })
 
 .controller('PinCtrl', function($controller, $scope, $state, $stateParams, $ionicLoading, $ionicPopup, Identity, Session) {
@@ -62,7 +67,7 @@ angular.module('copay.controllers')
       if ($stateParams.data) {
         $state.go('profile.payment', $stateParams);
       } else {
-        $state.go('profile.wallet.home');
+        $scope.goHome();
       }
     });
   };
@@ -83,7 +88,7 @@ angular.module('copay.controllers')
   $scope.onConfirm = function() {
     if (angular.equals(PIN, $scope.digits)) {
       Session.setCredentials(PIN, $stateParams);
-      return $state.go('profile.wallet.home');
+      return $scope.goHome();
     } else {
       Notifications.toast('PINs don\'t match, please try again');
     }
